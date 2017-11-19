@@ -1,12 +1,15 @@
 package simulation;
 
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 
 import map.MapPanel;
 
 public class FrameManager extends JFrame{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	MapPanel mapPanel;
 	Simulation simulation;
 	

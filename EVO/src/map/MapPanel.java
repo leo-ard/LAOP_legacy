@@ -4,25 +4,32 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.Image;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import javax.swing.JLabel;
+import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
+import core.CONSTANTS;
 import espece.Espece;
 import map.obstacle.Obstacle;
 
 public class MapPanel extends JPanel implements MouseMotionListener, MouseListener, MouseWheelListener{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	final int ZOOM_MINIMUM = 0;
 	final int ZOOM_MAXIMUM = 100;
 	
@@ -48,24 +55,41 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 	//temp
 	boolean D, G;
 	
+	//images;
+	public static Image IMG_VOITURE;
+	
 	public MapPanel(Map map, int w, int h) {
 		this.setPreferredSize(new Dimension(w, h));
 		this.w = w;
 		this.h = h;
 		this.map = map;
 		
-		this.viewX =0;
-		this.viewY = 0;
-		this.zoom = 1;
+		
+		this.zoom = 0.40f;
+		this.viewX =(int) ((-map.depart.x+ w/2)*zoom);
+		this.viewY =(int) ((-map.depart.y+ h/2)*zoom);
+		
+		this.loadImages();
 		this.addMouseMotionListener(this);
 		this.addMouseWheelListener(this);
 		this.addMouseListener(this);
+		
+		//this.mouseWheelMoved(new MouseWheelEvent(this, 0, 0, 0, 0, 0, 0, true, 0, 0, 0));
 		
 		Timer uploadCheckerTimer = new Timer(true);
 		uploadCheckerTimer.scheduleAtFixedRate(
 		    new TimerTask() {
 		      public void run() { repaint(); }
 		    }, 0, 16);
+	}
+	
+	public void loadImages() {
+		try {
+			BufferedImage temp  = ImageIO.read(new File(CONSTANTS.SRC_VOITURE));
+			IMG_VOITURE = temp.getScaledInstance(Espece.ESPECES_WIDTH, Espece.ESPECES_HEIGHT, Image.SCALE_DEFAULT);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	@Override
@@ -77,33 +101,43 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 		g.translate((viewX+offX)*(1.0/(double)zoom), (viewY+offY)*(1.0/(double)zoom));
 		
 		//background
-		g.setColor(new Color(255, 200, 120));
+		g.setColor(new Color(255, 178, 102));
 		g.fillRect(0, 0, map.mx, map.my);
-		g.setColor(Color.black);
-		g.drawRect(0, 0, map.mx, map.my);
+		
+		
+		//ellipse size
+		int s = 100;
+		g.setColor(Color.green);
+		g.fillOval(map.depart.x-s/2, map.depart.y-s/2, s, s);
+		
+		g.setColor(Color.YELLOW);
+		//g.fillOval(map.destination.x-s/2, map.destination.y-s/2, s, s);
+		
+		
 		
 		//draws map obstacle
-		g.setColor(new Color(255, 50, 50));
+		g.setColor(new Color(255, 51, 51));
 		for(Obstacle o : map.obstacles) {
 			o.draw(g);
 		}
+		
+		//contour
+		g.setColor(Color.black);
+		g.drawRect(0, 0, map.mx, map.my);
 		
 		g.setColor(Color.blue);
 		for(Espece e : map.simulation.especes) {
 			e.draw(g);
 		}
 		
-		//g.rotate(0);
-		
-		try {
-			//System.out.println(this.getMousePosition());
-			//System.out.println((viewX+offX)*(1.0/(double)zoom) - this.getMousePosition().getX()*(1.0/(double)zoom));
-		}catch(Exception e) {
-			
-		}
 		
 		
-		g.translate(0, 0);
+		
+		g.setTransform(new AffineTransform());
+		g.setColor(Color.black);
+		g.drawString("Version alpha 1.1 - Laboratoire de recherche LRIMA", 10, 20);
+		g.drawString(""+map.simulation.time/1000, 10,40);
+		
 	}
 	
 	public int addZoom(int x) {

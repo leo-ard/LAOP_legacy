@@ -1,12 +1,8 @@
 package simulation;
 
-import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
-
-import javax.swing.JFrame;
-import javax.swing.Timer;
 
 import espece.Espece;
 import espece.capteur.Capteur;
@@ -45,7 +41,7 @@ public class Simulation extends Thread implements KeyListener{
 		
 		
 		for(int i = 0; i < 1; i++) {
-			especes.add(new Espece(map.depart));
+			especes.add(new Espece(map.depart, map.orientation));
 		}
 		
 		frame.setVisible(true);
@@ -61,40 +57,47 @@ public class Simulation extends Thread implements KeyListener{
 	}
 	
 	public void run() {
-		long dt = 16;
+		double dt = 1000/60;
 		long currTime = System.currentTimeMillis();
 		long timePassed;
 		while(true) {
-			timePassed = System.currentTimeMillis() - currTime;
+			currTime = System.currentTimeMillis();
+			
 			time += dt;
 			for(Espece e : especes) {
-				e.update(dt, D?1:0, G?1:0);
+				e.resetCapteur();
 				for(Obstacle o : map.obstacles) {
 					if(o.fastCollision(e)) {
 						for(Capteur c : e.capteurs) {
-							o.getCapteurValue(c);
+							c.setValue(o.getCapteurValue(c));
 						}
 						
 						
 						if(o.collision(e)) {
 							e.tp(map.depart);
+							e.setAngle(map.orientation);
 						}
 					}
 				}
 			}
 			
+			for(Espece e : especes) {
+				e.update(dt, D?1:0, G?1:0);
+			}
+			
 			
 			
 			try {
+				timePassed = System.currentTimeMillis() - currTime;
 				if(timePassed > 16) {
 					System.out.println("ERROR - NOT ANOUGHT TIME");
 				}
-				
-				Simulation.sleep((1000/60 - timePassed) > 0 ?1000/60 - timePassed: 0 );
+				//System.out.println(timePassed);
+				Simulation.sleep((long) ((dt - timePassed) > 0 ?dt - timePassed: 0));
 			} catch (InterruptedException e1) {
 				e1.printStackTrace();
 			}
-			currTime = System.currentTimeMillis();
+			
 			
 			
 		}
@@ -123,9 +126,6 @@ public class Simulation extends Thread implements KeyListener{
 	}
 
 	@Override
-	public void keyTyped(KeyEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void keyTyped(KeyEvent e) {}
 
 }

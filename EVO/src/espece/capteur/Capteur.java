@@ -1,58 +1,44 @@
 package espece.capteur;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
 
 import espece.Espece;
-import simulation.Simulation;
 
 public class Capteur {
 	
-	public static final int CAPTEUR_LENGHT = 100;
+	public static final int CAPTEUR_LENGHT = 2000;
 	
 	Espece e;
 	double angle;
 	double calAngle;
 	double x, y;
+	double value;
 	
 	public Capteur(Espece e, double angle, int x, int y) {
 		this.e = e;
 		this.angle = Math.toRadians(angle);
 		this.x = x;
 		this.y = y;
+		value = 1;
 	}
 	
 	public void update() {
-		calAngle = this.angle + this.e.tetha;
+		value = 1;
 	}
 	
-	public double getValue() {
-		double a = e.tetha-angle;
+	public void setValue(double v) {
+		if(v <= value) {
+			value= v;
+		}
 		
-		double u = CAPTEUR_LENGHT * Math.cos(a);
-		double v = CAPTEUR_LENGHT * Math.sin(a);
-		//System.out.println(Math.toDegrees(e.tetha));
-		
-		
-		
-		return 0.0;
 	}
 	
 	public void draw(Graphics2D g, double a) {
-		
-		
-		
+		g.setColor(Color.CYAN);
 		g.drawLine((int)this.getX1(), (int)this.getY1(),(int)this.getX1()+ (int)this.getXRealtive(),(int)this.getY1()+  (int)this.getYRealtive());
-		
-		//this.getValue();
-		/*AffineTransform af = g.getTransform();
-		g.translate(e.x + x, e.y + y);
-		g.rotate(a);
-		g.drawLine(0, 0,(int)( CAPTEUR_LENGHT*Math.sin(a+angle)),(int)(CAPTEUR_LENGHT* Math.cos(a+angle)));
-		g.setTransform(af);*/
+		g.setColor(Color.BLACK);
+		g.drawRect((int)this.getX1()+ (int)(this.getXRealtive()*value),(int)this.getY1()+  (int)(this.getYRealtive()*value), 1, 1);
 	}
 	
 	public double getX1() {
@@ -76,6 +62,11 @@ public class Capteur {
 	public double getAngle() {
 		double a = e.tetha-angle;
 		return a;
+	}
+
+	public double getValue() {
+		// TODO Auto-generated method stub
+		return value;
 	}
 
 
