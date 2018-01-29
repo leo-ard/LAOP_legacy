@@ -31,8 +31,8 @@ public class ObstcaleRect extends Obstacle {
 		int ew =w+h/2 + Capteur.CAPTEUR_LENGHT*2;
 		int eh =w+h/2 + Capteur.CAPTEUR_LENGHT*2;
 		
-		double ex = e.x-ew/2;
-		double ey = e.y-eh/2;
+		double ex = e.getX()-ew/2;
+		double ey = e.getY()-eh/2;
 		
 		
 		if(ex < x + w && ex + ew > this.x && ey < y + h && ey + eh > this.y) {
@@ -43,12 +43,7 @@ public class ObstcaleRect extends Obstacle {
 
 	@Override
 	public boolean collision(Espece e) {
-		
-		
-		
-		
-		
-		Point2D.Double[] points = this.getPoints(e);
+		Point2D.Double[] points = this.getCoins(e);
 		
 		for(Point2D p : points) {
 			if(p.getX() < this.x + this.w && p.getX() > this.x && p.getY() < this.y + this.h && p.getY() > this.y) {
@@ -60,10 +55,6 @@ public class ObstcaleRect extends Obstacle {
 		return false;
 	}
 	
-	/**
-	 * 
-	 * @author Léonard Oest O'Leary
-	 */
 	@Override
 	public double getCapteurValue(Capteur c) {
 		return this.getCapteurValueForRect(c, w, h);

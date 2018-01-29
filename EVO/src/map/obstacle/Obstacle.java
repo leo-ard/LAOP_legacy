@@ -6,7 +6,7 @@ import java.awt.geom.Point2D;
 import espece.Espece;
 import espece.capteur.Capteur;
 
-public abstract class Obstacle implements ObstacleInterface{
+public abstract class Obstacle implements IObstacle{
 	
 	int x;
 	int y;
@@ -16,7 +16,14 @@ public abstract class Obstacle implements ObstacleInterface{
 		this.y = y;
 	}
 	
-	public Point2D.Double[] getPoints(Espece e) {
+	/**
+	 * 
+	 * Retourne la position des quatres coins d'une espèce
+	 * 
+	 * @param e
+	 * @return
+	 */
+	protected Point2D.Double[] getCoins(Espece e) {
 		
 		/*
 		 *   0     1
@@ -25,35 +32,35 @@ public abstract class Obstacle implements ObstacleInterface{
 		 */
 		
 		
-		double angle = e.tetha;
+		double angle = e.getOrientation();
 		double cos = Math.cos(angle);
 		double sin = Math.sin(angle);
 		
 		Point2D.Double[] points = new Point2D.Double[4];
 		
-		double tx = -e.w/2;
-		double ty = -e.h/2;
-		points[0] = new Point2D.Double(e.x + tx * cos - ty * sin,  e.y + tx * sin + ty * cos);
+		double tx = -e.getWidth()/2;
+		double ty = -e.getHeight()/2;
+		points[0] = new Point2D.Double(e.getX() + tx * cos - ty * sin,  e.getY() + tx * sin + ty * cos);
 		
-		tx = e.w/2;
-		ty = -e.h/2;
-		points[1] = new Point2D.Double(e.x + tx * cos - ty * sin,  e.y + tx * sin + ty * cos);
+		tx = e.getWidth()/2;
+		ty = -e.getHeight()/2;
+		points[1] = new Point2D.Double(e.getX() + tx * cos - ty * sin,  e.getY() + tx * sin + ty * cos);
 		
-		tx = -e.w/2;
-		ty = e.h/2;
-		points[2] = new Point2D.Double(e.x + tx * cos - ty * sin,  e.y + tx * sin + ty * cos);
+		tx = -e.getWidth()/2;
+		ty = e.getHeight()/2;
+		points[2] = new Point2D.Double(e.getX() + tx * cos - ty * sin,  e.getY() + tx * sin + ty * cos);
 		
-		tx = e.w/2;
-		ty = e.h/2;
-		points[3] = new Point2D.Double(e.x + tx * cos - ty * sin,  e.y + tx * sin + ty * cos);
+		tx = e.getWidth()/2;
+		ty = e.getHeight()/2;
+		points[3] = new Point2D.Double(e.getX() + tx * cos - ty * sin,  e.getY() + tx * sin + ty * cos);
 		
 		return points;
 	}
 	
-	public double getCapteurValueForRect(Capteur c, int w,int h) {
+	protected double getCapteurValueForRect(Capteur c, int w,int h) {
 		
-		double xRel = c.getXRealtive();
-		double yRel = c.getYRealtive();
+		double xRel = c.getLongeurX();
+		double yRel = c.getLongeurY();
 		
 		Line2D.Double line = new Line2D.Double(c.getX1(), c.getY1(), c.getX1()+xRel, c.getY1()+yRel);
 		
@@ -87,7 +94,7 @@ public abstract class Obstacle implements ObstacleInterface{
 		return v;
 	}
 	
-	private double addValue(double value, double value2) {
+	protected double addValue(double value, double value2) {
 		if(value > value2 ) {
 			return value2;
 		}

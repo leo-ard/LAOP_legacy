@@ -26,7 +26,7 @@ public class ObstacleContour extends Obstacle{
 
 	@Override
 	public boolean collision(Espece e) {
-		Point2D.Double[] points = this.getPoints(e);
+		Point2D.Double[] points = this.getCoins(e);
 		
 		for(Point2D.Double p : points) {
 			if(p.x < x || p.y < this.y || p.x > this.x + this.w || p.y > this.y + this.h) 

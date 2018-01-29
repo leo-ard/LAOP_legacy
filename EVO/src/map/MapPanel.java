@@ -21,6 +21,7 @@ import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
 import core.CONSTANTS;
+import core.EVO;
 import espece.Espece;
 import map.obstacle.Obstacle;
 
@@ -102,7 +103,7 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 		
 		//background
 		g.setColor(new Color(255, 178, 102));
-		g.fillRect(0, 0, map.mx, map.my);
+		g.fillRect(0, 0, map.w, map.h);
 		
 		
 		//ellipse size
@@ -123,11 +124,12 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 		
 		//contour
 		g.setColor(Color.black);
-		g.drawRect(0, 0, map.mx, map.my);
+		g.drawRect(0, 0, map.w, map.h);
 		
 		g.setColor(Color.blue);
-		for(Espece e : map.simulation.especes) {
-			e.draw(g);
+		for(Espece e : map.simulation.getEspeces()) {
+			if(e!= null)
+				e.draw(g);
 		}
 		
 		
@@ -146,13 +148,24 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 	
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		//requestFocus();
+		
 	}
 
 	@Override
 	public void mousePressed(MouseEvent e) {
 		mx = e.getX()-viewX;
 		my = e.getY()-viewY;
+		
+		int ex = (int) ((e.getX()-viewX-offX)*(1.0/(double)zoom));
+		int ey = (int) ((e.getY()-viewY-offY)*(1.0/(double)zoom));
+		System.out.println(ex+" "+ey);
+		int proche;
+		for(Espece espece : map.simulation.getEspeces()) {
+			if(ex <= espece.getX() + espece.getWidth() && ex >= espece.getX() && ey <= espece.getY() + espece.getWidth() && ey >= espece.getY()) {
+				EVO.simulation.getFrameManager().changeNetworkFocus(espece);
+			}
+			
+		}
 	}
 	@Override
 	public void mouseReleased(MouseEvent e) {

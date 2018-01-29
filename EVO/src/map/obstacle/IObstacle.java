@@ -5,7 +5,7 @@ import java.awt.Graphics;
 import espece.Espece;
 import espece.capteur.Capteur;
 
-public interface ObstacleInterface {
+public interface IObstacle {
 
 	public boolean collision(Espece e);
 	

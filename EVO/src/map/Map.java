@@ -17,25 +17,25 @@ public class Map {
 	public Point depart;
 	public Simulation simulation;
 	
-	public int mx, my;
+	public int w, h;
 	public int orientation;
 	
 	public Map(String s, Simulation sim) {
 		this.obstacles = new ArrayList<Obstacle>();
 		
 		this.simulation = sim;
-		this.mx = 8800;
-		this.my = 2000;
+		this.w = 8800;
+		this.h = 2000;
 		
 		this.obstacles.add(new ObstcaleRect(1800, 0, 400,1100));
 		this.obstacles.add(new ObstcaleRect(3800, 900, 400,1100));
 		this.obstacles.add(new ObstcaleRect(5800, 0, 400,1100));
-		this.obstacles.add(new ObstacleContour(0, 0, mx, my));
-		this.obstacles.add(new ObstacleArrivee(8000, 0, 800, my));
+		this.obstacles.add(new ObstacleContour(0, 0, w, h));
+		this.obstacles.add(new ObstacleArrivee(8000, 0, 800, h));
 		
-		this.depart = new Point(400,400);
+		this.depart = new Point(200,1000);
 		this.destination = new Point(7600, 1600);
-		this.orientation = 45;
+		this.orientation = 0;
 	}
 	
 	public void update(ArrayList<Espece> especes) {
