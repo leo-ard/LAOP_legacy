@@ -57,15 +57,16 @@ public class Simulation extends Thread implements KeyListener{
 	}
 	
 	public void run() {
-		dt = 1000/120;
+		dt = 1000/60;
 		long currTime = System.currentTimeMillis();
 		long timePassed;
 		while(true) {
 			if(!pausing) {
 				currTime = System.currentTimeMillis();
+				boolean d = D, g = G;
 				
 				for(Espece e : especesOpen) {
-					e.update(dt, D?1:0, G?1:0);
+					e.update(dt, d?1:0, g?1:0);
 				}
 				
 				time += dt;
@@ -81,10 +82,13 @@ public class Simulation extends Thread implements KeyListener{
 							
 							if(o.collision(e)) {
 								//e.update(dt,0,0);
+								try {
 								e.kill();
 								especesClosed.add(e);
 								especesOpen.remove(i);
-								continue;
+								}catch(Exception e1) {
+									System.err.println("FATAL");
+								}
 							}
 						}
 					}
@@ -132,22 +136,34 @@ public class Simulation extends Thread implements KeyListener{
 			}
 		});
 		
-		for(int i = 0; i < especesClosed.size(); i++) {
-			if(especesClosed.size() <= 50)
-				break;
+		this.getFrameManager().changeNetworkFocus(especesClosed.get(0));
+		
+		/*for(int i = 0; i < especesClosed.size() && especesClosed.size() >= CONSTANTS.NUMBERCARS/2; i++) {
 			if(Math.random()*CONSTANTS.NUMBERCARS+1 < i) {
-				System.out.println(i);
+				//System.out.println(especesClosed.get(i).getFitness());
 				especesClosed.remove(i);
-				
 			}
-		}
-		for(Espece e : especesClosed) {
+			else {
+				especesClosed.get(i).tpLikeNew(map.depart,map.orientation);
+			}
+		}*/
+		//System.out.println("-----------------------------------");
+		/*for(Espece e : especesClosed) {
+			//System.out.println(e.getFitness());
+			
 			/*Espece e1 = new Espece(e);
 			e1.mutate();
-			especesClosed.add(e1);*/
-		}
+			especesClosed.add(e1);
+		}*/
 		
-		System.out.println(especesClosed);
+		/*while (especesClosed.size() < CONSTANTS.NUMBERCARS) {
+			especesClosed.add(new Espece(map.depart, map.orientation));
+		}*/
+		
+		/*especesOpen =  especesClosed;
+		especesClosed = new ArrayList<Espece>();*/
+		//System.out.println(especesOpen.size());
+		//System.out.println(especesClosed);
 		//especesOpen = especesClosed;
 		this.resetAndAddEspeces();
 		/*especesOpen = especesClosed;

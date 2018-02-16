@@ -2,16 +2,21 @@ package espece.network;
 
 import java.util.ArrayList;
 
+import espece.network.functions.Function;
+import espece.network.functions.IFunction;
+
 public class Neuron {
 	private ArrayList<Connection> inputs;
 	private Layer layer;
 	private int index;
 	private double value;
+	private IFunction function;
 	
 	public Neuron(Layer l, int index) {
+		this.function = Function.getRandom();
 		this.layer = l;
 		this.index = index;
-		inputs = new ArrayList<Connection>();
+		this.inputs = new ArrayList<Connection>();
 	}
 	
 	public Neuron(Layer l, int index, double value) {
@@ -25,7 +30,7 @@ public class Neuron {
 		for(Connection c : inputs) {
 			sum += c.getWeight() * c.getNeuron().getValue();
 		}
-		this.value = sum;
+		this.value = this.function.getValue(sum);
 	}
 	
 	public void setValue(double value) {

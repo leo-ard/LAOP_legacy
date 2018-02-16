@@ -1,5 +1,6 @@
 package map.obstacle;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.geom.Line2D;
@@ -92,7 +93,8 @@ public class ObstcaleRect extends Obstacle {
 	@Override
 	public void draw(Graphics g) {
 		g.fillRect(x, y, w, h);
-		
+		//g.setColor(Color.black);
+		g.drawRect(x, y, w, h);
 	}
 
 	

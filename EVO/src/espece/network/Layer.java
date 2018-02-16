@@ -40,7 +40,6 @@ public class Layer implements Iterable<Neuron>{
 		
 	}
 
-	@Override
 	public Iterator<Neuron> iterator() {
 		return neurons.iterator();
 	}

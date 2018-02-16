@@ -17,6 +17,7 @@ public class NeuralNetwork {
 		nbOutputs = outputs;
 		layers = new ArrayList<Layer>();
 		createDefaultLayers();
+		
 	}
 	
 	public void update(double...inputs) {
@@ -44,8 +45,12 @@ public class NeuralNetwork {
 		}
 		this.layers.add(layer2);
 		
-		this.addRandomConnection();
-		this.addRandomConnection();
+		for(Neuron neuron1:layers.get(0)) {
+			for(Neuron neuron2:layers.get(1)) {
+				neuron2.addConnection(new Connection(neuron1));
+			}
+		}
+		//this.addRandomConnection();
 		
 	}
 	

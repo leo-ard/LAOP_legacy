@@ -56,7 +56,7 @@ public class Espece {
 	}
 
 	public Espece(Espece e) {
-		NeuralNetwork n = e.getNeuralNetwork();
+		neuralNetwork = e.getNeuralNetwork();
 	}
 
 	
@@ -76,10 +76,9 @@ public class Espece {
 		D = values[0];
 		G = values[1];
 		
-		
-		orientationRad += Math.toRadians((double)D*dt/10.0 - (double)G*dt/10.0);
-		acceleration = D*dt*CONSTANTS.VITESSE_VOITURE/100 + G*dt*CONSTANTS.VITESSE_VOITURE/100 ;
-		vitesse += acceleration/3 - vitesse/50;
+		orientationRad += Math.toRadians(D*dt - G*dt)*CONSTANTS.TURNRATE;
+		acceleration = D*dt*CONSTANTS.VITESSE_VOITURE/100 + G*dt*CONSTANTS.VITESSE_VOITURE/100;
+		vitesse += acceleration - vitesse;
 		
 		if(vitesse < 0) {
 			vitesse = 0;
@@ -165,6 +164,28 @@ public class Espece {
 	public ArrayList<Capteur> getCapteursList() {
 		// TODO Auto-generated method stub
 		return capteurs;
+	}
+
+	public boolean contains(Point point) {
+		
+		return false;
+	}
+
+	/**
+	 * Tp la voiure au point départ et lui donne une orientation orientation.
+	 * 
+	 * De plus, l'acceleration et la vitesse sont mise a zéro
+	 * 
+	 * @param depart
+	 * @param orientation
+	 */
+	public void tpLikeNew(Point depart, int orientation) {
+		this.acceleration = 0;
+		this.vitesse = 0;
+		this.x = depart.getX();
+		this.y = depart.getY();
+		this.orientationRad = Math.toRadians(orientation);
+		
 	}
 	
 	

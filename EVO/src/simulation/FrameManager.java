@@ -22,9 +22,9 @@ public class FrameManager extends JFrame{
 	public FrameManager(String s, Simulation simulation) {
 		super(s);
 		mapPanel = new MapPanel(simulation.map, 1000, 500);
-		networkPanel = new NetworkPanel(simulation.especesOpen.get(0).getNeuralNetwork(), 1000, 200);
+		//networkPanel = new NetworkPanel(simulation.especesOpen.get(0).getNeuralNetwork(), 1000, 200);
 		this.add(mapPanel);
-		this.add(networkPanel, BorderLayout.SOUTH);
+		//this.add(networkPanel, BorderLayout.SOUTH);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.pack();
 	}
@@ -36,7 +36,7 @@ public class FrameManager extends JFrame{
 	}
 
 	public void changeNetworkFocus(Espece e) {
-		networkPanel.network = e.getNeuralNetwork();
+		//networkPanel.network = e.getNeuralNetwork();
 		
 	}
 

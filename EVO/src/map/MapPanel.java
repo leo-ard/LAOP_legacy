@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -34,37 +35,27 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 	final int ZOOM_MINIMUM = 0;
 	final int ZOOM_MAXIMUM = 100;
 	
-	Map map;
-	
-	//Width and height of the JPanel
-	int w, h;
-	
-	//Width and height of the map
-	int mw, mh;
+	private Map map;
 	
 	//View range
-	int viewX, viewY;
-	int offX, offY;
-	float zoom;
-	int scale = 1;
-	
+	private int viewX, viewY;
+	private int offX, offY;
+	private float zoom;
 	
 	//drag n drop
-	int mx, my;
-	boolean dragging;
+	private int lastMousePositionX, lastMousePositionY;
+	private boolean dragging;
 	
 	//temp
 	boolean D, G;
 	
 	//images;
 	public static Image IMG_VOITURE;
+	public static Image IMG_LRIMA;
 	
 	public MapPanel(Map map, int w, int h) {
 		this.setPreferredSize(new Dimension(w, h));
-		this.w = w;
-		this.h = h;
 		this.map = map;
-		
 		
 		this.zoom = 0.40f;
 		this.viewX =(int) ((-map.depart.x+ w/2)*zoom);
@@ -88,6 +79,7 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 		try {
 			BufferedImage temp  = ImageIO.read(new File(CONSTANTS.SRC_VOITURE));
 			IMG_VOITURE = temp.getScaledInstance(Espece.ESPECES_WIDTH, Espece.ESPECES_HEIGHT, Image.SCALE_DEFAULT);
+			IMG_LRIMA = ImageIO.read(new File(CONSTANTS.SRC_LRIMA)).getScaledInstance(130,95, Image.SCALE_DEFAULT);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -132,45 +124,37 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 				e.draw(g);
 		}
 		
-		
-		
-		
 		g.setTransform(new AffineTransform());
 		g.setColor(Color.black);
 		g.drawString("Version alpha 1.1 - Laboratoire de recherche LRIMA", 10, 20);
 		g.drawString(""+map.simulation.time/1000, 10,40);
-		
-	}
-	
-	public int addZoom(int x) {
-		return (int)(x *zoom);
+		g.drawImage(IMG_LRIMA,this.getWidth()-150,this.getHeight()-105,null);
 	}
 	
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		
-	}
-
-	@Override
-	public void mousePressed(MouseEvent e) {
-		mx = e.getX()-viewX;
-		my = e.getY()-viewY;
-		
 		int ex = (int) ((e.getX()-viewX-offX)*(1.0/(double)zoom));
 		int ey = (int) ((e.getY()-viewY-offY)*(1.0/(double)zoom));
 		System.out.println(ex+" "+ey);
 		int proche;
 		for(Espece espece : map.simulation.getEspeces()) {
-			if(ex <= espece.getX() + espece.getWidth() && ex >= espece.getX() && ey <= espece.getY() + espece.getWidth() && ey >= espece.getY()) {
+			if(espece.contains(new Point(ex, ey))) {
 				EVO.simulation.getFrameManager().changeNetworkFocus(espece);
 			}
-			
 		}
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+		lastMousePositionX = e.getX()-viewX;
+		lastMousePositionY = e.getY()-viewY;
+		
+		
 	}
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		viewX = (int) (e.getX()-mx);
-		viewY = (int) (e.getY()-my);
+		viewX = (int) (e.getX()-lastMousePositionX);
+		viewY = (int) (e.getY()-lastMousePositionY);
 	}
 
 	@Override
@@ -190,8 +174,8 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		viewX = (int) (e.getX()-mx);
-		viewY = (int) (e.getY()-my);
+		viewX = (int) (e.getX()-lastMousePositionX);
+		viewY = (int) (e.getY()-lastMousePositionY);
 		//repaint();
 	}
 

@@ -43,9 +43,14 @@ public class Capteur {
 	 */
 	public void draw(Graphics2D g, double a) {
 		g.setColor(Color.CYAN);
-		g.drawLine((int)this.getX1(), (int)this.getY1(),(int)this.getX1()+ (int)this.getLongeurX(),(int)this.getY1()+  (int)this.getLongeurY());
+		int x1 = (int)(e.getX()+x);
+		int y1 = (int)(e.getY()-y);
+		int lx = (int) (CAPTEUR_LENGHT*Math.cos(-this.angle));
+		int ly = (int) (CAPTEUR_LENGHT*Math.sin(-this.angle));
+		
+		g.drawLine(x1,y1,x1+lx,y1-ly);
 		g.setColor(Color.BLACK);
-		g.drawRect((int)this.getX1()+ (int)(this.getLongeurX()*value),(int)this.getY1()+  (int)(this.getLongeurY()*value), 1, 1);
+		g.drawRect(x1+ (int)(lx*value),y1- (int)(ly*value), 1, 1);
 	}
 	
 	public double getX1() {
