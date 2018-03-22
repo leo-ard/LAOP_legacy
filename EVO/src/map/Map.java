@@ -24,14 +24,59 @@ public class Map {
 		this.obstacles = new ArrayList<Obstacle>();
 		
 		this.simulation = sim;
-		this.w = 8800;
+		this.w = 11000;
 		this.h = 2000;
 		
-		this.obstacles.add(new ObstcaleRect(1800, 0, 400,1100));
-		this.obstacles.add(new ObstcaleRect(3800, 900, 400,1100));
-		this.obstacles.add(new ObstcaleRect(5800, 0, 400,1100));
+		this.obstacles.add(new ObstcaleRect(2000, 0, 400,1700));
+		
+		this.obstacles.add(new ObstcaleRect(4000, 300, 400,1700));
+		
+		/*int x = 1000;
+		this.obstacles.add(new ObstcaleRect(4000+x, 100, 200, 200));
+		this.obstacles.add(new ObstcaleRect(4000+x, 500, 200, 200));
+		this.obstacles.add(new ObstcaleRect(4000+x, 900, 200, 200));
+		this.obstacles.add(new ObstcaleRect(4000+x, 1300, 200, 200));
+		this.obstacles.add(new ObstcaleRect(4000+x, 1700, 200, 200));
+		
+		x = 1600;
+		this.obstacles.add(new ObstcaleRect(4000+x, 100, 200, 200));
+		this.obstacles.add(new ObstcaleRect(4000+x, 500, 200, 200));
+		this.obstacles.add(new ObstcaleRect(4000+x, 900, 200, 200));
+		this.obstacles.add(new ObstcaleRect(4000+x, 1300, 200, 200));
+		this.obstacles.add(new ObstcaleRect(4000+x, 1700, 200, 200));
+		
+		x = 2200;
+		this.obstacles.add(new ObstcaleRect(4000+x, 100, 200, 200));
+		this.obstacles.add(new ObstcaleRect(4000+x, 500, 200, 200));
+		this.obstacles.add(new ObstcaleRect(4000+x, 900, 200, 200));
+		this.obstacles.add(new ObstcaleRect(4000+x, 1300, 200, 200));
+		this.obstacles.add(new ObstcaleRect(4000+x, 1700, 200, 200));
+		
+		x = 2800;
+		this.obstacles.add(new ObstcaleRect(4000+x, 100, 200, 200));
+		this.obstacles.add(new ObstcaleRect(4000+x, 500, 200, 200));
+		this.obstacles.add(new ObstcaleRect(4000+x, 900, 200, 600));
+		this.obstacles.add(new ObstcaleRect(4000+x, 1300, 200, 200));
+		this.obstacles.add(new ObstcaleRect(4000+x, 1700, 200, 200));
+		
+		x = 3400;
+		this.obstacles.add(new ObstcaleRect(4000+x, 100, 200, 200));
+		this.obstacles.add(new ObstcaleRect(4000+x, 500, 600, 200));
+		this.obstacles.add(new ObstcaleRect(4000+x, 900, 200, 200));
+		this.obstacles.add(new ObstcaleRect(4000+x, 1300, 200, 200));
+		this.obstacles.add(new ObstcaleRect(4000+x, 1700, 200, 200));/**/
+		
+		
+		this.obstacles.add(new ObstcaleRect(6000, 0, 400,1700));
+		
+		this.obstacles.add(new ObstcaleRect(8000, 0, 400, 900));
+		this.obstacles.add(new ObstcaleRect(8000, 1100, 400, 900));
+		
+
+		
+		
 		this.obstacles.add(new ObstacleContour(0, 0, w, h));
-		this.obstacles.add(new ObstacleArrivee(8000, 0, 800, h));
+		this.obstacles.add(new ObstacleArrivee(10000, 0, 1000, h));
 		
 		this.depart = new Point(200,1000);
 		this.destination = new Point(7600, 1600);

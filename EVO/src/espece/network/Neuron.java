@@ -24,11 +24,23 @@ public class Neuron {
 		this.value = value;
 	}
 	
+	public Neuron(Layer l, Neuron n) {
+		this.value = n.getValue();
+		this.function = n.function;
+		this.index = n.index;
+		this.layer = l;
+		this.inputs = new ArrayList<Connection>();
+		for(Connection c : n.inputs) {
+			this.inputs.add(new Connection(c.getNeuronInput(), this));
+		}
+		
+	}
+
 	public void calculateWeightedSum(Neuron bias) {
 		float sum = 0;
 		sum += bias.getValue();
 		for(Connection c : inputs) {
-			sum += c.getWeight() * c.getNeuron().getValue();
+			sum += c.getWeight() * c.getNeuronInput().getValue();
 		}
 		this.value = this.function.getValue(sum);
 	}
@@ -44,9 +56,18 @@ public class Neuron {
 	public void addConnection(Connection c) {
 		inputs.add(c);
 	}
+	
+	public void addConnection(Neuron n) {
+		inputs.add(new Connection(n, this));
+	}
 
 	public ArrayList<Connection> getConnections() {
-		return inputs;
+		ArrayList<Connection> con = new ArrayList<Connection>();
+		for(Connection c : inputs) {
+			if(c.isEnable())
+				con.add(c);
+		}
+		return con;
 	}
 
 	public Layer getLayer() {

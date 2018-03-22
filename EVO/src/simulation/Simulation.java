@@ -1,6 +1,7 @@
 package simulation;
 
 import java.awt.BorderLayout;
+import java.awt.EventQueue;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import espece.capteur.Capteur;
 import map.Map;
 import map.MapPanel;
 import map.obstacle.Obstacle;
+import simulation.selection.NaturalSelection;
 
 public class Simulation extends Thread implements KeyListener{
 	
@@ -21,10 +23,11 @@ public class Simulation extends Thread implements KeyListener{
 	public ArrayList<Espece> especesOpen;
 	public ArrayList<Espece> especesClosed;
 	
-	FrameManager frame;
+	//FrameManager frame;
 	
 	boolean running = true;
 	boolean pausing = false;
+	boolean REALTIMEMODE = true;
 	
 	
 	//temporaire
@@ -37,19 +40,8 @@ public class Simulation extends Thread implements KeyListener{
 		super();
 		//init
 		map = new Map("TODO", this);
-		//mapPanel = new MapPanel(map, 1000,500);
 		especesOpen = new ArrayList<>();
 		this.resetAndAddEspeces();
-		
-		
-	
-		frame = new FrameManager("EVO", this);
-		//frame.add(mapPanel);
-		//frame.add(new NetworkPanel(this.especesOpen.get(0).neuralNetwork, 1000, 200), BorderLayout.SOUTH);
-		//frame.pack();
-		//frame.setVisible(true);
-		frame.addKeyListener(this);
-		//frame.requestFocus();
 		
 		running = true;
 		
@@ -57,59 +49,77 @@ public class Simulation extends Thread implements KeyListener{
 	}
 	
 	public void run() {
-		dt = 1000/60;
+		dt = 8;
 		long currTime = System.currentTimeMillis();
 		long timePassed;
 		while(true) {
 			if(!pausing) {
-				currTime = System.currentTimeMillis();
-				boolean d = D, g = G;
-				
-				for(Espece e : especesOpen) {
-					e.update(dt, d?1:0, g?1:0);
-				}
-				
-				time += dt;
-				for(int i = 0; i < especesOpen.size(); i++) {
-					Espece e = especesOpen.get(i);
+				if(especesOpen.size() != 0 && time < CONSTANTS.TIME_LIMIT) {
+					currTime = System.currentTimeMillis();
+					boolean d = D, g = G;
+					for(Espece e : especesOpen) {
+						e.update(dt, d?1:0, g?1:0);
+					}
 					
-					e.resetCapteur();
-					for(Obstacle o : map.obstacles) {
-						if(o.fastCollision(e)) {
-							for(Capteur c : e.getCapteursList()) {
-								c.setValue(o.getCapteurValue(c));
-							}
-							
-							if(o.collision(e)) {
-								//e.update(dt,0,0);
-								try {
-								e.kill();
-								especesClosed.add(e);
-								especesOpen.remove(i);
-								}catch(Exception e1) {
-									System.err.println("FATAL");
+					time += dt;
+					for(int i = 0; i < especesOpen.size(); i++) {
+						Espece e = especesOpen.get(i);
+						e.resetCapteur();
+						for(Obstacle o : map.obstacles) {
+							if(o.fastCollision(e)) {
+								for(Capteur c : e.getCapteursList()) {
+									c.setValue(o.getCapteurValue(c));
+								}
+								
+								if(o.collision(e)) {
+									try {
+										especesClosed.add(e);
+										//e.update(dt,0,0);
+										e.kill();
+										
+										especesOpen.remove(i);
+									}catch(Exception e1) {
+										System.err.println("FATAL");
+									}
 								}
 							}
 						}
 					}
+					
+					
 				}
-				
-				if(especesOpen.size() == 0) {
+				else {
+					for(int i = 0; i < especesOpen.size(); i++) {
+						especesOpen.get(i).kill();
+						especesClosed.add(especesOpen.get(i));
+						especesOpen.remove(i);
+					}
+					
+					
 					this.mutate();
+					time = 0;
 				}
-			}
-			try {
-				timePassed = System.currentTimeMillis() - currTime;
-				if(timePassed > 16 && !pausing) {
-					System.out.println("ERROR - NOT ANOUGHT TIME");
-				}
-				//System.out.println(timePassed);
-				Simulation.sleep((long) ((dt - timePassed) > 0 ?dt - timePassed: 0));
-			} catch (InterruptedException e1) {
-				e1.printStackTrace();
 			}
 			
-			//dt = pausing?0:1000/60;
+			if(REALTIMEMODE) {
+				try {
+					timePassed = System.currentTimeMillis() - currTime;
+					if(timePassed > dt) {
+						System.out.println("ERROR - NOT ANOUGHT TIME");
+					}
+					//System.out.println(timePassed);
+					
+					if(especesOpen.size() == 0) {
+						
+					}
+					timePassed = System.currentTimeMillis() - currTime;
+					//System.out.println(timePassed);
+					Simulation.sleep((long) ((dt - timePassed) > 0 ?dt - timePassed: 0));
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
+			}
+			//  dt = pausing?0:1000/60;
 			
 			
 		}
@@ -117,7 +127,6 @@ public class Simulation extends Thread implements KeyListener{
 	}
 	
 	public void resetAndAddEspeces() {
-		
 		especesClosed = new ArrayList<>();
 		
 		while(especesOpen.size() < CONSTANTS.NUMBERCARS) {
@@ -127,47 +136,10 @@ public class Simulation extends Thread implements KeyListener{
 	}
 	
 	public void mutate() {
-		especesClosed.sort(new Comparator<Espece>() {
-			@Override
-			public int compare(Espece e1, Espece e2) {
-				if(e1.getFitness() == e2.getFitness())
-					return 0;
-				return e1.getFitness()>e2.getFitness()?-1:1;
-			}
-		});
+		NaturalSelection selection = new NaturalSelection(especesClosed);
+		this.especesOpen = selection.getMutatedList(map);
+		this.especesClosed = new ArrayList<Espece>();
 		
-		this.getFrameManager().changeNetworkFocus(especesClosed.get(0));
-		
-		/*for(int i = 0; i < especesClosed.size() && especesClosed.size() >= CONSTANTS.NUMBERCARS/2; i++) {
-			if(Math.random()*CONSTANTS.NUMBERCARS+1 < i) {
-				//System.out.println(especesClosed.get(i).getFitness());
-				especesClosed.remove(i);
-			}
-			else {
-				especesClosed.get(i).tpLikeNew(map.depart,map.orientation);
-			}
-		}*/
-		//System.out.println("-----------------------------------");
-		/*for(Espece e : especesClosed) {
-			//System.out.println(e.getFitness());
-			
-			/*Espece e1 = new Espece(e);
-			e1.mutate();
-			especesClosed.add(e1);
-		}*/
-		
-		/*while (especesClosed.size() < CONSTANTS.NUMBERCARS) {
-			especesClosed.add(new Espece(map.depart, map.orientation));
-		}*/
-		
-		/*especesOpen =  especesClosed;
-		especesClosed = new ArrayList<Espece>();*/
-		//System.out.println(especesOpen.size());
-		//System.out.println(especesClosed);
-		//especesOpen = especesClosed;
-		this.resetAndAddEspeces();
-		/*especesOpen = especesClosed;
-		especesClosed = new ArrayList<Espece>();*/
 	}
 
 	@Override
@@ -178,11 +150,14 @@ public class Simulation extends Thread implements KeyListener{
 		if(e.getKeyCode() == KeyEvent.VK_A) {
 			G = true;
 		}
-		
-		/*if(e.getKeyCode() == KeyEvent.VK_0) {
-			frame.changeNetworkFocus(this.especesClosed.get(2));
+		if(e.getKeyCode() == KeyEvent.VK_R) {
+			REALTIMEMODE = !REALTIMEMODE;
 		}
-		*/
+		
+		if(e.getKeyCode() == KeyEvent.VK_SPACE) {
+			pausing=!pausing;
+		}
+		
 		
 	}
 	@Override
@@ -193,11 +168,7 @@ public class Simulation extends Thread implements KeyListener{
 		if(e.getKeyCode() == KeyEvent.VK_A) {
 			G = false;
 		}
-		if(e.getKeyCode() == KeyEvent.VK_SPACE) {
-			pausing = !pausing;
-			
-			
-		}
+		
 	}
 
 	@Override
@@ -209,10 +180,6 @@ public class Simulation extends Thread implements KeyListener{
 		temp.addAll(especesOpen);
 		
 		return temp;
-	}
-
-	public FrameManager getFrameManager() {
-		return frame;
 	}
 
 }

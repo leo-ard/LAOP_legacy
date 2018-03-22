@@ -65,10 +65,12 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 		this.addMouseMotionListener(this);
 		this.addMouseWheelListener(this);
 		this.addMouseListener(this);
-		
 		//this.mouseWheelMoved(new MouseWheelEvent(this, 0, 0, 0, 0, 0, 0, true, 0, 0, 0));
 		
-		Timer uploadCheckerTimer = new Timer(true);
+	}
+	
+	public void start() {
+		Timer uploadCheckerTimer = new Timer(false);
 		uploadCheckerTimer.scheduleAtFixedRate(
 		    new TimerTask() {
 		      public void run() { repaint(); }
@@ -77,9 +79,9 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 	
 	public void loadImages() {
 		try {
-			BufferedImage temp  = ImageIO.read(new File(CONSTANTS.SRC_VOITURE));
+			BufferedImage temp  = ImageIO.read(MapPanel.class.getResource(CONSTANTS.SRC_VOITURE));
 			IMG_VOITURE = temp.getScaledInstance(Espece.ESPECES_WIDTH, Espece.ESPECES_HEIGHT, Image.SCALE_DEFAULT);
-			IMG_LRIMA = ImageIO.read(new File(CONSTANTS.SRC_LRIMA)).getScaledInstance(130,95, Image.SCALE_DEFAULT);
+			IMG_LRIMA = ImageIO.read(MapPanel.class.getResource(CONSTANTS.SRC_LRIMA)).getScaledInstance(130,95, Image.SCALE_DEFAULT);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -136,12 +138,17 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 		int ex = (int) ((e.getX()-viewX-offX)*(1.0/(double)zoom));
 		int ey = (int) ((e.getY()-viewY-offY)*(1.0/(double)zoom));
 		System.out.println(ex+" "+ey);
-		int proche;
+		
+		Espece selected = map.simulation.getEspeces().get(0);
+		int proche = selected.distanceFrom(new Point(ex,ey));
 		for(Espece espece : map.simulation.getEspeces()) {
-			if(espece.contains(new Point(ex, ey))) {
-				EVO.simulation.getFrameManager().changeNetworkFocus(espece);
+			if(proche >= espece.distanceFrom(new Point(ex, ey))) {
+				proche = espece.distanceFrom(new Point(ex, ey));
+				selected = espece;
 			}
 		}
+		
+		EVO.frame.changeNetworkFocus(selected);
 	}
 
 	@Override

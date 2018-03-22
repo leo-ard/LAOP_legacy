@@ -9,31 +9,45 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.RenderingHints;
-import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.swing.JPanel;
 
+import espece.Espece;
+
 public class NetworkPanel extends JPanel{
 		
-	public NeuralNetwork network;
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -9032648753101484360L;
+	private NeuralNetwork network;
+	private Espece espece;
 	
 	public final int OFFSETX = 10;
 	public final int OFFSETY = 10;
 	public final int OVALSIZE = 40;
 	
-	public NetworkPanel(NeuralNetwork n, int w, int h) {
+	public NetworkPanel(Espece e, int w, int h) {
 		super();
 		this.setPreferredSize(new Dimension(w, h));
-		this.network = n;
+		this.network = e.getNeuralNetwork();
+		this.espece = e;
 		
-		Timer uploadCheckerTimer = new Timer(true);
+	}
+	
+	public void start() {
+
+		Timer uploadCheckerTimer = new Timer(false);
 		uploadCheckerTimer.scheduleAtFixedRate(
 		    new TimerTask() {
 		      public void run() { repaint(); }
 		    }, 0, 16);
+		
 	}
+	
 	/**
 	 * Dessine le système de neurone
 	 */
@@ -47,7 +61,7 @@ public class NetworkPanel extends JPanel{
 		g.setColor(Color.black);
 		Font f = new Font("Arial",20,20);
 		g.setFont(f);
-		String text = "Bagage génétique de l'espèce "+this.network.getSize();
+		String text = String.format("Bagage génétique de l'espèce  %s", this.espece.toString());
 		g.drawString(text,this.getWidth()/2- getFontMetrics(f).stringWidth(text)/2, 20);
 		
 		
@@ -65,12 +79,12 @@ public class NetworkPanel extends JPanel{
 				//draw connection
 				Point p1 = this.getNodePosition(i, j, netSize, layerSize);
 				for(Connection c : this.network.getNeuron(i, j).getConnections()){
-					int k = c.getNeuron().getLayer().getIndex();
-					int l = c.getNeuron().getIndex();
+					int k = c.getNeuronInput().getLayer().getIndex();
+					int l = c.getNeuronInput().getIndex();
 					
-					Point p2 = this.getNodePosition(k, l, netSize, c.getNeuron().getLayer().getSize());
-					
-					this.drawConnectionAtPosition(g, p1, p2, c.getWeight(), this.network.getNeuron(i, j).getValue(), c.getNeuron().getValue());
+					Point p2 = this.getNodePosition(k, l, netSize, c.getNeuronInput().getLayer().getSize());
+					if(c.isEnable())
+						this.drawConnectionAtPosition(g, p1, p2, c.getWeight(), this.network.getNeuron(i, j).getValue(), c.getNeuronInput().getValue());
 					
 				}
 				
@@ -115,6 +129,11 @@ public class NetworkPanel extends JPanel{
 		int y = OFFSETY + (int) (((row+0.5)*(this.getHeight()-OFFSETY*2)/maxRow));
 		
 		return new Point(x, y);
+	}
+	
+	public void setEspece(Espece e) {
+		this.network = e.getNeuralNetwork();
+		this.espece = e;
 	}
 		
 }

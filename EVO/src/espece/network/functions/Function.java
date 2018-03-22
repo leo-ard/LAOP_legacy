@@ -11,7 +11,17 @@ public class Function{
 		}
 	};
 	
-	static IFunction[] functions = {SIGMOID};
+	public static IFunction TANH = new IFunction() {
+		public double getValue(double x) {
+			return Math.tanh(x);
+		}
+		
+		public String getName() {
+			return "Tan h";
+		}
+	};
+	
+	static IFunction[] functions = {TANH};
 	
 	public static IFunction getRandom() {
 		return functions[(int) (Math.random()*functions.length)];

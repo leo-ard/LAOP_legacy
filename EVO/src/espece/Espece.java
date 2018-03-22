@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
 import core.CONSTANTS;
@@ -29,7 +30,11 @@ public class Espece {
 	
 	private ArrayList<Capteur> capteurs = new ArrayList<Capteur>();
 	
-	private NeuralNetwork neuralNetwork;
+	public NeuralNetwork neuralNetwork;
+	
+	private Point oldPos;
+	
+	public static int conter;
 	
 	/**
 	 * Créer une espèce avec la position et l'orientation spécifiée
@@ -43,26 +48,41 @@ public class Espece {
 		this.x = positionDeDepart.x;
 		this.y = positionDeDepart.y;
 		this.orientationRad = Math.toRadians(orientationDeDepart);
-		alive = true;
 		neuralNetwork = new NeuralNetwork(3, 2);
+	}
+	
+	public Espece(Point positionDeDepart, double orientationDeDepart, Espece e) {
+		this();
+		this.x = positionDeDepart.x;
+		this.y = positionDeDepart.y;
+		this.orientationRad = Math.toRadians(orientationDeDepart);
+		this.neuralNetwork = new NeuralNetwork(e.getNeuralNetwork());
+		
 	}
 	
 	public Espece() {
 		this.w = ESPECES_WIDTH;
 		this.h = ESPECES_HEIGHT;
+		//capteurs.add(new Capteur(this, -60, w/2, h/2));
+		//capteurs.add(new Capteur(this, 60, w/2, -h/2));
 		capteurs.add(new Capteur(this, -25, w/2, h/2));
 		capteurs.add(new Capteur(this, 25, w/2, -h/2));
 		capteurs.add(new Capteur(this, 0, w/2, 0));
+		alive = true;
 	}
 
 	public Espece(Espece e) {
 		neuralNetwork = e.getNeuralNetwork();
 	}
-
 	
-
-	public void mutate() {
-		//this.neuralNetwork.mutate();
+	public double[] capteursToArray() {
+		double[] capteursValue = new double[this.capteurs.size()];
+		for (int i = 0; i < capteursValue.length; i++) {
+			capteursValue[i] = this.capteurs.get(i).getValue();
+		}
+		
+		return capteursValue;
+		
 	}
 	
 	public void update(double dt, double D, double G) {
@@ -71,7 +91,7 @@ public class Espece {
 		}
 		
 		//Update le résaux de neuronnes avec la valeur des capteurs
-		neuralNetwork.update(capteurs.get(0).getValue(), capteurs.get(1).getValue(),capteurs.get(2).getValue());
+		neuralNetwork.update(this.capteursToArray());
 		double[] values = neuralNetwork.getOutputValues();
 		D = values[0];
 		G = values[1];
@@ -107,6 +127,8 @@ public class Espece {
 	public void kill() {
 		alive = false;
 		this.calculateFitness();
+		
+		
 	}
 	
 	public void tp(Point p) {
@@ -153,22 +175,13 @@ public class Espece {
 		return this.neuralNetwork;
 	}
 
-	
-	//TODO just delete this
-	public Espece getMutated() {
-		Espece e = this;
-		e.mutate();
-		return e;
-	}
-
 	public ArrayList<Capteur> getCapteursList() {
 		// TODO Auto-generated method stub
 		return capteurs;
 	}
 
-	public boolean contains(Point point) {
-		
-		return false;
+	public int distanceFrom(Point point) {
+		return (int) ((point.x - this.x)*(point.x - this.x) + (point.y - this.y)*(point.y - this.y));
 	}
 
 	/**
@@ -185,7 +198,18 @@ public class Espece {
 		this.x = depart.getX();
 		this.y = depart.getY();
 		this.orientationRad = Math.toRadians(orientation);
+		this.alive = true;
+		this.resetCapteur();
 		
+	}
+
+	public boolean isDead() {
+		// TODO Auto-generated method stub
+		return !alive;
+	}
+	
+	public void mutate() {
+		this.neuralNetwork.mutate();
 	}
 	
 	

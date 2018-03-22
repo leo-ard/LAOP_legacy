@@ -17,9 +17,19 @@ public class Layer implements Iterable<Neuron>{
 		this.index = index;
 	}
 	
-	public void addNeuron() {
+	public Layer(Layer l) {
+		neurons = new ArrayList<Neuron>();
+		for(Neuron n : l.neurons) {
+			neurons.add(new Neuron(this, n));
+		}
+		bias = new Neuron(this, 0, l.bias.getValue());
+		this.index = index;
+	}
+
+	public Neuron addNeuron() {
 		Neuron n = new Neuron(this, neurons.size());
 		neurons.add(n);
+		return n;
 	}
 	
 	public Neuron getNeuron(int nb) {
@@ -59,7 +69,7 @@ public class Layer implements Iterable<Neuron>{
 	
 	public void addConnection(int chosenNeuronOutput, Connection c) {
 		for (Connection currentConnection : neurons.get(chosenNeuronOutput).getConnections()) {
-			if(currentConnection.getNeuron() == c.getNeuron()) {
+			if(currentConnection.getNeuronInput() == c.getNeuronInput()) {
 				c.setWeight(c.getWeight());
 				return;
 			}
@@ -73,6 +83,14 @@ public class Layer implements Iterable<Neuron>{
 
 	public void setIndex(int index) {
 		this.index = index;
+	}
+
+	public ArrayList<Connection> getAllConnections() {
+		ArrayList<Connection> con = new ArrayList<Connection>();
+		for(Neuron n: neurons) {
+			con.addAll(n.getConnections());
+		}
+		return con;
 	}
 	
 
