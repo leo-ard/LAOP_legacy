@@ -7,7 +7,7 @@ import espece.Espece;
 
 public class Capteur {
 	
-	public static final int CAPTEUR_LENGHT = 2000;
+	public static final int CAPTEUR_LENGHT = 1500;
 	
 	private Espece e;
 	private double angle;
@@ -28,7 +28,7 @@ public class Capteur {
 	}
 	
 	/**
-	 * Set la valeur la plus basse, car l'algorith va favoriser les jonctions plus proche du véhicule que celle plus loins. Aussi a noter que la valeur des capteurs est reset à chaque tick.
+	 * Set la valeur la plus basse, car l'algorith va favoriser les jonctions plus proche du vï¿½hicule que celle plus loins. Aussi a noter que la valeur des capteurs est reset ï¿½ chaque tick.
 	 * @param v
 	 */
 	public void setValue(double v) {

@@ -3,6 +3,7 @@ package map;
 import java.awt.Point;
 import java.util.ArrayList;
 
+import core.CONSTANTS;
 import espece.Espece;
 import map.obstacle.Obstacle;
 import map.obstacle.ObstacleArrivee;
@@ -92,7 +93,10 @@ public class Map {
 			}
 		}
 	}
-	
-	
 
+	public void setFitnessToEspece(Espece e) {
+		double x = e.getX();
+		double scale = 0.01;
+		e.setFitness(scale * (x+5000*(CONSTANTS.TIME_LIMIT-simulation.time)/ CONSTANTS.TIME_LIMIT));
+	}
 }

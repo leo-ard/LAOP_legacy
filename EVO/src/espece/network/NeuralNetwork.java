@@ -200,7 +200,7 @@ public class NeuralNetwork {
 	}
 
 	public void mutate() {
-		int ran = Random.getRandomIntegerValue(20);
+		int ran = Random.getRandomIntegerValue(100);
 		
 		if (ran <= 5)
 			this.addRandomConnection();

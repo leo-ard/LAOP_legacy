@@ -1,12 +1,13 @@
 package simulation.selection;
 
-import java.awt.Point;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 
 import core.CONSTANTS;
 import espece.Espece;
 import map.Map;
+import simulation.FrameManager;
 import utils.Random;
 
 public class  NaturalSelection {
@@ -29,11 +30,12 @@ public class  NaturalSelection {
 	
 	public ArrayList<Espece> getMutatedList(Map m) {
 		this.sort();
+		FrameManager.addGeneration(especes);
 		this.kill50();
 		this.resetList(m);
 		this.repopulate(m);
-		//System.out.println(especes.size());
 		return especes;
+
 	}
 	
 	private void repopulate(Map m) {
@@ -52,13 +54,11 @@ public class  NaturalSelection {
 	}
 
 	private void kill50() {
-		
+		//just a test
 		while(especes.size() >= CONSTANTS.NUMBERCARS*0.5) {
 			int nb =  (int) Math.sqrt(Random.getRandomIntegerValue(especes.size()*especes.size()));
-			
 			especes.remove(nb);
 		}
-		
 	}
 
 	public void resetList(Map m) {
@@ -66,7 +66,4 @@ public class  NaturalSelection {
 			especes.get(i).tpLikeNew(m.depart, m.orientation);
 		}
 	}
-	
-	
-
 }

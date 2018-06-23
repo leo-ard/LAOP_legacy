@@ -61,7 +61,7 @@ public class NetworkPanel extends JPanel{
 		g.setColor(Color.black);
 		Font f = new Font("Arial",20,20);
 		g.setFont(f);
-		String text = String.format("Bagage génétique de l'espèce  %s", this.espece.toString());
+		String text = String.format("Bagage génétique de l'espèce  %s", this.espece.toString(), this.espece.getFitness());
 		g.drawString(text,this.getWidth()/2- getFontMetrics(f).stringWidth(text)/2, 20);
 		
 		

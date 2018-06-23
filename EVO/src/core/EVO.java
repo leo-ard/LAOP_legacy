@@ -2,10 +2,6 @@ package core;
 
 import java.awt.EventQueue;
 
-import javax.swing.JFrame;
-
-import map.Map;
-import map.MapPanel;
 import simulation.FrameManager;
 import simulation.Simulation;
 

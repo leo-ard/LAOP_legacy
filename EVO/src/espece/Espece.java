@@ -26,7 +26,7 @@ public class Espece {
 	private double vitesse;
 	private double acceleration;
 	
-	private int fitness;
+	private double fitness;
 	
 	private ArrayList<Capteur> capteurs = new ArrayList<Capteur>();
 	
@@ -119,16 +119,9 @@ public class Espece {
 		
 		g.setTransform(oldForm);
 	}
-	
-	public void calculateFitness() {
-		fitness = (int) (this.x*this.x/10000);
-	}
-	
+
 	public void kill() {
 		alive = false;
-		this.calculateFitness();
-		
-		
 	}
 	
 	public void tp(Point p) {
@@ -166,7 +159,7 @@ public class Espece {
 		return h;
 	}
 
-	public int getFitness() {
+	public double getFitness() {
 		// TODO Auto-generated method stub
 		return this.fitness;
 	}
@@ -211,7 +204,9 @@ public class Espece {
 	public void mutate() {
 		this.neuralNetwork.mutate();
 	}
-	
-	
 
+
+    public void setFitness(double fitness) {
+		this.fitness = fitness;
+    }
 }

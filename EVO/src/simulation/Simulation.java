@@ -35,12 +35,12 @@ public class Simulation extends Thread implements KeyListener{
 	
 	double dt;
 	public double time;
-	
+
 	public Simulation() {
 		super();
 		//init
 		map = new Map("TODO", this);
-		especesOpen = new ArrayList<>();
+		especesOpen = new ArrayList<Espece>();
 		this.resetAndAddEspeces();
 		
 		running = true;
@@ -76,6 +76,7 @@ public class Simulation extends Thread implements KeyListener{
 										especesClosed.add(e);
 										//e.update(dt,0,0);
 										e.kill();
+										map.setFitnessToEspece(e);
 										
 										especesOpen.remove(i);
 									}catch(Exception e1) {
@@ -91,6 +92,7 @@ public class Simulation extends Thread implements KeyListener{
 				else {
 					for(int i = 0; i < especesOpen.size(); i++) {
 						especesOpen.get(i).kill();
+						map.setFitnessToEspece(especesOpen.get(i));
 						especesClosed.add(especesOpen.get(i));
 						especesOpen.remove(i);
 					}

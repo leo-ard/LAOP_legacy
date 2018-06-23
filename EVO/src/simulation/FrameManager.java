@@ -1,17 +1,20 @@
 package simulation;
 
 import java.awt.BorderLayout;
-import java.awt.EventQueue;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.ArrayList;
 
 import javax.swing.JFrame;
 
-import core.EVO;
 import espece.Espece;
 import espece.network.NetworkPanel;
 import map.MapPanel;
-import simulation.selection.SimulationPanel;
+import simulation.Interface.SimulationPanel;
 
-public class FrameManager extends JFrame{
+public class FrameManager extends JFrame implements MouseListener{
 	
 	/**
 	 * 
@@ -22,17 +25,25 @@ public class FrameManager extends JFrame{
 	
 	public static Simulation simulation;
 	public static FrameManager frame;
+	public static SimulationInfos simulationInfos;
+	public static SimulationPanel simulationPanel;
 	
 	public FrameManager(String s, Simulation simulation) {
 		super(s);
 		mapPanel = new MapPanel(simulation.map, 1000, 500);
 		networkPanel = new NetworkPanel(simulation.especesOpen.get(0), 1000, 200);
+		simulationInfos=new SimulationInfos(simulation);
 		this.add(mapPanel);
 		this.add(networkPanel, BorderLayout.SOUTH);
-		//this.add(new SimulationPanel(simulation), BorderLayout.WEST);
+		simulationPanel = new SimulationPanel(simulationInfos);
+		this.add(simulationPanel, BorderLayout.WEST);
 		this.addKeyListener(simulation);
+		this.addMouseListener(this);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.pack();
+		//this.setAutoRequestFocus(true);
+
+		//this.requestFocus();
 	}
 	
 	public void start() {
@@ -52,4 +63,33 @@ public class FrameManager extends JFrame{
 		
 	}
 
+	public static void addGeneration(ArrayList<Espece> especes) {
+		simulationInfos.addGeneration(especes);
+		simulationPanel.update();
+	}
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		this.requestFocus();
+		System.out.println("KYS");
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {
+
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+
+	}
 }
