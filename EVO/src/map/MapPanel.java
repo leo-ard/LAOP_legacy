@@ -14,6 +14,7 @@ import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -24,6 +25,7 @@ import javax.swing.JPanel;
 import core.CONSTANTS;
 import core.EVO;
 import espece.Espece;
+import espece.capteur.Capteur;
 import map.obstacle.Obstacle;
 
 public class MapPanel extends JPanel implements MouseMotionListener, MouseListener, MouseWheelListener{
@@ -111,8 +113,9 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 		
 		
 		//draws map obstacle
-		g.setColor(new Color(255, 51, 51));
+
 		for(Obstacle o : map.obstacles) {
+            g.setColor(new Color(255, 51, 51));
 			o.draw(g);
 		}
 		
@@ -131,10 +134,19 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 		g.drawString("Version alpha 1.1 - Laboratoire de recherche LRIMA", 10, 20);
 		g.drawString(""+map.simulation.time/1000, 10,40);
 		g.drawImage(IMG_LRIMA,this.getWidth()-150,this.getHeight()-105,null);
+
+
+		//Draw capteurs lines
+		/*for(Espece e : map.simulation.especesOpen){
+			for(Capteur c : e.getCapteursList()){
+				c.draw(g);
+			}
+		}*/
 	}
 	
 	@Override
 	public void mouseClicked(MouseEvent e) {
+
 		int ex = (int) ((e.getX()-viewX-offX)*(1.0/(double)zoom));
 		int ey = (int) ((e.getY()-viewY-offY)*(1.0/(double)zoom));
 		System.out.println(ex+" "+ey);
@@ -142,11 +154,15 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 		Espece selected = map.simulation.getEspeces().get(0);
 		int proche = selected.distanceFrom(new Point(ex,ey));
 		for(Espece espece : map.simulation.getEspeces()) {
+		    //Reset selected
+		    espece.selected = false;
+
 			if(proche >= espece.distanceFrom(new Point(ex, ey))) {
 				proche = espece.distanceFrom(new Point(ex, ey));
 				selected = espece;
 			}
 		}
+		selected.selected = true;
 		
 		EVO.frame.changeNetworkFocus(selected);
 	}

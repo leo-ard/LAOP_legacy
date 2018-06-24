@@ -46,6 +46,7 @@ public class Simulation extends Thread implements KeyListener{
 		running = true;
 		
 		time = 0;
+
 	}
 	
 	public void run() {
@@ -90,16 +91,7 @@ public class Simulation extends Thread implements KeyListener{
 					
 				}
 				else {
-					for(int i = 0; i < especesOpen.size(); i++) {
-						especesOpen.get(i).kill();
-						map.setFitnessToEspece(especesOpen.get(i));
-						especesClosed.add(especesOpen.get(i));
-						especesOpen.remove(i);
-					}
-					
-					
-					this.mutate();
-					time = 0;
+					nextGeneration();
 				}
 			}
 			
@@ -107,7 +99,7 @@ public class Simulation extends Thread implements KeyListener{
 				try {
 					timePassed = System.currentTimeMillis() - currTime;
 					if(timePassed > dt) {
-						System.out.println("ERROR - NOT ANOUGHT TIME");
+						System.out.println("ERROR - NOT ENOUGHT TIME");
 					}
 					//System.out.println(timePassed);
 					
@@ -127,6 +119,21 @@ public class Simulation extends Thread implements KeyListener{
 		}
 		
 	}
+
+	private void nextGeneration(){
+        for(int i = 0; i < especesOpen.size(); i++) {
+            Espece espece = especesOpen.get(i);
+
+            espece.kill();
+            map.setFitnessToEspece(espece);
+            especesClosed.add(espece);
+            especesOpen.remove(i);
+        }
+
+
+        this.mutate();
+        time = 0;
+    }
 	
 	public void resetAndAddEspeces() {
 		especesClosed = new ArrayList<>();
@@ -146,6 +153,10 @@ public class Simulation extends Thread implements KeyListener{
 
 	@Override
 	public void keyPressed(KeyEvent e) {
+	    //Next generation
+	    if(e.getKeyCode() == KeyEvent.VK_Q){
+            nextGeneration();
+        }
 		if(e.getKeyCode() == KeyEvent.VK_D) {
 			D = true;
 		}

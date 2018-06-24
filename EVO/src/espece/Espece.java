@@ -15,7 +15,7 @@ import simulation.Simulation;
 public class Espece {
 	
 	//Width doit etre plus grand que height
-	public static final int ESPECES_WIDTH = 200, ESPECES_HEIGHT = 101;
+	public static final int ESPECES_WIDTH = 150, ESPECES_HEIGHT = 101;
 	
 	private double x, y;
 	private int w, h;
@@ -29,12 +29,17 @@ public class Espece {
 	private double fitness;
 	
 	private ArrayList<Capteur> capteurs = new ArrayList<Capteur>();
+
+	//MAX 180
+	private final int NB_CAPTEUR = 10;
 	
 	public NeuralNetwork neuralNetwork;
 	
 	private Point oldPos;
 	
 	public static int conter;
+
+	public boolean selected;
 	
 	/**
 	 * Créer une espèce avec la position et l'orientation spécifiée
@@ -48,7 +53,7 @@ public class Espece {
 		this.x = positionDeDepart.x;
 		this.y = positionDeDepart.y;
 		this.orientationRad = Math.toRadians(orientationDeDepart);
-		neuralNetwork = new NeuralNetwork(3, 2);
+		neuralNetwork = new NeuralNetwork(NB_CAPTEUR, 2);
 	}
 	
 	public Espece(Point positionDeDepart, double orientationDeDepart, Espece e) {
@@ -63,11 +68,21 @@ public class Espece {
 	public Espece() {
 		this.w = ESPECES_WIDTH;
 		this.h = ESPECES_HEIGHT;
-		//capteurs.add(new Capteur(this, -60, w/2, h/2));
-		//capteurs.add(new Capteur(this, 60, w/2, -h/2));
-		capteurs.add(new Capteur(this, -25, w/2, h/2));
-		capteurs.add(new Capteur(this, 25, w/2, -h/2));
-		capteurs.add(new Capteur(this, 0, w/2, 0));
+
+		//Setup les capteurs
+        for(int i = 90 ; i > -90 ; i -= 180 / NB_CAPTEUR){
+            if(i > 0 && i < 90){
+                capteurs.add(new Capteur(this, i, w/2, -h/2));
+            }
+            else if(i == 0){
+                capteurs.add(new Capteur(this, i, w/2, 0));
+            }
+            else{
+                capteurs.add(new Capteur(this, i, w/2, h/2));
+            }
+
+        }
+
 		alive = true;
 	}
 
@@ -116,7 +131,14 @@ public class Espece {
 		g.setColor(new Color(90, 200, 255));
 		
 		g.drawImage(MapPanel.IMG_VOITURE, (int)x-w/2, (int)y-h/2, null);
-		
+
+		//Draw les capteurs
+        if(selected) {
+            for (Capteur c : capteurs) {
+                c.draw(g);
+            }
+        }
+
 		g.setTransform(oldForm);
 	}
 

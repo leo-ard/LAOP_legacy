@@ -81,7 +81,6 @@ public abstract class Obstacle implements IObstacle{
 		double sy = (y-line.getY1())/yRel;
 		double x3 = line.getX1() + (sy*xRel);
 		if(x3 <=x+w && x3 >= x && sy <= 1 && sy >=0) {
-			//System.out.println(sy);
 			v = addValue(v, sy);
 		}
 		

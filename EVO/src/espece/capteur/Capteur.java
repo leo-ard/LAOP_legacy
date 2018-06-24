@@ -39,12 +39,12 @@ public class Capteur {
 	/**
 	 * Dessine une ligne bleu la ou le capteur est
 	 * @param g
-	 * @param a
 	 */
-	public void draw(Graphics2D g, double a) {
+	public void draw(Graphics2D g) {
 		g.setColor(Color.CYAN);
-		int x1 = (int)(e.getX()+x);
-		int y1 = (int)(e.getY()-y);
+
+		int x1 = (int)(e.getX());
+		int y1 = (int)(e.getY());
 		int lx = (int) (CAPTEUR_LENGHT*Math.cos(-this.angle));
 		int ly = (int) (CAPTEUR_LENGHT*Math.sin(-this.angle));
 		

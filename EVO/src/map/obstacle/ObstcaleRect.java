@@ -86,14 +86,12 @@ public class ObstcaleRect extends Obstacle {
 	}
 	
 	public Rectangle toRect() {
-		//System.out.println(this.x+" "+ this.y+" "+ this.w+" "+ this.h);
 		return new Rectangle(this.x, this.y, this.w, this.h);
 	}
 
 	@Override
 	public void draw(Graphics g) {
 		g.fillRect(x, y, w, h);
-		//g.setColor(Color.black);
 		g.drawRect(x, y, w, h);
 	}
 

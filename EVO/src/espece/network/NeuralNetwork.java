@@ -97,12 +97,28 @@ public class NeuralNetwork {
 	}
 
 	public NeuralNetwork(int inputs, int outputs) {
-		nbInputs = inputs;
-		nbOutputs = outputs;
-		layers = new ArrayList<Layer>();
-		createDefaultLayers();
-		this.addRandomConnection();
-	}
+        nbInputs = inputs;
+        nbOutputs = outputs;
+        layers = new ArrayList<Layer>();
+        createDefaultLayers();
+        this.addRandomConnection();
+    }
+
+    public NeuralNetwork(int inputs,int hidden, int outputs) {
+        nbInputs = inputs;
+        nbOutputs = outputs;
+        layers = new ArrayList<Layer>();
+
+        for(int i = 0; i < hidden; i++) {
+            layers.add(new Layer(i));
+            /*for(int j = 0; j < ns.getLayerSizes()[i]; j++) {
+                layers.get(i).addNeuron();
+            }*/
+        }
+
+        createDefaultLayers();
+        this.addRandomConnection();
+    }
 
 	public void update(double... inputs) {
 		layers.get(0).setValues(inputs);
@@ -206,8 +222,9 @@ public class NeuralNetwork {
 			this.addRandomConnection();
 		else if(ran <= 10)
 			this.mutateRandomConnection();
-		else 
-			this.minimalModificationWeight();
+		else {
+		    this.minimalModificationWeight();
+        }
 	}
 	
 	public void minimalModificationWeight() {

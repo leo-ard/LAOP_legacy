@@ -20,67 +20,49 @@ public class Map {
 	
 	public int w, h;
 	public int orientation;
+
+	int[][] mapping = {
+	        {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, -2},
+            {0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, -2},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, -2},
+            {0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, -2},
+            {0, 9, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, -2},
+            {0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, -2},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, -2},
+            {0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, -2},
+            {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, -2}
+
+	};
+	int blocSize = 200;
+
 	
 	public Map(String s, Simulation sim) {
 		this.obstacles = new ArrayList<Obstacle>();
 		
 		this.simulation = sim;
-		this.w = 11000;
-		this.h = 2000;
-		
-		this.obstacles.add(new ObstcaleRect(2000, 0, 400,1700));
-		
-		this.obstacles.add(new ObstcaleRect(4000, 300, 400,1700));
-		
-		/*int x = 1000;
-		this.obstacles.add(new ObstcaleRect(4000+x, 100, 200, 200));
-		this.obstacles.add(new ObstcaleRect(4000+x, 500, 200, 200));
-		this.obstacles.add(new ObstcaleRect(4000+x, 900, 200, 200));
-		this.obstacles.add(new ObstcaleRect(4000+x, 1300, 200, 200));
-		this.obstacles.add(new ObstcaleRect(4000+x, 1700, 200, 200));
-		
-		x = 1600;
-		this.obstacles.add(new ObstcaleRect(4000+x, 100, 200, 200));
-		this.obstacles.add(new ObstcaleRect(4000+x, 500, 200, 200));
-		this.obstacles.add(new ObstcaleRect(4000+x, 900, 200, 200));
-		this.obstacles.add(new ObstcaleRect(4000+x, 1300, 200, 200));
-		this.obstacles.add(new ObstcaleRect(4000+x, 1700, 200, 200));
-		
-		x = 2200;
-		this.obstacles.add(new ObstcaleRect(4000+x, 100, 200, 200));
-		this.obstacles.add(new ObstcaleRect(4000+x, 500, 200, 200));
-		this.obstacles.add(new ObstcaleRect(4000+x, 900, 200, 200));
-		this.obstacles.add(new ObstcaleRect(4000+x, 1300, 200, 200));
-		this.obstacles.add(new ObstcaleRect(4000+x, 1700, 200, 200));
-		
-		x = 2800;
-		this.obstacles.add(new ObstcaleRect(4000+x, 100, 200, 200));
-		this.obstacles.add(new ObstcaleRect(4000+x, 500, 200, 200));
-		this.obstacles.add(new ObstcaleRect(4000+x, 900, 200, 600));
-		this.obstacles.add(new ObstcaleRect(4000+x, 1300, 200, 200));
-		this.obstacles.add(new ObstcaleRect(4000+x, 1700, 200, 200));
-		
-		x = 3400;
-		this.obstacles.add(new ObstcaleRect(4000+x, 100, 200, 200));
-		this.obstacles.add(new ObstcaleRect(4000+x, 500, 600, 200));
-		this.obstacles.add(new ObstcaleRect(4000+x, 900, 200, 200));
-		this.obstacles.add(new ObstcaleRect(4000+x, 1300, 200, 200));
-		this.obstacles.add(new ObstcaleRect(4000+x, 1700, 200, 200));/**/
-		
-		
-		this.obstacles.add(new ObstcaleRect(6000, 0, 400,1700));
-		
-		this.obstacles.add(new ObstcaleRect(8000, 0, 400, 900));
-		this.obstacles.add(new ObstcaleRect(8000, 1100, 400, 900));
-		
+		this.w = mapping[0].length * blocSize;//11000;
+		this.h = mapping.length * blocSize;//2000;
 
-		
-		
+        for(int i = 0 ; i < mapping.length ; i++){
+            for(int j = 0 ; j < mapping[0].length ; j++){
+                switch(mapping[i][j]){
+                    case 1:
+                        this.obstacles.add(new ObstcaleRect(j * blocSize, i * blocSize, blocSize, blocSize));
+                        break;
+                    case 9:
+                        this.depart = new Point(j * blocSize,i * blocSize);
+                        break;
+                    case -2:
+                        this.obstacles.add(new ObstacleArrivee(j * blocSize, i * blocSize, blocSize, blocSize));
+                        break;
+                }
+            }
+        }
+
+        //Setup la destination sur toute la derniere colonne
+        //this.destination = new Point(mapping[0].length * blocSize, mapping.length * blocSize);
+
 		this.obstacles.add(new ObstacleContour(0, 0, w, h));
-		this.obstacles.add(new ObstacleArrivee(10000, 0, 1000, h));
-		
-		this.depart = new Point(200,1000);
-		this.destination = new Point(7600, 1600);
 		this.orientation = 0;
 	}
 	
@@ -97,6 +79,7 @@ public class Map {
 	public void setFitnessToEspece(Espece e) {
 		double x = e.getX();
 		double scale = 0.01;
-		e.setFitness(scale * (x+5000*(CONSTANTS.TIME_LIMIT-simulation.time)/ CONSTANTS.TIME_LIMIT));
+
+		e.setFitness(scale * ((x * 10)+5000*(CONSTANTS.TIME_LIMIT-simulation.time)/ CONSTANTS.TIME_LIMIT));
 	}
 }
