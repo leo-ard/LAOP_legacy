@@ -4,12 +4,14 @@ import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 
 import core.CONSTANTS;
 import espece.Espece;
 import espece.capteur.Capteur;
+import espece.network.NeuralNetwork;
 import map.Map;
 import map.MapPanel;
 import map.obstacle.Obstacle;
@@ -27,7 +29,7 @@ public class Simulation extends Thread implements KeyListener{
 	
 	boolean running = true;
 	boolean pausing = false;
-	boolean REALTIMEMODE = true;
+	boolean REALTIMEMODE = false;
 	
 	
 	//temporaire
@@ -82,6 +84,7 @@ public class Simulation extends Thread implements KeyListener{
 										especesOpen.remove(i);
 									}catch(Exception e1) {
 										System.err.println("FATAL");
+										e1.printStackTrace();
 									}
 								}
 							}
@@ -130,16 +133,74 @@ public class Simulation extends Thread implements KeyListener{
             especesOpen.remove(i);
         }
 
-
         this.mutate();
+
+        //Check if should save best NN
+        if(NaturalSelection.best != null){
+            //Load le currentBest
+            NeuralNetwork currentBest = null;
+            try{
+                FileInputStream fis = new FileInputStream("best_nn.dat");
+                ObjectInputStream ois = new ObjectInputStream(fis);
+
+                currentBest = (NeuralNetwork) ois.readObject();
+
+
+            } catch (FileNotFoundException e) {
+                currentBest = null;
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+
+
+            if(currentBest != null){
+                System.out.println("Current: " + currentBest.getFitness() + " Now: " + NaturalSelection.best.getFitness());
+
+                //Check si le nouveau est meilleur
+                if(NaturalSelection.best.getFitness() > currentBest.getFitness()){
+                    System.out.println("BETTER!!");
+                    saveBest();
+                }
+
+            }else{
+                saveBest();
+            }
+        }
+
+
         time = 0;
+
+        //Change la map
+		//map.createRandomMap();
+
+    }
+
+    /**
+     * Sauvegarde dans un fichier le meilleur neuralNetwork
+     */
+    private void saveBest(){
+        Espece espece = NaturalSelection.best;
+
+        if(espece != null) {
+            try {
+                FileOutputStream fos = new FileOutputStream("best_nn.dat");
+                ObjectOutputStream oos = new ObjectOutputStream(fos);
+
+                oos.writeObject(espece.neuralNetwork);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 	
 	public void resetAndAddEspeces() {
 		especesClosed = new ArrayList<>();
 		
 		while(especesOpen.size() < CONSTANTS.NUMBERCARS) {
-			especesOpen.add(new Espece(map.depart, map.orientation));
+			especesOpen.add(new Espece(map.depart, map.orientation, this.map));
 		}
 		
 	}

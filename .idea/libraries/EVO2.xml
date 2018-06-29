@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="EVO2">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/EVO/EVO2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -5,7 +5,12 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
+import java.util.*;
+import map.Map;
 
 import core.CONSTANTS;
 import espece.capteur.Capteur;
@@ -15,7 +20,7 @@ import simulation.Simulation;
 public class Espece {
 	
 	//Width doit etre plus grand que height
-	public static final int ESPECES_WIDTH = 150, ESPECES_HEIGHT = 101;
+	public static final int ESPECES_WIDTH = 74, ESPECES_HEIGHT = 50;
 	
 	private double x, y;
 	private int w, h;
@@ -31,7 +36,7 @@ public class Espece {
 	private ArrayList<Capteur> capteurs = new ArrayList<Capteur>();
 
 	//MAX 180
-	private final int NB_CAPTEUR = 10;
+	private int NB_CAPTEUR = 6;
 	
 	public NeuralNetwork neuralNetwork;
 	
@@ -40,24 +45,58 @@ public class Espece {
 	public static int conter;
 
 	public boolean selected;
-	
+	public double totalSpeed;
+	public double maxDistanceFromStart;
+
+	private Map map;
+
 	/**
 	 * Créer une espèce avec la position et l'orientation spécifiée
 	 * 
 	 * @param positionDeDepart Position de départ
 	 * @param orientationDeDepart Orientation de départ en degrés
 	 */
-	public Espece(Point positionDeDepart, double orientationDeDepart) {
+	public Espece(Point positionDeDepart, double orientationDeDepart, Map map) {
 		this();
-		
+
+		this.map = map;
 		this.x = positionDeDepart.x;
 		this.y = positionDeDepart.y;
 		this.orientationRad = Math.toRadians(orientationDeDepart);
-		neuralNetwork = new NeuralNetwork(NB_CAPTEUR, 2);
-	}
+
+        //Load la meilleure espece
+
+        int ran = utils.Random.getRandomIntegerValue(1000);
+
+        if(CONSTANTS.USE_BEST && ran < 800) {
+            try {
+                FileInputStream fis = new FileInputStream("best_nn.dat");
+                ObjectInputStream ois = new ObjectInputStream(fis);
+
+                neuralNetwork = (NeuralNetwork) ois.readObject();
+                neuralNetwork.minimalModificationWeight();
+
+                NB_CAPTEUR = neuralNetwork.getLayer(0).getSize();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+        else{
+            neuralNetwork = new NeuralNetwork(NB_CAPTEUR, 2);
+        }
+
+        //Ajoute comme input la position actuel et la destination
+		//neuralNetwork.getLayer(0).addNeuron();
+		//neuralNetwork.getLayer(0).addNeuron();
+
+    }
 	
-	public Espece(Point positionDeDepart, double orientationDeDepart, Espece e) {
+	public Espece(Point positionDeDepart, double orientationDeDepart, Espece e, Map map) {
 		this();
+		this.map = map;
 		this.x = positionDeDepart.x;
 		this.y = positionDeDepart.y;
 		this.orientationRad = Math.toRadians(orientationDeDepart);
@@ -104,9 +143,40 @@ public class Espece {
 		if(!alive) {
 			return;
 		}
+
+		if(map != null) {
+			double distanceFromStart = this.distanceFrom(map.depart);
+
+			if (distanceFromStart > maxDistanceFromStart) {
+				maxDistanceFromStart = distanceFromStart;
+			}
+		}
 		
 		//Update le résaux de neuronnes avec la valeur des capteurs
-		neuralNetwork.update(this.capteursToArray());
+		double[] capteurArray = capteursToArray();
+		/*double[] inputs = new double[capteurs.size() + 2];
+
+		for(int i = 0 ; i < capteurArray.length ; i++){
+			inputs[i] = capteurArray[i];
+		}
+
+		if(map != null && map.depart != null && map.destination != null){
+
+			Point depart = this.map.depart;
+			Point destination = this.map.destination;
+			int width = this.map.w;
+			int height = this.map.h;
+
+
+			//Distance de la fin comme input
+			inputs[(inputs.length - 1) - 1] = (double)(destination.x - x) / (double)width;
+			inputs[(inputs.length - 1)] = (double)(destination.y - y) / (double)height;
+		}*/
+
+
+
+		neuralNetwork.update(capteurArray);
+
 		double[] values = neuralNetwork.getOutputValues();
 		D = values[0];
 		G = values[1];
@@ -118,6 +188,9 @@ public class Espece {
 		if(vitesse < 0) {
 			vitesse = 0;
 		}
+
+		//Pour avoir la vitesse moyenne
+		totalSpeed += vitesse;
 		
 		x += vitesse*Math.cos(orientationRad);
 		y += vitesse*Math.sin(orientationRad);
@@ -230,5 +303,6 @@ public class Espece {
 
     public void setFitness(double fitness) {
 		this.fitness = fitness;
+		this.neuralNetwork.setFitness(fitness);
     }
 }

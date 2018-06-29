@@ -2,7 +2,9 @@ package espece.network;
 
 import utils.Random;
 
-public class Connection {
+import java.io.Serializable;
+
+public class Connection implements Serializable {
 	
 	private double weight;
 	private Neuron neuronInput;

@@ -1,6 +1,10 @@
 package simulation.selection;
 
 import java.awt.*;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Comparator;
 
@@ -12,6 +16,7 @@ import utils.Random;
 
 public class  NaturalSelection {
 	ArrayList<Espece> especes;
+	public static Espece best = null;
 	
 	public NaturalSelection(ArrayList<Espece> especes) {
 		this.especes = especes;
@@ -30,23 +35,26 @@ public class  NaturalSelection {
 	
 	public ArrayList<Espece> getMutatedList(Map m) {
 		this.sort();
+		this.getBest();
 		FrameManager.addGeneration(especes);
 		this.kill50();
 		this.resetList(m);
 		this.repopulate(m);
+
 		return especes;
 
 	}
+
+	private void getBest(){
+	    best = especes.get(0);
+    }
 	
 	private void repopulate(Map m) {
 		
 		while(especes.size() < CONSTANTS.NUMBERCARS) {
-			//System.out.println(":::::::::"+especes.get(0).getFitness());
-			//System.out.println("------"+especes.get(especes.size()-1).getFitness());
 			int nb =  (int)Math.pow(Random.getRandomDoubleValue(Math.sqrt(especes.size())), 2);
-			//System.out.println(nb);
-			//System.out.println(nb);
-			Espece e = new Espece(m.depart, m.orientation, especes.get(nb));
+
+			Espece e = new Espece(m.depart, m.orientation, especes.get(nb), m);
 			e.mutate();
 			especes.add(e);
 		}

@@ -1,5 +1,6 @@
 package espece.network;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import javax.swing.JFrame;
@@ -7,8 +8,10 @@ import javax.swing.JFrame;
 import espece.Espece;
 import utils.Random;
 
-public class NeuralNetwork {
+public class NeuralNetwork implements Serializable {
 	boolean[] things = new boolean[10];
+	int mutationRate = 100;
+	private double fitness;
 
 	// FOR TESTS
 	public static void main(String args[]) {
@@ -216,14 +219,15 @@ public class NeuralNetwork {
 	}
 
 	public void mutate() {
-		int ran = Random.getRandomIntegerValue(100);
-		
-		if (ran <= 5)
-			this.addRandomConnection();
-		else if(ran <= 10)
-			this.mutateRandomConnection();
-		else {
-		    this.minimalModificationWeight();
+        int ran = Random.getRandomIntegerValue(100);
+
+        if (ran <= 5)
+            this.addRandomConnection();
+            if (ran <= 1){
+                mutateRandomConnection();
+            }
+        else {
+            this.minimalModificationWeight();
         }
 	}
 	
@@ -259,4 +263,11 @@ public class NeuralNetwork {
 		return layers;
 	}
 
+    public void setFitness(double fitness) {
+        this.fitness = fitness;
+    }
+
+    public double getFitness() {
+        return fitness;
+    }
 }

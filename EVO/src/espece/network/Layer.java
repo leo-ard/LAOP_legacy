@@ -1,12 +1,13 @@
 package espece.network;
 
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 
 import utils.Random;
 
-public class Layer implements Iterable<Neuron>{
+public class Layer implements Iterable<Neuron>, Serializable {
 	private Neuron bias;
 	private ArrayList<Neuron> neurons;
 	private int index;

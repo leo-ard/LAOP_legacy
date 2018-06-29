@@ -1,11 +1,12 @@
 package espece.network;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import espece.network.functions.Function;
 import espece.network.functions.IFunction;
 
-public class Neuron {
+public class Neuron implements Serializable {
 	private ArrayList<Connection> inputs;
 	private Layer layer;
 	private int index;

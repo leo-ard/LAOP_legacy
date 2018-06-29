@@ -1,20 +1,19 @@
 package espece.network;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GradientPaint;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.RenderingHints;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.beans.PropertyChangeListener;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import javax.swing.JPanel;
+import javax.swing.*;
 
 import espece.Espece;
+import simulation.selection.NaturalSelection;
 
 public class NetworkPanel extends JPanel{
 		
@@ -35,7 +34,36 @@ public class NetworkPanel extends JPanel{
 		this.setPreferredSize(new Dimension(w, h));
 		this.network = e.getNeuralNetwork();
 		this.espece = e;
-		
+
+		JButton save = new JButton("Save Net");
+		save.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				saveBest();
+			}
+		});
+
+		add(save);
+
+	}
+
+	/**
+	 * Sauvegarde dans un fichier le meilleur neuralNetwork
+	 */
+	private void saveBest(){
+		Espece espece = NaturalSelection.best;
+
+		if(espece != null) {
+			try {
+				FileOutputStream fos = new FileOutputStream("best_nn.dat");
+				ObjectOutputStream oos = new ObjectOutputStream(fos);
+
+				oos.writeObject(espece.neuralNetwork);
+
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	public void start() {
@@ -52,6 +80,7 @@ public class NetworkPanel extends JPanel{
 	 * Dessine le système de neurone
 	 */
 	public void paintComponent(Graphics gra) {
+	    super.paintComponent(gra);
 		Graphics2D g = (Graphics2D)gra;
 		
 		g.setColor(Color.white);
@@ -63,8 +92,8 @@ public class NetworkPanel extends JPanel{
 		g.setFont(f);
 		String text = String.format("Bagage génétique de l'espèce  %s", this.espece.toString(), this.espece.getFitness());
 		g.drawString(text,this.getWidth()/2- getFontMetrics(f).stringWidth(text)/2, 20);
-		
-		
+
+
 		g.setFont(new Font("Arial",12,12));
 		g.setColor(Color.red);
 		g.setStroke(new BasicStroke(2));

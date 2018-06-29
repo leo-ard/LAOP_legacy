@@ -2,6 +2,7 @@ package map;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Random;
 
 import core.CONSTANTS;
 import espece.Espece;
@@ -14,34 +15,134 @@ import simulation.Simulation;
 public class Map {
 	
 	public ArrayList<Obstacle> obstacles;
-	public Point destination;
-	public Point depart;
+	public Point destination = null;
+	public Point depart = null;
 	public Simulation simulation;
 	
 	public int w, h;
 	public int orientation;
 
-	int[][] mapping = {
-	        {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, -2},
-            {0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, -2},
-            {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, -2},
-            {0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, -2},
-            {0, 9, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, -2},
-            {0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, -2},
-            {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, -2},
-            {0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, -2},
-            {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, -2}
+	//int[][] mapping;
 
-	};
+	/*int[][] mapping = {
+	        {0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, -2},
+            {0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, -2},
+            {0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, -2},
+            {0, 1, 0, 9, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, -2},
+            {0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 0, -2},
+            {0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, -2},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, -2}
+
+	};*/
+
+
+	/*int[][] mapping = {
+            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            {1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
+            {1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
+            {1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
+            {1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1},
+            {1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0},
+            {1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0},
+            {1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0},
+            {1, 0, 1, 0, 0, 0, 1, 0, 9, 0, 0, 1, 0, 1, 0, 1, 0},
+            {1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0},
+            {1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
+            {1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0},
+            {1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1},
+            {0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0},
+            {0, 9, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0},
+            {0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0}
+    };*/
+
+    int[][] mapping = {
+            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            {1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
+            {1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
+            {1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
+            {1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1},
+            {1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0},
+            {1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0},
+            {1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0},
+            {1, 0, 1, 0, 0, 0, 1, 0, 9, 0, 0, 1, 0, 1, 0, 1, 0},
+            {1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0},
+            {1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
+            {1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0},
+            {1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1},
+            {0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0},
+            {0, 9, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
+            {0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0}
+    };
+
 	int blocSize = 200;
 
 	
 	public Map(String s, Simulation sim) {
-		this.obstacles = new ArrayList<Obstacle>();
 		
 		this.simulation = sim;
-		this.w = mapping[0].length * blocSize;//11000;
-		this.h = mapping.length * blocSize;//2000;
+
+
+		//createRandomMap();
+        reloadMap();
+
+		this.orientation = 0;
+	}
+
+	public void createRandomMap(){
+        int width = utils.Random.getRandomIntegerValue(10, 50);
+        int height = utils.Random.getRandomIntegerValue(10, 50);
+
+        mapping = new int[height][width];
+
+        int blocChance = 40;
+
+        for(int i = 0 ; i < height ; i++){
+            for(int j = 0 ; j < width ; j++){
+                if(i == 1 && j == 1){
+                    mapping[i][j] = 9; //DEPART
+                    this.depart = new Point(j * blocSize, i * blocSize);
+                }
+                else if(i <= 2 && j <= 2){
+                    mapping[i][j] = 0; //Rien autour du spawn
+                }
+                else{
+                    mapping[i][j] = 0;
+
+                    int ran = utils.Random.getRandomIntegerValue(100);
+                    if(ran < blocChance){
+                        mapping[i][j] = 1;
+                    }
+                }
+            }
+        }
+        //Ajoute la fin aleatoirement
+        int endX = utils.Random.getRandomIntegerValue(10, width - 1);
+        int endY = utils.Random.getRandomIntegerValue(10, height -1 );
+
+        destination = new Point(endX, endY);
+        mapping[endY][endX] = -2; //Fin
+
+
+        if(!mapSolvable()){
+            createRandomMap();
+        }
+        else{
+            reloadMap();
+        }
+    }
+
+    private boolean mapSolvable(){
+        return true;
+    }
+
+    /**
+     * Reload la map, apres l'avoir generer
+     */
+    private void reloadMap(){
+        this.obstacles = new ArrayList<Obstacle>();
+
+        this.w = mapping[0].length * blocSize;//11000;
+        this.h = mapping.length * blocSize;//2000;
 
         for(int i = 0 ; i < mapping.length ; i++){
             for(int j = 0 ; j < mapping[0].length ; j++){
@@ -59,12 +160,8 @@ public class Map {
             }
         }
 
-        //Setup la destination sur toute la derniere colonne
-        //this.destination = new Point(mapping[0].length * blocSize, mapping.length * blocSize);
-
-		this.obstacles.add(new ObstacleContour(0, 0, w, h));
-		this.orientation = 0;
-	}
+        this.obstacles.add(new ObstacleContour(0, 0, w, h));
+    }
 	
 	public void update(ArrayList<Espece> especes) {
 		for(Espece e : especes) {
@@ -78,8 +175,22 @@ public class Map {
 
 	public void setFitnessToEspece(Espece e) {
 		double x = e.getX();
-		double scale = 0.01;
+		double y = e.getY();
+		double scale = 0.001;
 
-		e.setFitness(scale * ((x * 10)+5000*(CONSTANTS.TIME_LIMIT-simulation.time)/ CONSTANTS.TIME_LIMIT));
+        double averageSpeed = e.totalSpeed / simulation.time;
+
+        double fitness = ((1 * ((simulation.time - 0.00001) / CONSTANTS.TIME_LIMIT)) + scale * e.maxDistanceFromStart) ;// * averageSpeed);
+
+        //Quand il se rend a destination
+        if(fitness == Double.POSITIVE_INFINITY){
+            fitness = 9999999;
+		}
+
+		if(e.maxDistanceFromStart < 600){
+		    fitness = 0.0;
+        }
+
+		e.setFitness(fitness);
 	}
 }
