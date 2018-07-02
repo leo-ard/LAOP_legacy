@@ -70,7 +70,6 @@ public class FrameManager extends JFrame implements MouseListener{
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		this.requestFocus();
-		System.out.println("KYS");
 	}
 
 	@Override

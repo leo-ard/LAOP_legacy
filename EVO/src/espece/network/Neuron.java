@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import espece.network.functions.Function;
 import espece.network.functions.IFunction;
 
-public class Neuron implements Serializable {
+public class Neuron {
 	private ArrayList<Connection> inputs;
 	private Layer layer;
 	private int index;

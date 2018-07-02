@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.util.*;
+
+import espece.network.NetworkStructure;
 import map.Map;
 
 import core.CONSTANTS;
@@ -48,6 +50,10 @@ public class Espece {
 	public double totalSpeed;
 	public double maxDistanceFromStart;
 
+	public double manual_right = 0.0;
+	public double manual_left = 0.0;
+	public boolean shouldListenToNN = true;
+
 	private Map map;
 
 	/**
@@ -69,19 +75,12 @@ public class Espece {
         int ran = utils.Random.getRandomIntegerValue(1000);
 
         if(CONSTANTS.USE_BEST && ran < 800) {
-            try {
-                FileInputStream fis = new FileInputStream("best_nn.dat");
-                ObjectInputStream ois = new ObjectInputStream(fis);
+            NetworkStructure savedNS = NetworkStructure.load("best_nn.dat");
+            if(savedNS != null) {
+                neuralNetwork = new NeuralNetwork(savedNS);
 
-                neuralNetwork = (NeuralNetwork) ois.readObject();
                 neuralNetwork.minimalModificationWeight();
-
                 NB_CAPTEUR = neuralNetwork.getLayer(0).getSize();
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
             }
         }
         else{
@@ -144,42 +143,28 @@ public class Espece {
 			return;
 		}
 
-		if(map != null) {
-			double distanceFromStart = this.distanceFrom(map.depart);
-
-			if (distanceFromStart > maxDistanceFromStart) {
-				maxDistanceFromStart = distanceFromStart;
-			}
-		}
+		//Calcul la distance la plus loin que l'auto se rend
+		if(this.map != null){
+		    double currentDistance = distanceFrom(map.depart);
+		    if(maxDistanceFromStart < currentDistance){
+		        maxDistanceFromStart = currentDistance;
+            }
+        }
 		
 		//Update le résaux de neuronnes avec la valeur des capteurs
 		double[] capteurArray = capteursToArray();
-		/*double[] inputs = new double[capteurs.size() + 2];
-
-		for(int i = 0 ; i < capteurArray.length ; i++){
-			inputs[i] = capteurArray[i];
-		}
-
-		if(map != null && map.depart != null && map.destination != null){
-
-			Point depart = this.map.depart;
-			Point destination = this.map.destination;
-			int width = this.map.w;
-			int height = this.map.h;
-
-
-			//Distance de la fin comme input
-			inputs[(inputs.length - 1) - 1] = (double)(destination.x - x) / (double)width;
-			inputs[(inputs.length - 1)] = (double)(destination.y - y) / (double)height;
-		}*/
-
-
 
 		neuralNetwork.update(capteurArray);
 
 		double[] values = neuralNetwork.getOutputValues();
-		D = values[0];
-		G = values[1];
+		if(shouldListenToNN) {
+            D = values[0];
+            G = values[1];
+        }
+        else{
+		    D = manual_right;
+		    G = manual_left;
+        }
 		
 		orientationRad += Math.toRadians(D*dt - G*dt)*CONSTANTS.TURNRATE;
 		acceleration = D*dt*CONSTANTS.VITESSE_VOITURE/100 + G*dt*CONSTANTS.VITESSE_VOITURE/100;

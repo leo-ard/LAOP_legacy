@@ -7,7 +7,7 @@ import java.util.Iterator;
 
 import utils.Random;
 
-public class Layer implements Iterable<Neuron>, Serializable {
+public class Layer implements Iterable<Neuron> {
 	private Neuron bias;
 	private ArrayList<Neuron> neurons;
 	private int index;

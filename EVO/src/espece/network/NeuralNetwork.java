@@ -96,7 +96,8 @@ public class NeuralNetwork implements Serializable {
 			layers.get(outputLayerIndex).addConnection(outputNeuronIndex, c);
 			
 		}
-		
+
+		this.fitness = ns.fitness;
 	}
 
 	public NeuralNetwork(int inputs, int outputs) {
@@ -221,10 +222,13 @@ public class NeuralNetwork implements Serializable {
 	public void mutate() {
         int ran = Random.getRandomIntegerValue(100);
 
-        if (ran <= 5)
+        if (ran <= 10)
             this.addRandomConnection();
-            if (ran <= 1){
+            if (ran <= 5){
                 mutateRandomConnection();
+                if(ran <= 2){
+                    bigModificationWeight();
+                }
             }
         else {
             this.minimalModificationWeight();
@@ -237,6 +241,13 @@ public class NeuralNetwork implements Serializable {
 		double ranModifi = Random.getRandomDoubleValue(-0.2, 0.2);
 		c.setWeight(c.getWeight()+ranModifi);
 	}
+
+	public void bigModificationWeight(){
+	    int ran = Random.getRandomIntegerValue(this.getAllConnections().size());
+	    Connection c = this.getAllConnections().get(ran);
+	    double ranModifi = Random.getRandomDoubleValue(-0.7, 0.7);
+	    c.setWeight(c.getWeight()+ranModifi);
+    }
 
 	public int nbConnections() {
 		int nb = 0;

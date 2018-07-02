@@ -149,7 +149,6 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 
 		int ex = (int) ((e.getX()-viewX-offX)*(1.0/(double)zoom));
 		int ey = (int) ((e.getY()-viewY-offY)*(1.0/(double)zoom));
-		System.out.println(ex+" "+ey);
 		
 		Espece selected = map.simulation.getEspeces().get(0);
 		int proche = selected.distanceFrom(new Point(ex,ey));
@@ -163,6 +162,11 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 			}
 		}
 		selected.selected = true;
+        System.out.println("====== INFO de l'auto ========");
+        System.out.println("Is dead? " + selected.isDead());
+		System.out.println("Fitness: " + selected.getFitness());
+        System.out.println("Max distance from start: " + selected.maxDistanceFromStart);
+        System.out.println("==============================");
 		
 		EVO.frame.changeNetworkFocus(selected);
 	}

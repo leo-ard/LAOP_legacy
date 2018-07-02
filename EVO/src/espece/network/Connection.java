@@ -4,7 +4,7 @@ import utils.Random;
 
 import java.io.Serializable;
 
-public class Connection implements Serializable {
+public class Connection {
 	
 	private double weight;
 	private Neuron neuronInput;

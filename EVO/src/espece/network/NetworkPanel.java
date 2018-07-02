@@ -54,15 +54,7 @@ public class NetworkPanel extends JPanel{
 		Espece espece = NaturalSelection.best;
 
 		if(espece != null) {
-			try {
-				FileOutputStream fos = new FileOutputStream("best_nn.dat");
-				ObjectOutputStream oos = new ObjectOutputStream(fos);
-
-				oos.writeObject(espece.neuralNetwork);
-
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			NetworkStructure.save("best_nn.dat", espece.neuralNetwork);
 		}
 	}
 	

@@ -1,7 +1,6 @@
 package simulation;
 
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.*;
@@ -11,6 +10,7 @@ import java.util.Comparator;
 import core.CONSTANTS;
 import espece.Espece;
 import espece.capteur.Capteur;
+import espece.network.NetworkStructure;
 import espece.network.NeuralNetwork;
 import map.Map;
 import map.MapPanel;
@@ -21,6 +21,8 @@ public class Simulation extends Thread implements KeyListener{
 	
 	Map map;
 	MapPanel mapPanel;
+
+	int generation = 0;
 	
 	public ArrayList<Espece> especesOpen;
 	public ArrayList<Espece> especesClosed;
@@ -30,6 +32,8 @@ public class Simulation extends Thread implements KeyListener{
 	boolean running = true;
 	boolean pausing = false;
 	boolean REALTIMEMODE = false;
+	boolean MANUALMODE = false;
+	boolean RANDOMMAP = false;
 	
 	
 	//temporaire
@@ -102,7 +106,6 @@ public class Simulation extends Thread implements KeyListener{
 				try {
 					timePassed = System.currentTimeMillis() - currTime;
 					if(timePassed > dt) {
-						System.out.println("ERROR - NOT ENOUGHT TIME");
 					}
 					//System.out.println(timePassed);
 					
@@ -124,11 +127,14 @@ public class Simulation extends Thread implements KeyListener{
 	}
 
 	private void nextGeneration(){
+		this.generation++;
+
         for(int i = 0; i < especesOpen.size(); i++) {
             Espece espece = especesOpen.get(i);
 
+			map.setFitnessToEspece(espece);
+
             espece.kill();
-            map.setFitnessToEspece(espece);
             especesClosed.add(espece);
             especesOpen.remove(i);
         }
@@ -139,24 +145,14 @@ public class Simulation extends Thread implements KeyListener{
         if(NaturalSelection.best != null){
             //Load le currentBest
             NeuralNetwork currentBest = null;
-            try{
-                FileInputStream fis = new FileInputStream("best_nn.dat");
-                ObjectInputStream ois = new ObjectInputStream(fis);
+            NetworkStructure bestNS = NetworkStructure.load("best_nn.dat");
 
-                currentBest = (NeuralNetwork) ois.readObject();
-
-
-            } catch (FileNotFoundException e) {
-                currentBest = null;
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
+            if(bestNS != null) {
+                currentBest = new NeuralNetwork(bestNS);
             }
 
-
             if(currentBest != null){
-                System.out.println("Current: " + currentBest.getFitness() + " Now: " + NaturalSelection.best.getFitness());
+                System.out.println("Saved best: " + currentBest.getFitness() + " Now: " + NaturalSelection.best.getFitness());
 
                 //Check si le nouveau est meilleur
                 if(NaturalSelection.best.getFitness() > currentBest.getFitness()){
@@ -172,8 +168,12 @@ public class Simulation extends Thread implements KeyListener{
 
         time = 0;
 
-        //Change la map
-		//map.createRandomMap();
+        //Change la map a chaque 10 generations
+        if(RANDOMMAP) {
+            if (this.generation % 10 == 0) {
+                map.createRandomMap();
+            }
+        }
 
     }
 
@@ -184,15 +184,7 @@ public class Simulation extends Thread implements KeyListener{
         Espece espece = NaturalSelection.best;
 
         if(espece != null) {
-            try {
-                FileOutputStream fos = new FileOutputStream("best_nn.dat");
-                ObjectOutputStream oos = new ObjectOutputStream(fos);
-
-                oos.writeObject(espece.neuralNetwork);
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            NetworkStructure.save("best_nn.dat", espece.neuralNetwork);
         }
     }
 	
@@ -212,21 +204,44 @@ public class Simulation extends Thread implements KeyListener{
 		
 	}
 
+	private Espece getSelectedEspece(){
+        for(Espece espece : this.especesOpen){
+            if(espece.selected){
+                return espece;
+            }
+        }
+
+        return null;
+    }
+
 	@Override
 	public void keyPressed(KeyEvent e) {
 	    //Next generation
 	    if(e.getKeyCode() == KeyEvent.VK_Q){
             nextGeneration();
         }
-		if(e.getKeyCode() == KeyEvent.VK_D) {
-			D = true;
-		}
-		if(e.getKeyCode() == KeyEvent.VK_A) {
-			G = true;
-		}
+		if(e.getKeyCode() == KeyEvent.VK_X){
+	        REALTIMEMODE = true;
+	        MANUALMODE = true;
+        }
 		if(e.getKeyCode() == KeyEvent.VK_R) {
 			REALTIMEMODE = !REALTIMEMODE;
 		}
+
+		if(MANUALMODE){
+            Espece selected = getSelectedEspece();
+
+	        if(e.getKeyCode() == KeyEvent.VK_A){
+	            selected.shouldListenToNN = false;
+	            selected.manual_left = 1.0;
+                System.out.println("gauche");
+            }
+            else if(e.getKeyCode() == KeyEvent.VK_D){
+                selected.shouldListenToNN = false;
+                selected.manual_right = 1.0;
+                System.out.println("droite");
+            }
+        }
 		
 		if(e.getKeyCode() == KeyEvent.VK_SPACE) {
 			pausing=!pausing;
@@ -236,12 +251,18 @@ public class Simulation extends Thread implements KeyListener{
 	}
 	@Override
 	public void keyReleased(KeyEvent e) {
-		if(e.getKeyCode() == KeyEvent.VK_D) {
-			D = false;
-		}
-		if(e.getKeyCode() == KeyEvent.VK_A) {
-			G = false;
-		}
+        if(MANUALMODE) {
+            Espece selected = getSelectedEspece();
+            if (e.getKeyCode() == KeyEvent.VK_D) {
+                selected.shouldListenToNN = true;
+                selected.manual_right = 0.0;
+
+            }
+            if (e.getKeyCode() == KeyEvent.VK_A) {
+                selected.shouldListenToNN = true;
+                selected.manual_left = 0.0;
+            }
+        }
 		
 	}
 
@@ -249,7 +270,7 @@ public class Simulation extends Thread implements KeyListener{
 	public void keyTyped(KeyEvent e) {}
 
 	public ArrayList<Espece> getEspeces() {
-		ArrayList<Espece> temp = new ArrayList<Espece>();
+		ArrayList<Espece> temp = new ArrayList<>();
 		temp.addAll(especesClosed);
 		temp.addAll(especesOpen);
 		
