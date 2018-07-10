@@ -16,4 +16,8 @@ public class Start extends Square implements Drawable {
         this.rect = new Rectangle();
     }
 
+    @Override
+    public void draw(Graphics2D g) {
+        g.drawImage(icon.getImage(), position.x, position.y, null);
+    }
 }

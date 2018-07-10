@@ -13,6 +13,8 @@ import org.lrima.map.Map;
 import org.lrima.espece.capteur.Capteur;
 import org.lrima.espece.network.NeuralNetwork;
 import org.lrima.map.MapPanel;
+import org.lrima.map.Studio.Drawables.Line;
+import org.lrima.map.Studio.Drawables.Obstacle;
 
 public class Espece {
 	
@@ -33,7 +35,7 @@ public class Espece {
 	private ArrayList<Capteur> capteurs = new ArrayList<Capteur>();
 
 	//MAX 180
-	private int NB_CAPTEUR = 6;
+	private int NB_CAPTEUR = 1;
 	
 	public NeuralNetwork neuralNetwork;
 	
@@ -53,17 +55,15 @@ public class Espece {
 
 	/**
 	 * Créer une espèce avec la position et l'orientation spécifiée
-	 * 
-	 * @param positionDeDepart Position de départ
-	 * @param orientationDeDepart Orientation de départ en degrés
+	 *
 	 */
-	public Espece(Point positionDeDepart, double orientationDeDepart, Map map) {
+	public Espece(Map map) {
 		this();
 
 		this.map = map;
-		this.x = positionDeDepart.x;
-		this.y = positionDeDepart.y;
-		this.orientationRad = Math.toRadians(orientationDeDepart);
+		this.x = map.depart.x;
+		this.y = map.depart.y;
+		this.orientationRad = map.orientation;
 
         //Load la meilleure org.lrima.espece
 
@@ -77,8 +77,8 @@ public class Espece {
 
     }
 
-    public Espece(Point positionDeDepart, double orientationDeDepart, Map map, NeuralNetwork nn){
-	    this(positionDeDepart, orientationDeDepart, map);
+    public Espece(Map map, NeuralNetwork nn){
+	    this(map);
 	    this.neuralNetwork = nn;
     }
 	
@@ -158,7 +158,8 @@ public class Espece {
         int savedCarSpeed = UserPrefs.preferences.getInt(UserPrefs.KEY_CAR_SPEED, UserPrefs.DEFAULT_CAR_SPEED);
         double savedTurnRate = UserPrefs.preferences.getDouble(UserPrefs.KEY_TURN_RATE, UserPrefs.DEFAULT_TURN_RATE);
 
-		orientationRad += Math.toRadians(D*dt - G*dt)*savedTurnRate;
+
+		orientationRad -= Math.toRadians(G*dt - D*dt)*savedTurnRate;
 		acceleration = D*dt*savedCarSpeed/100 + G*dt*savedCarSpeed/100;
 		vitesse += acceleration - vitesse;
 		
@@ -185,6 +186,16 @@ public class Espece {
 		//Draw les capteurs
         if(selected) {
             for (Capteur c : capteurs) {
+                g.setColor(Color.CYAN);
+            	for(Obstacle o : map.obstacles){
+            	    if(o.type.equals(Obstacle.TYPE_LINE)){
+            	        Line line = (Line) o;
+
+            	        if(line.isCollideWith(c)){
+            	            g.setColor(Color.GREEN);
+                        }
+                    }
+                }
                 c.draw(g);
             }
         }

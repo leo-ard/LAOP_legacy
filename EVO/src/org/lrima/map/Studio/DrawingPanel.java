@@ -11,19 +11,39 @@ import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class DrawingPanel extends JPanel implements MouseMotionListener, MouseListener {
+public class DrawingPanel extends JPanel implements MouseMotionListener, MouseListener, MouseWheelListener {
 
     private Obstacle selectedObstacle = null;
     public ArrayList<Obstacle> placedObstacles;
-    private Point mousePosition;
+    private Point mousePositionOnMap;
 
     private Point firstClic = null;
     private Point secondClic = null;
 
-    public DrawingPanel(){
+    //View range
+    private int viewX, viewY;
+    private int offX, offY;
+    private float zoom;
+    int lastMousePositionX, lastMousePositionY;
+
+    int mapWidth = 10000;
+    int mapHeight = 10000;
+
+    boolean placedStart = false;
+    boolean placedEnd = false;
+
+    Studio studio;
+
+    public DrawingPanel(Studio studio){
+        this.studio = studio;
 
         addMouseMotionListener(this);
         addMouseListener(this);
+        addMouseWheelListener(this);
+
+        this.zoom = 0.40f;
+        this.viewX =0;
+        this.viewY =0;
 
         placedObstacles = new ArrayList<>();
     }
@@ -39,21 +59,30 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
     }
 
     @Override
-    protected void paintComponent(Graphics g) {
+    protected void paintComponent(Graphics gld) {
+        Graphics2D g = (Graphics2D) gld;
         super.paintComponent(g);
+
+        g.scale(zoom, zoom);
+        g.translate((viewX+offX)*(1.0/(double)zoom), (viewY+offY)*(1.0/(double)zoom));
+
+        //Draw la map
+        g.setColor(new Color(255, 178, 102));
+        g.fillRect(0, 0, mapWidth, mapHeight);
+
+        g.setColor(new Color(255, 51, 51));
         //L'icon suit la souris de l'utilisateur
         if(selectedObstacle != null){
-            g.drawImage(selectedObstacle.getIcon().getImage(),mousePosition.x, mousePosition.y, null);
-            if(selectedObstacle.type == Obstacle.TYPE_LINE){
-                Graphics2D g2 = (Graphics2D) g;
+            g.drawImage(selectedObstacle.getIcon().getImage(),mousePositionOnMap.x, mousePositionOnMap.y, null);
+            if(selectedObstacle.type.equals(Obstacle.TYPE_LINE)){
 
-                g2.setStroke(new BasicStroke(10));
+                g.setStroke(new BasicStroke(10));
                 if(firstClic != null) {
                     if(secondClic == null) {
-                        g2.drawLine(firstClic.x, firstClic.y, mousePosition.x, mousePosition.y);
+                        g.drawLine(firstClic.x, firstClic.y, mousePositionOnMap.x, mousePositionOnMap.y);
                     }
                     else{
-                        g2.drawLine(firstClic.x, firstClic.y, secondClic.x, secondClic.y);
+                        g.drawLine(firstClic.x, firstClic.y, secondClic.x, secondClic.y);
                     }
                 }
             }
@@ -62,33 +91,33 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
         //Draw tous les obstacles placed
         Iterator<Obstacle> iterator = placedObstacles.iterator();
         while(iterator.hasNext()) {
+            Obstacle currentObstacle = iterator.next();
 
-            Obstacle currentObstacle = (Obstacle) iterator.next();
-
-            if (currentObstacle.placingIcon) {
-                g.drawImage(currentObstacle.getIcon().getImage(), currentObstacle.getPosition().x, currentObstacle.getPosition().y, null);
-            }
-            else{
-                Graphics2D g2 = (Graphics2D) g;
-
-                if(currentObstacle.type.equals(Obstacle.TYPE_LINE)){
-                    Line line = (Line) currentObstacle;
-                    g2.setStroke(new BasicStroke(line.strokeWidth));
-                    g2.drawLine(line.start.x, line.start.y, line.end.x, line.end.y);
-                }
-            }
+            currentObstacle.draw(g);
         }
     }
 
     public void setSelectedObstacle(Obstacle selectedObstacle) { this.selectedObstacle = selectedObstacle; }
 
     @Override
-    public void mouseDragged(MouseEvent e) { }
+    public void mouseDragged(MouseEvent e) {
+        viewX = (int) (e.getX()-lastMousePositionX);
+        viewY = (int) (e.getY()-lastMousePositionY);
+
+        repaint();
+    }
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        mousePosition = new Point(e.getX(), e.getY());
+        getMousePositionOnMap(e);
         this.repaint();
+    }
+
+    private void getMousePositionOnMap(MouseEvent e){
+        int x = -((int)((viewX+offX)*(1.0/(double)zoom) - e.getX()*(1.0/(double)zoom)));
+        int y = -((int)((viewY+offY)*(1.0/(double)zoom) - e.getY()*(1.0/(double)zoom)));
+
+        mousePositionOnMap = new Point(x, y);
     }
 
     public void resetClic(){
@@ -101,22 +130,39 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 
     @Override
     public void mousePressed(MouseEvent e) {
+        getMousePositionOnMap(e);
+        lastMousePositionX = e.getX()-viewX;
+        lastMousePositionY = e.getY()-viewY;
+
         //Clique gauche
         if(e.getButton() == MouseEvent.BUTTON1) {
             //Si il place une icon
             if (selectedObstacle.placingIcon) {
-                selectedObstacle.move(mousePosition);
+                selectedObstacle.move(mousePositionOnMap);
                 placedObstacles.add(selectedObstacle);
+
+                //On place seulement start et end une fois
+                if(selectedObstacle.type.equals(Obstacle.TYPE_START)){
+                    placedStart = true;
+                    selectedObstacle = null;
+                    studio.startButton.setEnabled(false);
+                }
+                if(selectedObstacle.type.equals(Obstacle.TYPE_END)){
+                    placedEnd = true;
+                    selectedObstacle = null;
+                    studio.endButton.setEnabled(false);
+                }
+
                 nextObstacle();
             }
 
             //Si le user dessine une ligne
-            if (selectedObstacle.type == Obstacle.TYPE_LINE) {
+            if (selectedObstacle.type.equals(Obstacle.TYPE_LINE)) {
                 Line line = (Line) selectedObstacle;
 
                 if (firstClic == null) {
                     if (secondClic == null) {
-                        firstClic = new Point(e.getX(), e.getY());
+                        firstClic = mousePositionOnMap;
                     } else {
                         firstClic = secondClic;
                         secondClic = null;
@@ -124,7 +170,7 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
                     line.start = firstClic;
                 } else {
                     if (secondClic == null) {
-                        secondClic = new Point(e.getX(), e.getY());
+                        secondClic = mousePositionOnMap;
                         line.end = secondClic;
                         placedObstacles.add(line);
                         nextObstacle();
@@ -154,15 +200,58 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
                 selectedObstacle = null;
                 repaint();
             }
+
+            //Check si il n'y a plus de start ou de end
+            placedStart = false;
+            studio.startButton.setEnabled(true);
+
+            Iterator<Obstacle> iterator = placedObstacles.iterator();
+            while(iterator.hasNext()){
+                Obstacle obstacle = iterator.next();
+                if(obstacle.type.equals(Obstacle.TYPE_START)){
+                    placedStart = true;
+                    studio.startButton.setEnabled(false);
+                }
+                if(obstacle.type.equals(Obstacle.TYPE_END)){
+                    placedEnd = true;
+                    studio.endButton.setEnabled(false);
+                }
+            }
         }
     }
 
     @Override
-    public void mouseReleased(MouseEvent e) { }
+    public void mouseReleased(MouseEvent e) {
+        viewX = (int) (e.getX()-lastMousePositionX);
+        viewY = (int) (e.getY()-lastMousePositionY);
+    }
 
     @Override
     public void mouseEntered(MouseEvent e) { }
 
     @Override
     public void mouseExited(MouseEvent e) { }
+
+    @Override
+    public void mouseWheelMoved(MouseWheelEvent e) {
+        double delta = e.getWheelRotation()/10.0;
+        double zoomOld = zoom;
+        zoom /= Math.exp(delta);
+
+        double mouseXOnMap = (viewX+offX)*(1.0/(double)zoomOld) - e.getX()*(1.0/(double)zoomOld);
+        double mouseYOnMap = (viewY+offY)*(1.0/(double)zoomOld) - e.getY()*(1.0/(double)zoomOld);
+
+        offX += (int) (-mouseXOnMap  * -(zoom-zoomOld));
+        offY += (int) (-mouseYOnMap * -(zoom-zoomOld));
+    }
+
+    /**
+     * Reset la map a zero
+     */
+    public void newMap(){
+        this.selectedObstacle = null;
+        this.placedEnd = false;
+        this.placedStart = false;
+        this.placedObstacles = new ArrayList<Obstacle>();
+    }
 }

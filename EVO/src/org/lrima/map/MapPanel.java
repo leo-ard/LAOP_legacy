@@ -24,7 +24,8 @@ import javax.swing.JPanel;
 import org.lrima.core.EVO;
 import org.lrima.core.UserPrefs;
 import org.lrima.espece.Espece;
-import org.lrima.map.obstacle.Obstacle;
+import org.lrima.espece.capteur.Capteur;
+import org.lrima.map.Studio.Drawables.Obstacle;
 
 public class MapPanel extends JPanel implements MouseMotionListener, MouseListener, MouseWheelListener{
 	
@@ -160,15 +161,22 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 				proche = espece.distanceFrom(new Point(ex, ey));
 				selected = espece;
 			}
+
 		}
 		selected.selected = true;
-        System.out.println("====== INFO de l'auto ========");
-        System.out.println("Is dead? " + selected.isDead());
-		System.out.println("Fitness: " + selected.getFitness());
-        System.out.println("Max distance from start: " + selected.maxDistanceFromStart);
-        System.out.println("==============================");
+
+		System.out.println("Clic: " + getPointOnMap(e.getPoint()));
+		/*System.out.println("Selected position: " + new Point.Double(selected.getX(), selected.getY()));*/
+
 		
 		EVO.frame.changeNetworkFocus(selected);
+	}
+
+	public Point.Double getPointOnMap(Point point){
+		double mouseXOnMap = -((viewX+offX)*(1.0/(double)zoom) - point.x*(1.0/(double)zoom));
+		double mouseYOnMap = -((viewY+offY)*(1.0/(double)zoom) - point.y*(1.0/(double)zoom));
+
+		return new Point.Double(mouseXOnMap, mouseYOnMap);
 	}
 
 	@Override

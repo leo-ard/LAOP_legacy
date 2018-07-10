@@ -20,6 +20,7 @@ public class Studio extends JFrame implements ActionListener {
     JFileChooser fileChooser;
     JMenuItem save;
     JMenuItem load;
+    JMenuItem newMap;
 
     public Studio(Simulation simulation){
         this.simulation = simulation;
@@ -30,7 +31,7 @@ public class Studio extends JFrame implements ActionListener {
         setupMenu();
         setupToolBar();
 
-        drawingPanel = new DrawingPanel();
+        drawingPanel = new DrawingPanel(this);
         add(drawingPanel);
 
         //Continue la simulation quand on ferme le Studio
@@ -52,6 +53,10 @@ public class Studio extends JFrame implements ActionListener {
 
         JMenu file = new JMenu("File");
         menuBar.add(file);
+
+        newMap = new JMenuItem("New");
+        newMap.addActionListener(this);
+        file.add(newMap);
 
         save = new JMenuItem("Save");
         save.addActionListener(this);
@@ -103,6 +108,9 @@ public class Studio extends JFrame implements ActionListener {
         }
 
         //Menu
+        if(e.getSource() == newMap){
+            drawingPanel.newMap();
+        }
         if(e.getSource() == save){
             fileChooser.setApproveButtonText("Save");
 

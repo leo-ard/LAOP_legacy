@@ -59,7 +59,7 @@ public abstract class Obstacle implements IObstacle{
 	
 	protected double getCapteurValueForRect(Capteur c, int w,int h) {
 		
-		double xRel = c.getLongeurX();
+		/*double xRel = c.getLongeurX();
 		double yRel = c.getLongeurY();
 		
 		Line2D.Double line = new Line2D.Double(c.getX1(), c.getY1(), c.getX1()+xRel, c.getY1()+yRel);
@@ -90,7 +90,8 @@ public abstract class Obstacle implements IObstacle{
 			v = addValue(v, syh);
 		}
 		
-		return v;
+		return v;*/
+		return 1.0;
 	}
 	
 	protected double addValue(double value, double value2) {

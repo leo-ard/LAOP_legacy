@@ -44,4 +44,7 @@ public class Obstacle implements Drawable, Serializable {
     public Point getPosition() {
         return position;
     }
+    @Override
+    public void draw(Graphics2D g) {
+    }
 }

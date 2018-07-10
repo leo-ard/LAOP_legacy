@@ -11,7 +11,8 @@ import org.lrima.espece.network.NetworkStructure;
 import org.lrima.espece.network.NeuralNetwork;
 import org.lrima.map.Map;
 import org.lrima.map.MapPanel;
-import org.lrima.map.obstacle.Obstacle;
+import org.lrima.map.Studio.Drawables.Line;
+import org.lrima.map.Studio.Drawables.Obstacle;
 import org.lrima.simulation.selection.NaturalSelection;
 
 public class Simulation extends Thread implements KeyListener{
@@ -69,8 +70,39 @@ public class Simulation extends Thread implements KeyListener{
 					for(int i = 0; i < especesOpen.size(); i++) {
 						Espece e = especesOpen.get(i);
 						e.resetCapteur();
-						for(Obstacle o : map.obstacles) {
-							if(o.fastCollision(e)) {
+						for(Capteur c : e.getCapteursList()){
+						    boolean collided = false;
+						    for(Obstacle o : map.obstacles){
+						        if(o.type.equals(Obstacle.TYPE_LINE)){
+						            Line line = (Line) o;
+						            if(!collided) {
+										double capteurValue = line.getCapteurValue(c);
+
+										if (capteurValue != -1.0) {
+											//Si il y a eu une collision
+											c.setValue(capteurValue);
+											c.lastObstacleCollided = o;
+											collided = true;
+										}
+									}
+                                }
+                            }
+                            if(!collided){
+						        c.setValue(1.0);
+                            }
+                        }
+
+						/*for(Obstacle o : map.obstacles) {
+						    if(o.type.equals(Obstacle.TYPE_LINE)) {
+						        Line line = (Line) o;
+                                for (Capteur c : e.getCapteursList()) {
+                                    if(line.isCollideWith(c)) {
+                                        c.setValue(line.getCapteurValue(c));
+                                    }
+                                }
+                            }
+
+							/*if(o.fastCollision(e)) {
 								for(Capteur c : e.getCapteursList()) {
 									c.setValue(o.getCapteurValue(c));
 								}
@@ -88,7 +120,7 @@ public class Simulation extends Thread implements KeyListener{
 									}
 								}
 							}
-						}
+						}*/
 					}
                     //Quand le user clique sur le bouton new map dans le menu
                     if(shouldGetNewMap){
@@ -137,6 +169,7 @@ public class Simulation extends Thread implements KeyListener{
 	}
 
 	public void changeNeuralNetwork(NeuralNetwork nn){
+	    generation = 0;
         neuralNetworkToUse = nn;
         shouldResetAndAddEspece = true;
     }
@@ -189,11 +222,11 @@ public class Simulation extends Thread implements KeyListener{
 
 		while(especesOpen.size() < numberOfCar) {
 		    if(neuralNetworkToUse == null) {
-                especesOpen.add(new Espece(map.depart, map.orientation, this.map));
+                especesOpen.add(new Espece(this.map));
             }
             else{
 		        //Load le neuralNetwork qui a été demmandé d'être loadé
-		        especesOpen.add(new Espece(map.depart, map.orientation, this.map, neuralNetworkToUse));
+		        especesOpen.add(new Espece(this.map, neuralNetworkToUse));
             }
 		}
 		
@@ -243,5 +276,9 @@ public class Simulation extends Thread implements KeyListener{
 
     public Map getMap() {
         return map;
+    }
+
+    public MapPanel getMapPanel() {
+        return mapPanel;
     }
 }

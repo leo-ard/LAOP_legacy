@@ -1,14 +1,15 @@
 package org.lrima.map;
 
 import java.awt.Point;
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import org.lrima.core.UserPrefs;
 import org.lrima.espece.Espece;
-import org.lrima.map.obstacle.Obstacle;
-import org.lrima.map.obstacle.ObstacleArrivee;
-import org.lrima.map.obstacle.ObstacleContour;
-import org.lrima.map.obstacle.ObstcaleRect;
+import org.lrima.map.Studio.Drawables.Line;
+import org.lrima.map.Studio.Drawables.Obstacle;
 import org.lrima.simulation.Simulation;
 
 public class Map {
@@ -68,8 +69,7 @@ public class Map {
 	public Map(String s, Simulation sim) {
 		
 		this.simulation = sim;
-
-
+        orientation = 0;
 		//createRandomMap();
         reloadMap();
 
@@ -129,10 +129,29 @@ public class Map {
     private void reloadMap(){
         this.obstacles = new ArrayList<Obstacle>();
 
-        this.w = mapping[0].length * blocSize;//11000;
-        this.h = mapping.length * blocSize;//2000;
+        try {
+            FileInputStream fis = new FileInputStream("test.map");
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            this.obstacles = (ArrayList<Obstacle>) ois.readObject();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
-        for(int i = 0 ; i < mapping.length ; i++){
+        //depart = new Point(500, 500);
+
+        this.w = 10000;
+        this.h = 10000;
+
+        //Trouve le depart
+        Iterator<Obstacle> iterator = obstacles.iterator();
+        while (iterator.hasNext()){
+            Obstacle obstacle = iterator.next();
+            if(obstacle.type.equals(Obstacle.TYPE_START)){
+                this.depart = obstacle.getPosition();
+            }
+        }
+
+        /*for(int i = 0 ; i < mapping.length ; i++){
             for(int j = 0 ; j < mapping[0].length ; j++){
                 switch(mapping[i][j]){
                     case 1:
@@ -157,17 +176,18 @@ public class Map {
             }
         }
 
-        this.obstacles.add(new ObstacleContour(0, 0, w, h));
+        this.obstacles.add(new ObstacleContour(0, 0, w, h));*/
     }
 	
 	public void update(ArrayList<Espece> especes) {
-		for(Espece e : especes) {
+        //TODO
+		/*for(Espece e : especes) {
 			for(Obstacle o : obstacles) {
 				if(o.collision(e)) {
 					e.kill();
 				}
 			}
-		}
+		}*/
 	}
 
 	public void setFitnessToEspece(Espece e) {

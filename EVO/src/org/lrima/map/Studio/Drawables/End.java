@@ -10,4 +10,9 @@ public class End extends Square {
         icon = new ImageIcon(getClass().getResource("/images/icons/Map_Studio/finish.gif"));
         this.rect = new Rectangle();
     }
+
+    @Override
+    public void draw(Graphics2D g) {
+        g.drawImage(icon.getImage(), position.x, position.y, null);
+    }
 }
