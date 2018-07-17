@@ -54,7 +54,7 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
             selectedObstacle = new Line(selectedObstacle);
         }
         else{
-            selectedObstacle = new Obstacle(selectedObstacle);
+            //selectedObstacle = new Obstacle(selectedObstacle);
         }
     }
 
@@ -137,7 +137,7 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
         //Clique gauche
         if(e.getButton() == MouseEvent.BUTTON1) {
             //Si il place une icon
-            if (selectedObstacle.placingIcon) {
+            if (selectedObstacle != null && selectedObstacle.placingIcon) {
                 selectedObstacle.move(mousePositionOnMap);
                 placedObstacles.add(selectedObstacle);
 

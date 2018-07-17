@@ -14,6 +14,8 @@ public class EVO {
 		UserPrefs prefs = new UserPrefs();
         UserPrefs.load();
 
+        //UserPrefs.preferences.putInt(UserPrefs.KEY_NUMBER_OF_CAR, 10);
+
 		start();
 
 	}

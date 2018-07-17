@@ -11,6 +11,7 @@ public class UserPrefs {
 
     public static boolean REAL_TIME;
     public static boolean RANDOM_MAP;
+    public static boolean FOLLOW_BEST;
 
     public static boolean SHOW_WINDOW_GRAPHIQUE;
     public static boolean SHOW_WINDOW_NEURAL_NETWORK;
@@ -34,6 +35,7 @@ public class UserPrefs {
 
     final public static String KEY_REAL_TIME = "REAL_TIME";
     final public static String KEY_RANDOM_MAP = "RANDOM_MAP";
+    final public static String KEY_FOLLOW_BEST = "FOLLOW_BEST";
 
     final public static String KEY_WINDOW_GRAPHIQUE = "WINDOW_GRAPHIQUE";
     final public static String KEY_WINDOW_NEURAL_NET = "WINDOW_NEURAL_NET";
@@ -49,6 +51,7 @@ public class UserPrefs {
 
     final public static boolean DEFAULT_REAL_TIME = false;
     final public static boolean DEFAULT_RANDOM_MAP = false;
+    final public static boolean DEFAULT_FOLLOW_BEST = true;
 
     final public static boolean DEFAULT_WINDOW_GRAPHIQUE = false;
     final public static boolean DEFAULT_WINDOW_NEURAL_NET = false;
@@ -68,6 +71,7 @@ public class UserPrefs {
 
         REAL_TIME = preferences.getBoolean(KEY_REAL_TIME, DEFAULT_REAL_TIME);
         RANDOM_MAP = preferences.getBoolean(KEY_RANDOM_MAP, DEFAULT_RANDOM_MAP);
+        FOLLOW_BEST = preferences.getBoolean(KEY_FOLLOW_BEST, DEFAULT_FOLLOW_BEST);
 
         SHOW_WINDOW_GRAPHIQUE = preferences.getBoolean(KEY_WINDOW_GRAPHIQUE, DEFAULT_WINDOW_GRAPHIQUE);
         SHOW_WINDOW_NEURAL_NETWORK = preferences.getBoolean(KEY_WINDOW_NEURAL_NET, DEFAULT_WINDOW_NEURAL_NET);

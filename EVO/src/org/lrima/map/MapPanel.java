@@ -53,12 +53,15 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 	//images;
 	public static Image IMG_VOITURE;
 	public static Image IMG_LRIMA;
-	
+
+	public boolean followBest = UserPrefs.FOLLOW_BEST;
+
+
 	public MapPanel(Map map, int w, int h) {
 		this.setPreferredSize(new Dimension(w, h));
 		this.map = map;
 		
-		this.zoom = 0.40f;
+		this.zoom = 1.50f;
 		this.viewX =(int) ((-map.depart.x+ w/2)*zoom);
 		this.viewY =(int) ((-map.depart.y+ h/2)*zoom);
 		
@@ -66,6 +69,7 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 		this.addMouseMotionListener(this);
 		this.addMouseWheelListener(this);
 		this.addMouseListener(this);
+
 		//this.mouseWheelMoved(new MouseWheelEvent(this, 0, 0, 0, 0, 0, 0, true, 0, 0, 0));
 		
 	}
@@ -94,13 +98,37 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 	public void paintComponent(Graphics g1d) {
 		Graphics2D g = (Graphics2D) g1d;
 		super.paintComponent(g);
-		
-		g.scale(zoom, zoom);
-		g.translate((viewX+offX)*(1.0/(double)zoom), (viewY+offY)*(1.0/(double)zoom));
+
+
+		if(followBest){
+			Espece bestEspece = map.simulation.getBest();
+
+			double anchorx = (getWidth() - (getWidth() * zoom)) / 2;
+			double anchory = (getHeight() - (getHeight() * zoom)) / 2;
+
+			g.translate(anchorx, anchory);
+			g.scale(zoom, zoom);
+			g.translate((-bestEspece.getX() + getWidth() / 2), (-bestEspece.getY() + getHeight() / 2));
+		}
+		else{
+			double translateX = (viewX+offX)*(1.0/(double)zoom);
+			double translateY = (viewY+offY)*(1.0/(double)zoom);
+			g.scale(zoom, zoom);
+			g.translate(translateX, translateY);
+		}
 		
 		//background
-		g.setColor(new Color(255, 178, 102));
+		g.setColor(new Color(238, 238, 238));
 		g.fillRect(0, 0, map.w, map.h);
+
+		//Cadriller
+		g.setColor(new Color(136, 136, 136));
+		for(int i = 0 ; i < map.w ; i += map.w / 40){
+			g.drawLine(i, 0, i, map.h);
+		}
+		for(int i = 0 ; i < map.h ; i += map.h / 40){
+			g.drawLine(0, i, map.w, i);
+		}
 		
 		
 		//ellipse size
@@ -147,15 +175,14 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 	
 	@Override
 	public void mouseClicked(MouseEvent e) {
-
 		int ex = (int) ((e.getX()-viewX-offX)*(1.0/(double)zoom));
 		int ey = (int) ((e.getY()-viewY-offY)*(1.0/(double)zoom));
-		
+
 		Espece selected = map.simulation.getEspeces().get(0);
 		int proche = selected.distanceFrom(new Point(ex,ey));
 		for(Espece espece : map.simulation.getEspeces()) {
-		    //Reset selected
-		    espece.selected = false;
+			//Reset selected
+			espece.selected = false;
 
 			if(proche >= espece.distanceFrom(new Point(ex, ey))) {
 				proche = espece.distanceFrom(new Point(ex, ey));
@@ -168,7 +195,7 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 		System.out.println("Clic: " + getPointOnMap(e.getPoint()));
 		/*System.out.println("Selected position: " + new Point.Double(selected.getX(), selected.getY()));*/
 
-		
+
 		EVO.frame.changeNetworkFocus(selected);
 	}
 
@@ -194,17 +221,25 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
-		double delta = e.getWheelRotation()/10.0;
-		double zoomOld = zoom;
-		zoom /= Math.exp(delta);	
-		
-		double mouseXOnMap = (viewX+offX)*(1.0/(double)zoomOld) - e.getX()*(1.0/(double)zoomOld);
-		double mouseYOnMap = (viewY+offY)*(1.0/(double)zoomOld) - e.getY()*(1.0/(double)zoomOld);
-		
-		offX += (int) (-mouseXOnMap  * -(zoom-zoomOld));
-		offY += (int) (-mouseYOnMap * -(zoom-zoomOld));
-		
-		//repaint();	
+
+			double delta = e.getWheelRotation() / 10.0;
+			double zoomOld = zoom;
+			zoom /= Math.exp(delta);
+
+			if (zoom <= 0.5) {
+				zoom = 0.5f;
+			}
+			if (zoom >= 2.5) {
+				zoom = 2.5f;
+			}
+
+			double mouseXOnMap = (viewX + offX) * (1.0 / (double) zoomOld) - e.getX() * (1.0 / (double) zoomOld);
+			double mouseYOnMap = (viewY + offY) * (1.0 / (double) zoomOld) - e.getY() * (1.0 / (double) zoomOld);
+
+			offX += (int) (-mouseXOnMap * -(zoom - zoomOld));
+			offY += (int) (-mouseYOnMap * -(zoom - zoomOld));
+
+		//repaint();
 	}
 
 	@Override

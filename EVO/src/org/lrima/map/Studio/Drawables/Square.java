@@ -1,5 +1,7 @@
 package org.lrima.map.Studio.Drawables;
 
+import org.lrima.espece.Espece;
+
 import java.awt.*;
 
 public abstract class Square extends Obstacle {
@@ -19,5 +21,10 @@ public abstract class Square extends Obstacle {
     public void move(Point newPos) {
         super.move(newPos);
         this.rect = new Rectangle(newPos.x, newPos.y, icon.getIconWidth(), icon.getIconHeight());
+    }
+
+    @Override
+    public boolean collisionWithRect(Espece e) {
+        return false;
     }
 }

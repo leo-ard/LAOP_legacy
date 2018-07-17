@@ -1,8 +1,12 @@
 package org.lrima.simulation;
 
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Iterator;
 
 import org.lrima.core.UserPrefs;
 import org.lrima.espece.Espece;
@@ -67,64 +71,53 @@ public class Simulation extends Thread implements KeyListener{
 					}
 
 					time += dt;
-					for(int i = 0; i < especesOpen.size(); i++) {
-						Espece e = especesOpen.get(i);
+					Iterator<Espece> iterator = especesOpen.iterator();
+
+					while (((Iterator) iterator).hasNext()){
+						Espece e = iterator.next();
 						e.resetCapteur();
 						for(Capteur c : e.getCapteursList()){
-						    boolean collided = false;
+						    double minCapteurValue = 100.0; // Pour avoir le capteur le plus proche possible
 						    for(Obstacle o : map.obstacles){
 						        if(o.type.equals(Obstacle.TYPE_LINE)){
 						            Line line = (Line) o;
-						            if(!collided) {
-										double capteurValue = line.getCapteurValue(c);
-
-										if (capteurValue != -1.0) {
-											//Si il y a eu une collision
-											c.setValue(capteurValue);
-											c.lastObstacleCollided = o;
-											collided = true;
-										}
+									double capteurValue = line.getCapteurValue(c);
+						            if(capteurValue < minCapteurValue && capteurValue != -1.0) {
+						            	//Si il y a eu une collision
+										c.setValue(capteurValue);
+										c.lastObstacleCollided = o;
+										minCapteurValue = capteurValue;
 									}
                                 }
-                            }
-                            if(!collided){
-						        c.setValue(1.0);
+
                             }
                         }
 
-						/*for(Obstacle o : map.obstacles) {
-						    if(o.type.equals(Obstacle.TYPE_LINE)) {
-						        Line line = (Line) o;
-                                for (Capteur c : e.getCapteursList()) {
-                                    if(line.isCollideWith(c)) {
-                                        c.setValue(line.getCapteurValue(c));
-                                    }
-                                }
-                            }
-
-							/*if(o.fastCollision(e)) {
-								for(Capteur c : e.getCapteursList()) {
-									c.setValue(o.getCapteurValue(c));
-								}
-
-								if(o.collision(e)) {
+                        //Check si l'auto meurt
+						boolean died = false;
+                        for(Obstacle o : map.obstacles) {
+                        	if(!died) {
+								//Si l'espece touche un mur
+								if (o.collisionWithRect(e)) {
 									try {
 										especesClosed.add(e);
 										//e.update(dt,0,0);
 										e.kill();
 										map.setFitnessToEspece(e);
 
-										especesOpen.remove(i);
-									}catch(Exception e1) {
+										iterator.remove();
+										died = true;
+									} catch (Exception e1) {
+										e1.printStackTrace();
 										running = false;
 									}
 								}
 							}
-						}*/
+						}
 					}
                     //Quand le user clique sur le bouton new map dans le menu
                     if(shouldGetNewMap){
-                        map.createRandomMap();
+                        //TODO: map.createRandomMap();
                         shouldGetNewMap = false;
                     }
                     if(shouldResetAndAddEspece){
@@ -139,8 +132,8 @@ public class Simulation extends Thread implements KeyListener{
 
 				}
 				else {
-
 					nextGeneration();
+					//resetEspeceImage();
 				}
 			}
 
@@ -184,6 +177,7 @@ public class Simulation extends Thread implements KeyListener{
             Espece espece = especesOpen.get(i);
 
 			map.setFitnessToEspece(espece);
+			espece.maxDistanceFromStart = 0.0;
 
             espece.kill();
             especesClosed.add(espece);
@@ -197,23 +191,12 @@ public class Simulation extends Thread implements KeyListener{
         //Change la org.lrima.map a chaque 10 generations
         if(UserPrefs.RANDOM_MAP) {
             if (this.generation % 10 == 0) {
-                map.createRandomMap();
+                //TODO: map.createRandomMap();
             }
         }
 
     }
 
-    /**
-     * Sauvegarde dans un fichier le meilleur neuralNetwork
-     */
-    private void saveBest(){
-        Espece espece = NaturalSelection.best;
-
-        if(espece != null) {
-            NetworkStructure.save("best_nn.dat", espece.neuralNetwork);
-        }
-    }
-	
 	public void resetAndAddEspeces(NeuralNetwork neuralNetworkToUse) {
         especesOpen = new ArrayList<>();
 		especesClosed = new ArrayList<>();
@@ -236,7 +219,29 @@ public class Simulation extends Thread implements KeyListener{
 		NaturalSelection selection = new NaturalSelection(especesClosed);
 		this.especesOpen = selection.getMutatedList(map);
 		this.especesClosed = new ArrayList<Espece>();
-		
+	}
+
+	/**
+	 * Trouve le meilleur fitness dans toutes les voitures
+	 * @return le fitness de la meilleure voiture
+	 */
+	public double getBestFitness(){
+		return getBest().getFitness();
+	}
+
+	public Espece getBest(){
+		ArrayList<Espece> sortedEspece = new ArrayList<>(especesOpen);
+		sortedEspece.addAll(especesClosed);
+		sortedEspece.sort(new Comparator<Espece>() {
+			@Override
+			public int compare(Espece e1, Espece e2) {
+				if(e1.getFitness() == e2.getFitness())
+					return 0;
+				return e1.getFitness()>e2.getFitness()?-1:1;
+			}
+		});
+
+		return sortedEspece.get(0);
 	}
 
 	private Espece getSelectedEspece(){

@@ -2,7 +2,6 @@ package org.lrima.espece.capteur;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
-
 import org.lrima.espece.Espece;
 import org.lrima.map.Studio.Drawables.Obstacle;
 import org.lrima.simulation.Simulation;
@@ -73,21 +72,7 @@ public class Capteur {
     }
 
     public Point.Double getPoint2(){
-		/*double coefLongueur = (Math.cos(Math.abs(angle)) - Math.sin(Math.abs(angle))) + Math.tan(angle);
-		double coefHauteur = (Math.cos(Math.abs(angle)) - Math.sin(Math.abs(angle))) - Math.tan(angle);
 
-		Point.Double returnVal;
-
-		/*if(coef < 0.001){
-			returnVal = new Point.Double((double)e.getX() + getLongeurX(), (double)e.getY() + getLongeurY());
-		}
-		else{
-
-		}
-
-		returnVal = new Point.Double((double)e.getX() + coefLongueur * getLongeurX(), (double)e.getY() + coefHauteur * getLongeurY());
-
-	    return returnVal;*/
 
 		int ly = (int) getLongeurY();
 		int lx = (int )getLongeurX();
@@ -128,7 +113,6 @@ public class Capteur {
 	}
 
 	public double getValue() {
-		// TODO Auto-generated method stub
 		return value;
 	}
 

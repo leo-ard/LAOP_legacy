@@ -1,9 +1,10 @@
 package org.lrima.espece;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Point;
+import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 import org.lrima.core.UserPrefs;
@@ -15,6 +16,8 @@ import org.lrima.espece.network.NeuralNetwork;
 import org.lrima.map.MapPanel;
 import org.lrima.map.Studio.Drawables.Line;
 import org.lrima.map.Studio.Drawables.Obstacle;
+
+import javax.imageio.ImageIO;
 
 public class Espece {
 	
@@ -35,7 +38,7 @@ public class Espece {
 	private ArrayList<Capteur> capteurs = new ArrayList<Capteur>();
 
 	//MAX 180
-	private int NB_CAPTEUR = 1;
+	private int NB_CAPTEUR = 6;
 	
 	public NeuralNetwork neuralNetwork;
 	
@@ -52,6 +55,10 @@ public class Espece {
 	public boolean shouldListenToNN = true;
 
 	private Map map;
+
+	public Point topLeft, topRight, bottomRight, bottomLeft;
+
+	Color voitureColor = Color.RED;
 
 	/**
 	 * Créer une espèce avec la position et l'orientation spécifiée
@@ -99,18 +106,29 @@ public class Espece {
 		//Setup les capteurs
         for(int i = 90 ; i > -90 ; i -= 180 / NB_CAPTEUR){
             if(i > 0 && i < 90){
-                capteurs.add(new Capteur(this, i, w/2, -h/2));
+                capteurs.add(new Capteur(this, i, 0, 0));
             }
             else if(i == 0){
-                capteurs.add(new Capteur(this, i, w/2, 0));
+                capteurs.add(new Capteur(this, i, 0, 0));
             }
             else{
-                capteurs.add(new Capteur(this, i, w/2, h/2));
+                capteurs.add(new Capteur(this, i, 0, 0));
             }
 
         }
 
 		alive = true;
+	}
+
+	/**
+	 * Met la couleur de la voiture dépendant de son fitness.
+	 * Plus son fitness se rapproche du meilleur, plus elle est verte, sinon elle est plus rouge
+	 */
+	private void setColor(){
+		double bestFitness = map.simulation.getBestFitness();
+		double percentageFitness = fitness / bestFitness;
+
+		this.voitureColor = new Color(255 - (int)(255 *  percentageFitness), (int)(255 * percentageFitness), 0);
 	}
 
 	public Espece(Espece e) {
@@ -131,6 +149,10 @@ public class Espece {
 		if(!alive) {
 			return;
 		}
+
+		//Set le fitness
+		map.setFitnessToEspece(this);
+		setColor();
 
 		//Calcul la distance la plus loin que l'auto se rend
 		if(this.map != null){
@@ -177,12 +199,17 @@ public class Espece {
 	
 	public void draw(Graphics2D g) {
 		AffineTransform oldForm = g.getTransform();
-		
-		g.rotate(orientationRad,x, y);
-		g.setColor(new Color(90, 200, 255));
-		
-		g.drawImage(MapPanel.IMG_VOITURE, (int)x-w/2, (int)y-h/2, null);
 
+		g.setColor(Color.CYAN);
+
+		g.rotate(orientationRad,x, y);
+		g.setColor(voitureColor);
+
+		//Dessine l'image avec sa couleur
+		g.fillRect((int)x, (int)y, Espece.ESPECES_WIDTH, Espece.ESPECES_HEIGHT);
+		g.drawImage(MapPanel.IMG_VOITURE, (int)x, (int)y, null);
+
+		g.setStroke(new BasicStroke(3));
 		//Draw les capteurs
         if(selected) {
             for (Capteur c : capteurs) {
@@ -198,9 +225,69 @@ public class Espece {
                 }
                 c.draw(g);
             }
+
+            //Draw hitboxe
+			//g.translate(-w / 2, -h / 2);
+            g.setStroke(new BasicStroke(5));
+            g.rotate(-orientationRad, x, y);
+			setCorners();
+            int[] pointX = {topLeft.x, topRight.x, bottomRight.x, bottomLeft.x, topLeft.x};
+            int[] pointY = {topLeft.y, topRight.y, bottomRight.y, bottomLeft.y, topLeft.y};
+
+			g.setColor(Color.BLACK);
+            g.drawPolyline(pointX, pointY, 5);
         }
 
 		g.setTransform(oldForm);
+	}
+
+	private void setCorners(){
+		getTopLeft();
+		getTopRight();
+		getBottomRight();
+		getBottomLeft();
+	}
+
+	private Point rotatePoint(Point point){
+		int centerX = (int)x;
+		int centerY = (int)y;
+
+		int newX = (int)((point.x-centerX)*Math.cos(orientationRad) - (point.y-centerY) * Math.sin(orientationRad)) + centerX;
+		int newY = (int)((point.x-centerX)*Math.sin(orientationRad) + (point.y-centerY) * Math.cos(orientationRad)) + centerY;
+
+		return new Point(newX, newY);
+	}
+
+	public Point getTopLeft() {
+		double x = this.x;
+		double y = this.y;
+
+		topLeft = rotatePoint(new Point((int)x, (int)y));
+		return topLeft;
+	}
+
+	public Point getTopRight() {
+		double x = this.x;
+		double y = this.y;
+
+		topRight = rotatePoint(new Point((int)x + w, (int)y));
+		return topRight;
+	}
+
+	public Point getBottomRight() {
+		double x = this.x;
+		double y = this.y;
+
+		bottomRight = rotatePoint(new Point((int)x + w, (int)y + h));
+		return bottomRight;
+	}
+
+	public Point getBottomLeft() {
+		double x = this.x;
+		double y = this.y;
+
+		bottomLeft = rotatePoint(new Point((int)x, (int)y + h));
+		return bottomLeft;
 	}
 
 	public void kill() {
@@ -243,7 +330,6 @@ public class Espece {
 	}
 
 	public double getFitness() {
-		// TODO Auto-generated method stub
 		return this.fitness;
 	}
 	
@@ -252,7 +338,6 @@ public class Espece {
 	}
 
 	public ArrayList<Capteur> getCapteursList() {
-		// TODO Auto-generated method stub
 		return capteurs;
 	}
 
@@ -293,4 +378,5 @@ public class Espece {
 		this.fitness = fitness;
 		this.neuralNetwork.setFitness(fitness);
     }
+
 }

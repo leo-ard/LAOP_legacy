@@ -1,13 +1,14 @@
 package org.lrima.map.Studio.Drawables;
 
 
+import org.lrima.espece.Espece;
 import org.omg.CORBA.Bounds;
 
 import javax.swing.*;
 import java.awt.*;
 import java.io.Serializable;
 
-public class Obstacle implements Drawable, Serializable {
+public abstract class Obstacle implements Drawable, Serializable {
     Point position;
     ImageIcon icon;
     public String type;
@@ -47,4 +48,6 @@ public class Obstacle implements Drawable, Serializable {
     @Override
     public void draw(Graphics2D g) {
     }
+
+    public abstract boolean collisionWithRect(Espece espece);
 }

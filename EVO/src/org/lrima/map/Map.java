@@ -21,50 +21,6 @@ public class Map {
 	
 	public int w, h;
 	public int orientation;
-
-	//int[][] mapping;
-
-	int[][] mapping = {
-	        {0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, -2},
-            {0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, -2},
-            {0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, -2},
-            {0, 1, 0, 9, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, -2},
-            {0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 0, -2},
-            {0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, -2},
-            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, -2}
-
-	};
-
-
-	/*int[][] mapping = {
-            {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-            {1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-            {0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1},
-            {0, 9, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 1},
-            {0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 4, 4, 4, 4, 4, 1, 1}
-    };*/
-
-    /*int[][] mapping = {
-            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-            {1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
-            {1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
-            {1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
-            {1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1},
-            {1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0},
-            {1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0},
-            {1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0},
-            {1, 0, 1, 0, 0, 0, 1, 0, 9, 0, 0, 1, 0, 1, 0, 1, 0},
-            {1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0},
-            {1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
-            {1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0},
-            {1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1},
-            {0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0},
-            {0, 9, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
-            {0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0}
-    };*/
-
-	int blocSize = 200;
-
 	
 	public Map(String s, Simulation sim) {
 		
@@ -75,53 +31,6 @@ public class Map {
 
 		this.orientation = 0;
 	}
-
-	public void createRandomMap(){
-        int width = org.lrima.utils.Random.getRandomIntegerValue(30, 50);
-        int height = org.lrima.utils.Random.getRandomIntegerValue(30, 50);
-
-        mapping = new int[height][width];
-
-        int blocChance = 30;
-
-        for(int i = 0 ; i < height ; i++){
-            for(int j = 0 ; j < width ; j++){
-                if(i == 1 && j == 1){
-                    mapping[i][j] = 9; //DEPART
-                    this.depart = new Point(j * blocSize, i * blocSize);
-                }
-                else if(i <= 2 && j <= 2){
-                    mapping[i][j] = 0; //Rien autour du spawn
-                }
-                else{
-                    mapping[i][j] = 0;
-
-                    int ran = org.lrima.utils.Random.getRandomIntegerValue(100);
-                    if(ran < blocChance){
-                        mapping[i][j] = 1;
-                    }
-                }
-            }
-        }
-        //Ajoute la fin aleatoirement
-        int endX = org.lrima.utils.Random.getRandomIntegerValue(10, width - 1);
-        int endY = org.lrima.utils.Random.getRandomIntegerValue(10, height -1 );
-
-        destination = new Point(endX, endY);
-        mapping[endY][endX] = -2; //Fin
-
-
-        if(!mapSolvable()){
-            createRandomMap();
-        }
-        else{
-            reloadMap();
-        }
-    }
-
-    private boolean mapSolvable(){
-        return true;
-    }
 
     /**
      * Reload la org.lrima.map, apres l'avoir generer
@@ -178,27 +87,16 @@ public class Map {
 
         this.obstacles.add(new ObstacleContour(0, 0, w, h));*/
     }
-	
-	public void update(ArrayList<Espece> especes) {
-        //TODO
-		/*for(Espece e : especes) {
-			for(Obstacle o : obstacles) {
-				if(o.collision(e)) {
-					e.kill();
-				}
-			}
-		}*/
-	}
 
 	public void setFitnessToEspece(Espece e) {
 		double x = e.getX();
 		double y = e.getY();
-		double scale = 0.001;
+		double scale = 0.01;
 
         double averageSpeed = e.totalSpeed / simulation.time;
         int timeLimit = UserPrefs.TIME_LIMIT;
 
-        double fitness = ((1 * ((simulation.time - 0.00001) / timeLimit)) *( scale * e.maxDistanceFromStart)) ;// * averageSpeed);
+        double fitness = /*(averageSpeed * ((simulation.time - 0.00001) / timeLimit)) **/( scale * e.maxDistanceFromStart) ;// * averageSpeed);
 
         //double fitness = (scale * e.maxDistanceFromStart);
 
@@ -210,6 +108,9 @@ public class Map {
         if(fitness == Double.POSITIVE_INFINITY){
             fitness = 9999999;
 		}
+		if(fitness == Double.NEGATIVE_INFINITY){
+            fitness = 0.0;
+        }
 
 		if(e.maxDistanceFromStart < 800){
 		    fitness = 0.0;

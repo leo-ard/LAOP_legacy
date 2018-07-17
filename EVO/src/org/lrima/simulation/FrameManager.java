@@ -32,6 +32,7 @@ public class FrameManager extends JFrame implements MouseListener {
     private JCheckBoxMenuItem randomMap;
     private JCheckBoxMenuItem graphique;
     private JCheckBoxMenuItem neuralNet;
+    private JCheckBoxMenuItem followBest;
 
     boolean haveToRestart = false;
 	
@@ -42,6 +43,7 @@ public class FrameManager extends JFrame implements MouseListener {
 		setExtendedState(JFrame.MAXIMIZED_BOTH);
 
 		mapPanel = new MapPanel(simulation.getMap(), getSize().width, getSize().height);
+        System.out.println(simulation.especesOpen.size());
 		networkPanel = new NetworkPanel(simulation.especesOpen.get(0), 1000, 200);
 		simulationInfos=new SimulationInfos(simulation);
 		this.simulation = simulation;
@@ -89,8 +91,11 @@ public class FrameManager extends JFrame implements MouseListener {
         realtime = new JCheckBoxMenuItem(new RealTimeAction("Real time"));
         simulationMenu.add(realtime);
 
-        randomMap = new JCheckBoxMenuItem(new RandomMapAction("Random Map"));
-        simulationMenu.add(randomMap);
+        //randomMap = new JCheckBoxMenuItem(new RandomMapAction("Random Map"));
+        //simulationMenu.add(randomMap);
+
+        followBest = new JCheckBoxMenuItem(new FollowBestAction("Follow best", mapPanel));
+        simulationMenu.add(followBest);
 
         JMenuItem pause = new JMenuItem(new PauseAction("Pause", simulation));
         pause.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, InputEvent.CTRL_MASK));
@@ -106,8 +111,8 @@ public class FrameManager extends JFrame implements MouseListener {
         JMenuItem mapEditor = new JMenuItem(new OpenStudioAction("Open Studio", simulation));
         map.add(mapEditor);
 
-        JMenuItem changeMap = new JMenuItem(new ChangeMapAction("Get Random Map", this));
-        map.add(changeMap);
+        //JMenuItem changeMap = new JMenuItem(new ChangeMapAction("Get Random Map", this));
+        //map.add(changeMap);
 
         //Menu window
         JMenu window = new JMenu("Window");
@@ -124,7 +129,8 @@ public class FrameManager extends JFrame implements MouseListener {
 
     private void load_pref(){
         realtime.setState(UserPrefs.REAL_TIME);
-        randomMap.setState(UserPrefs.RANDOM_MAP);
+        //randomMap.setState(UserPrefs.RANDOM_MAP);
+        followBest.setState(UserPrefs.FOLLOW_BEST);
 
 	    graphique.setState(UserPrefs.SHOW_WINDOW_GRAPHIQUE);
 	    neuralNet.setState(UserPrefs.SHOW_WINDOW_NEURAL_NETWORK);
