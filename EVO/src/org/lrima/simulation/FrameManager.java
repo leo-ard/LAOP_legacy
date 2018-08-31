@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 import javax.swing.*;
 
-import javafx.scene.input.KeyCode;
+//import javafx.scene.input.KeyCode;
 import org.lrima.core.UserPrefs;
 import org.lrima.espece.Espece;
 import org.lrima.espece.network.NetworkPanel;
