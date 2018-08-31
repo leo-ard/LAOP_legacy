@@ -1,17 +1,14 @@
 package org.lrima.map;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.Point;
+import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.awt.font.FontRenderContext;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -26,6 +23,8 @@ import org.lrima.core.UserPrefs;
 import org.lrima.espece.Espece;
 import org.lrima.espece.capteur.Capteur;
 import org.lrima.map.Studio.Drawables.Obstacle;
+import org.lrima.simulation.Interface.EspeceInfoPanel;
+import org.omg.CORBA.Bounds;
 
 public class MapPanel extends JPanel implements MouseMotionListener, MouseListener, MouseWheelListener{
 	
@@ -64,8 +63,7 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 		this.zoom = 1.50f;
 		this.viewX =(int) ((-map.depart.x+ w/2)*zoom);
 		this.viewY =(int) ((-map.depart.y+ h/2)*zoom);
-		
-		this.loadImages();
+
 		this.addMouseMotionListener(this);
 		this.addMouseWheelListener(this);
 		this.addMouseListener(this);
@@ -82,40 +80,36 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 		    }, 0, 16);
 	}
 	
-	public void loadImages() {
-		UserPrefs.load();
-
-		try {
-			BufferedImage temp  = ImageIO.read(new File(UserPrefs.SRC_VOITURE));
-			IMG_VOITURE = temp.getScaledInstance(Espece.ESPECES_WIDTH, Espece.ESPECES_HEIGHT, Image.SCALE_DEFAULT);
-			IMG_LRIMA = ImageIO.read(MapPanel.class.getResource(UserPrefs.SRC_LRIMA)).getScaledInstance(130,95, Image.SCALE_DEFAULT);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	
 	@Override
 	public void paintComponent(Graphics g1d) {
 		Graphics2D g = (Graphics2D) g1d;
 		super.paintComponent(g);
 
+		double translateX, translateY;
+
 
 		if(followBest){
 			Espece bestEspece = map.simulation.getBest();
+			viewX = (int) -bestEspece.getX() + getWidth() / 2;
+			viewY = (int) -bestEspece.getY() + getHeight() / 2;
 
-			double anchorx = (getWidth() - (getWidth() * zoom)) / 2;
-			double anchory = (getHeight() - (getHeight() * zoom)) / 2;
+			//TODO: faire qu'on puisse modifier le zoom
+			zoom = 1.0f;
 
-			g.translate(anchorx, anchory);
-			g.scale(zoom, zoom);
-			g.translate((-bestEspece.getX() + getWidth() / 2), (-bestEspece.getY() + getHeight() / 2));
+			translateX = (viewX);
+			translateY = (viewY);
+
+			bestEspece.setSelected(true);
 		}
 		else{
-			double translateX = (viewX+offX)*(1.0/(double)zoom);
-			double translateY = (viewY+offY)*(1.0/(double)zoom);
-			g.scale(zoom, zoom);
-			g.translate(translateX, translateY);
+			translateX = (viewX+offX)*(1.0/(double)zoom);
+			translateY = (viewY+offY)*(1.0/(double)zoom);
 		}
+
+
+
+		g.scale(zoom, zoom);
+		g.translate(translateX, translateY);
 		
 		//background
 		g.setColor(new Color(238, 238, 238));
@@ -165,12 +159,47 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 		g.drawImage(IMG_LRIMA,this.getWidth()-150,this.getHeight()-105,null);
 
 
-		//Draw capteurs lines
-		/*for(Espece e : org.lrima.map.org.lrima.simulation.especesOpen){
-			for(Capteur c : e.getCapteursList()){
-				c.draw(g);
-			}
-		}*/
+		//Écrit les information de la génération
+		float yTextLocation = getHeight() / 10;
+		float xTextLocation = getWidth() - getWidth() / 5;
+		float minTextWidth = 100;
+
+		Font font = new Font("TimesRoman", Font.PLAIN, 25);
+		AffineTransform affinetransform = new AffineTransform();
+		FontRenderContext frc = new FontRenderContext(affinetransform,true,true);
+		g.setFont(font);
+
+		//Generation text
+		String generationText = "Generation: " + map.simulation.getGeneration();
+		Rectangle2D generationTextBounds = font.getStringBounds(generationText, frc);
+		double generationTextWidth = minTextWidth;
+		double generationTextHeight = generationTextBounds.getHeight();
+		yTextLocation += generationTextHeight;
+		g.drawString(generationText, xTextLocation - (float)generationTextWidth, yTextLocation);
+
+		//Time since generation started
+		String timeText = "Time: " + map.simulation.time / 1000;
+		Rectangle2D timeTextBounds = font.getStringBounds(timeText, frc);
+		double timeTextWidth = minTextWidth;
+		double timeTextHeight = timeTextBounds.getHeight();
+		yTextLocation += timeTextHeight;
+		g.drawString(timeText, xTextLocation - (float) timeTextWidth, (float) yTextLocation);
+
+		//Selected espece info
+		Espece selectedEspece = map.simulation.getSelectedEspece();
+		double fitness = 0.0;
+
+		if(selectedEspece != null){
+			fitness = selectedEspece.getFitness();
+		}
+
+		//Fitness text
+		String fitnessText = "Fitnessasdfsadfsafasfdasdfasfd: " + fitness;
+		Rectangle2D fitnessTextBounds = font.getStringBounds(fitnessText, frc);
+		double fitnessTextWidth = minTextWidth;
+		double fitnessTextHeight = fitnessTextBounds.getHeight();
+		yTextLocation += fitnessTextHeight;
+		g.drawString(fitnessText, xTextLocation - (float)fitnessTextWidth, (float)yTextLocation);
 	}
 	
 	@Override
@@ -190,11 +219,7 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 			}
 
 		}
-		selected.selected = true;
-
-		System.out.println("Clic: " + getPointOnMap(e.getPoint()));
-		/*System.out.println("Selected position: " + new Point.Double(selected.getX(), selected.getY()));*/
-
+		selected.setSelected(true);
 
 		EVO.frame.changeNetworkFocus(selected);
 	}
@@ -226,9 +251,9 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 			double zoomOld = zoom;
 			zoom /= Math.exp(delta);
 
-			if (zoom <= 0.5) {
-				zoom = 0.5f;
-			}
+			//if (zoom <= 0.5) {
+			//	zoom = 0.5f;
+			//}
 			if (zoom >= 2.5) {
 				zoom = 2.5f;
 			}

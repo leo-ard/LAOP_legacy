@@ -1,38 +1,37 @@
 package org.lrima.espece;
 
 import java.awt.*;
-import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.*;
 
+import org.lrima.annotations.DisplayInfo;
 import org.lrima.core.UserPrefs;
-import org.lrima.espece.network.NetworkStructure;
 import org.lrima.map.Map;
 
 import org.lrima.espece.capteur.Capteur;
 import org.lrima.espece.network.NeuralNetwork;
-import org.lrima.map.MapPanel;
-import org.lrima.map.Studio.Drawables.Line;
-import org.lrima.map.Studio.Drawables.Obstacle;
-
-import javax.imageio.ImageIO;
+import org.lrima.simulation.Interface.EspeceInfoPanel;
+import org.lrima.simulation.Simulation;
 
 public class Espece {
 	
 	//Width doit etre plus grand que height
 	public static final int ESPECES_WIDTH = 74, ESPECES_HEIGHT = 50;
-	
+
+	@DisplayInfo
 	private double x, y;
 	private int w, h;
-	
+
+	@DisplayInfo
 	private boolean alive;
-	
+
+	@DisplayInfo
 	private double orientationRad;
+	@DisplayInfo
 	private double vitesse;
+	@DisplayInfo
 	private double acceleration;
-	
+
+	@DisplayInfo
 	private double fitness;
 	
 	private ArrayList<Capteur> capteurs = new ArrayList<Capteur>();
@@ -48,7 +47,13 @@ public class Espece {
 
 	public boolean selected;
 	public double totalSpeed;
+	@DisplayInfo
 	public double maxDistanceFromStart;
+
+	@DisplayInfo
+	public double totalDistanceTraveled;
+	private Point lastPointTraveled;
+	public int bornOnGeneration = 0;
 
 	public double manual_right = 0.0;
 	public double manual_left = 0.0;
@@ -72,32 +77,21 @@ public class Espece {
 		this.y = map.depart.y;
 		this.orientationRad = map.orientation;
 
+		this.lastPointTraveled = new Point((int)x, (int)y);
+
         //Load la meilleure org.lrima.espece
 
 
-		neuralNetwork = new NeuralNetwork(NB_CAPTEUR, 2);
+		neuralNetwork = new NeuralNetwork(NB_CAPTEUR, 2, true);
 
-
-        //Ajoute comme input la position actuel et la destination
-		//neuralNetwork.getLayer(0).addNeuron();
-		//neuralNetwork.getLayer(0).addNeuron();
 
     }
 
     public Espece(Map map, NeuralNetwork nn){
 	    this(map);
 	    this.neuralNetwork = nn;
+	    this.neuralNetwork.randomize();
     }
-	
-	public Espece(Point positionDeDepart, double orientationDeDepart, Espece e, Map map) {
-		this();
-		this.map = map;
-		this.x = positionDeDepart.x;
-		this.y = positionDeDepart.y;
-		this.orientationRad = Math.toRadians(orientationDeDepart);
-		this.neuralNetwork = new NeuralNetwork(e.getNeuralNetwork());
-		
-	}
 	
 	public Espece() {
 		this.w = ESPECES_WIDTH;
@@ -128,7 +122,7 @@ public class Espece {
 		double bestFitness = map.simulation.getBestFitness();
 		double percentageFitness = fitness / bestFitness;
 
-		this.voitureColor = new Color(255 - (int)(255 *  percentageFitness), (int)(255 * percentageFitness), 0);
+		this.voitureColor = new Color(255 - (int)(255 *  percentageFitness), (int)(255 * percentageFitness), 124, 124);
 	}
 
 	public Espece(Espece e) {
@@ -161,6 +155,10 @@ public class Espece {
 		        maxDistanceFromStart = currentDistance;
             }
         }
+
+        //Calcule la distance totale de la voiture
+		totalDistanceTraveled += distanceFrom(lastPointTraveled);
+		lastPointTraveled = new Point((int)x, (int)y);
 		
 		//Update le résaux de neuronnes avec la valeur des capteurs
 		double[] capteurArray = capteursToArray();
@@ -194,27 +192,48 @@ public class Espece {
 		
 		x += vitesse*Math.cos(orientationRad);
 		y += vitesse*Math.sin(orientationRad);
+
+		if(selected){
+			EspeceInfoPanel.update(this);
+		}
 		
 	}
 	
 	public void draw(Graphics2D g) {
-		AffineTransform oldForm = g.getTransform();
-
+		setCorners(); //Calcule les quatres coins de la voiture
 		g.setColor(Color.CYAN);
 
-		g.rotate(orientationRad,x, y);
-		g.setColor(voitureColor);
+		//g.setColor(voitureColor);
 
-		//Dessine l'image avec sa couleur
-		g.fillRect((int)x, (int)y, Espece.ESPECES_WIDTH, Espece.ESPECES_HEIGHT);
-		g.drawImage(MapPanel.IMG_VOITURE, (int)x, (int)y, null);
+		if(bornOnGeneration != Simulation.generation){
+			g.setColor(new Color(0, 255, 0, 127));
+		}
+		else{
+			g.setColor(new Color(255, 0, 0, 127));
+		}
+
+		//Dessine l'auto
+		int[] pointX = {topLeft.x, topRight.x, bottomRight.x, bottomLeft.x, topLeft.x};
+		int[] pointY = {topLeft.y, topRight.y, bottomRight.y, bottomLeft.y, topLeft.y};
+		g.fillPolygon(pointX, pointY, 5);
+
+		//Draw hitboxe
+		g.setStroke(new BasicStroke(5));
+
+		g.setColor(Color.BLACK);
+		if(selected){
+			g.setColor(Color.BLUE);
+		}
+		g.drawPolyline(pointX, pointY, 5);
+
 
 		g.setStroke(new BasicStroke(3));
+		g.rotate(orientationRad,x, y);
 		//Draw les capteurs
         if(selected) {
             for (Capteur c : capteurs) {
                 g.setColor(Color.CYAN);
-            	for(Obstacle o : map.obstacles){
+            	/*for(Obstacle o : map.obstacles){
             	    if(o.type.equals(Obstacle.TYPE_LINE)){
             	        Line line = (Line) o;
 
@@ -222,23 +241,11 @@ public class Espece {
             	            g.setColor(Color.GREEN);
                         }
                     }
-                }
+                }*/
                 c.draw(g);
             }
-
-            //Draw hitboxe
-			//g.translate(-w / 2, -h / 2);
-            g.setStroke(new BasicStroke(5));
-            g.rotate(-orientationRad, x, y);
-			setCorners();
-            int[] pointX = {topLeft.x, topRight.x, bottomRight.x, bottomLeft.x, topLeft.x};
-            int[] pointY = {topLeft.y, topRight.y, bottomRight.y, bottomLeft.y, topLeft.y};
-
-			g.setColor(Color.BLACK);
-            g.drawPolyline(pointX, pointY, 5);
         }
-
-		g.setTransform(oldForm);
+        g.rotate(-orientationRad, x, y);
 	}
 
 	private void setCorners(){
@@ -379,4 +386,16 @@ public class Espece {
 		this.neuralNetwork.setFitness(fitness);
     }
 
+
+	/**
+	 * Set l'espece selected et update le paneau d'information pour prendre la nouvelle espece
+	 * @param selected espece selected
+	 */
+	public void setSelected(boolean selected) {
+		//Reset la selection des especes a false
+		if(selected == true){
+			map.simulation.resetSelected();
+		}
+		this.selected = selected;
+	}
 }

@@ -22,9 +22,10 @@ public class Capteur {
 	public Capteur(/*Simulation simulation, */Espece e, double angle, int x, int y) {
 		this.e = e;
 		this.angle = Math.toRadians(angle);
+		value = 1;
 		this.x = x;
 		this.y = y;
-		value = 1;
+
 		//this.simulation = simulation;
 		//simulation.getMapPanel().getPointOnMap(new Point(x, y));
 	}
@@ -47,6 +48,9 @@ public class Capteur {
 	 * @param g
 	 */
 	public void draw(Graphics2D g) {
+		// = e.getX();// + e.getHeight();
+		//this.y = e.getY();// - e.getWidth();
+
 		int x1 = (int)(e.getX());
 		int y1 = (int)(e.getY());
 		int lx = (int) (CAPTEUR_LENGHT*Math.cos(-this.angle));
@@ -58,11 +62,11 @@ public class Capteur {
 		g.setColor(Color.BLACK);
 		g.drawRect(x1+ (int)(lx*value),y1- (int)(ly*value), 1, 1);
 	}
-	
+
 	/*public double getX1() {
 		return e.getX() + x * Math.cos(e.getOrientation()) - y * Math.sin(e.getOrientation());
 	}
-	
+
 	public double getY1() {
 		return e.getY() + x * Math.sin(e.getOrientation()) + y * Math.cos(e.getOrientation());
 	}*/

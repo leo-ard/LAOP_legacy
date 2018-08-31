@@ -24,7 +24,7 @@ public class Simulation extends Thread implements KeyListener{
 	private Map map;
 	private MapPanel mapPanel;
 
-	int generation = 0;
+	public static int generation = 1;
 	
 	public ArrayList<Espece> especesOpen;
 	public ArrayList<Espece> especesClosed;
@@ -36,6 +36,7 @@ public class Simulation extends Thread implements KeyListener{
 
     public boolean shouldGetNewMap = false;
     public boolean shouldResetAndAddEspece = false;
+    public boolean shouldGoToNextGeneration = false;
 
     public NeuralNetwork neuralNetworkToUse = null;
 
@@ -63,6 +64,7 @@ public class Simulation extends Thread implements KeyListener{
 		long timePassed;
 		while(running) {
 			if(!pausing) {
+
 				if(especesOpen.size() != 0 && time < UserPrefs.TIME_LIMIT) {
 					currTime = System.currentTimeMillis();
 					boolean d = D, g = G;
@@ -76,34 +78,34 @@ public class Simulation extends Thread implements KeyListener{
 					while (((Iterator) iterator).hasNext()){
 						Espece e = iterator.next();
 						e.resetCapteur();
-						for(Capteur c : e.getCapteursList()){
-						    double minCapteurValue = 100.0; // Pour avoir le capteur le plus proche possible
-						    for(Obstacle o : map.obstacles){
-						        if(o.type.equals(Obstacle.TYPE_LINE)){
-						            Line line = (Line) o;
-									double capteurValue = line.getCapteurValue(c);
-						            if(capteurValue < minCapteurValue && capteurValue != -1.0) {
-						            	//Si il y a eu une collision
-										c.setValue(capteurValue);
-										c.lastObstacleCollided = o;
-										minCapteurValue = capteurValue;
-									}
-                                }
-
-                            }
-                        }
-
-                        //Check si l'auto meurt
 						boolean died = false;
-                        for(Obstacle o : map.obstacles) {
-                        	if(!died) {
+						if(!died) {
+							for (Capteur c : e.getCapteursList()) {
+								double minCapteurValue = 100.0; // Pour avoir le capteur le plus proche possible
+								for (Obstacle o : map.obstacles) {
+									if (o.type.equals(Obstacle.TYPE_LINE)) {
+										Line line = (Line) o;
+										double capteurValue = line.getCapteurValue(c);
+										if (capteurValue < minCapteurValue && capteurValue != -1.0) {
+											//Si il y a eu une collision
+											c.setValue(capteurValue);
+											c.lastObstacleCollided = o;
+											minCapteurValue = capteurValue;
+										}
+									}
+
+								}
+							}
+
+							//Check si l'auto meurt
+							for (Obstacle o : map.obstacles) {
 								//Si l'espece touche un mur
-								if (o.collisionWithRect(e)) {
+								if (!died && o.collisionWithRect(e)) {
 									try {
 										especesClosed.add(e);
 										//e.update(dt,0,0);
 										e.kill();
-										map.setFitnessToEspece(e);
+										//map.setFitnessToEspece(e);
 
 										iterator.remove();
 										died = true;
@@ -129,7 +131,10 @@ public class Simulation extends Thread implements KeyListener{
                         }
                         shouldResetAndAddEspece = false;
                     }
-
+					if(shouldGoToNextGeneration){
+						nextGeneration();
+						shouldGoToNextGeneration = false;
+					}
 				}
 				else {
 					nextGeneration();
@@ -168,16 +173,12 @@ public class Simulation extends Thread implements KeyListener{
     }
 
 	public void nextGeneration(){
+		this.generation++;
 	    //Reload les préférences du user
 	    UserPrefs.load();
 
-		this.generation++;
-
         for(int i = 0; i < especesOpen.size(); i++) {
             Espece espece = especesOpen.get(i);
-
-			map.setFitnessToEspece(espece);
-			espece.maxDistanceFromStart = 0.0;
 
             espece.kill();
             especesClosed.add(espece);
@@ -202,6 +203,7 @@ public class Simulation extends Thread implements KeyListener{
 		especesClosed = new ArrayList<>();
 
 		int numberOfCar = UserPrefs.preferences.getInt(UserPrefs.KEY_NUMBER_OF_CAR, UserPrefs.DEFAULT_NUMBER_OF_CAR);
+
 
 		while(especesOpen.size() < numberOfCar) {
 		    if(neuralNetworkToUse == null) {
@@ -244,7 +246,7 @@ public class Simulation extends Thread implements KeyListener{
 		return sortedEspece.get(0);
 	}
 
-	private Espece getSelectedEspece(){
+	public Espece getSelectedEspece(){
         for(Espece espece : this.especesOpen){
             if(espece.selected){
                 return espece;
@@ -253,6 +255,15 @@ public class Simulation extends Thread implements KeyListener{
 
         return null;
     }
+
+    public void resetSelected(){
+		for(int i = 0 ; i < especesOpen.size() ; i++){
+			especesOpen.get(i).setSelected(false);
+		}
+		for(int i = 0 ; i < especesClosed.size() ; i++){
+			especesClosed.get(i).setSelected(false);
+		}
+	}
 
 	@Override
 	public void keyPressed(KeyEvent e) {
@@ -286,4 +297,8 @@ public class Simulation extends Thread implements KeyListener{
     public MapPanel getMapPanel() {
         return mapPanel;
     }
+
+	public int getGeneration() {
+		return generation;
+	}
 }

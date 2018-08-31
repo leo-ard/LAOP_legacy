@@ -13,65 +13,14 @@ public class NeuralNetwork implements Serializable {
 	int mutationRate = 100;
 	private double fitness;
 
-	// FOR TESTS
-	public static void main(String args[]) {
-		for(int i = 10; i > 0 ; i--) {
-			JFrame f = new JFrame("TEST");
-			NeuralNetwork nn = new NeuralNetwork(3, 2);
-			
-	
-			nn.addRandomConnection();
-			nn.addRandomConnection();
-			nn.addRandomConnection();
-			nn.addRandomConnection();
-			
-			nn.mutateRandomConnection();
-			nn.mutateRandomConnection();
-			nn.mutateRandomConnection();
-			nn.mutateRandomConnection();
-			
-			NeuralNetwork n1 = new NeuralNetwork(nn);
-			
-			nn.printState();
-			nn.update(1, 1, 1);
-	
-			Espece e = new Espece();
-			e.neuralNetwork = nn;
-			f.add(new NetworkPanel(e, 800, 300));
-			f.pack();
-			f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			f.setVisible(true);
-		}
-	}
-	
 	//for test
 	private int nbWeightMut = 0;
 	private int nbNeuronMut = 0;
-
-	// for test
-	private void printState() {
-		System.out.println("=======");
-		for (Layer l : this.layers) {
-			for (Neuron n : l) {
-				String txt = "";
-				for (Connection c : n.getConnections()) {
-					txt += String.format("<-(%d,%d)", c.getNeuronInput().getLayer().getIndex(),
-							c.getNeuronInput().getIndex());
-				}
-				System.out.printf("(%d,%d)%s \t", l.getIndex(), n.getIndex(), txt);
-			}
-			System.out.println();
-		}
-		System.out.println("=======");
-	}
 
 	private ArrayList<Layer> layers;
 	private int nbInputs;
 	private int nbOutputs;
 
-	public NeuralNetwork(NeuralNetwork nn) {
-		this(new NetworkStructure(nn));
-	}
 	
 	public NeuralNetwork(NetworkStructure ns) {
 		this.nbInputs = ns.getLayerSizes()[0];
@@ -100,12 +49,17 @@ public class NeuralNetwork implements Serializable {
 		this.fitness = ns.fitness;
 	}
 
-	public NeuralNetwork(int inputs, int outputs) {
+	public NeuralNetwork(int inputs, int outputs, boolean allconnection) {
         nbInputs = inputs;
         nbOutputs = outputs;
         layers = new ArrayList<Layer>();
         createDefaultLayers();
-        this.addRandomConnection();
+        if(!allconnection) {
+			this.addRandomConnection();
+		}
+		else{
+        	this.addAllConnection();
+		}
     }
 
     public NeuralNetwork(int inputs,int hidden, int outputs) {
@@ -149,12 +103,6 @@ public class NeuralNetwork implements Serializable {
 		}
 		this.layers.add(layer2);
 
-		/*
-		 * for(Neuron neuron1:layers.get(0)) { for(Neuron neuron2:layers.get(1)) {
-		 * neuron2.addConnection(new Connection(neuron1)); } }
-		 */
-		// this.addRandomConnection();
-
 	}
 
 	private void addRandomConnection() {
@@ -171,6 +119,28 @@ public class NeuralNetwork implements Serializable {
 		Connection c = new Connection(this.layers.get(chosenLayerInput).getNeuron(chosenNeuronInput),
 		this.getLayer(chosenLayerOutput).getNeuron(chosenNeuronOutput));
 		this.layers.get(chosenLayerOutput).addConnection(chosenNeuronOutput, c);
+	}
+
+	private void addAllConnection() {
+		for(int i = 0 ; i < nbInputs ; i++){
+			for(int j = 0 ; j < nbOutputs ; j++){
+
+				Connection c = null;
+
+				if(i < Math.ceil(nbInputs / 2) && j < 1) {
+					c = new Connection(this.layers.get(0).getNeuron(i),
+							this.getLayer(1).getNeuron(0));
+				}
+				else if(i >= Math.floor(nbInputs / 2) && j >= 1){
+					c = new Connection(this.layers.get(0).getNeuron(i),
+							this.getLayer(1).getNeuron(1));
+				}
+
+				if(c != null) {
+					this.layers.get(1).addConnection(j, c);
+				}
+			}
+		}
 	}
 
 	private void mutateRandomConnection() {
@@ -199,6 +169,17 @@ public class NeuralNetwork implements Serializable {
 
 	}
 
+	public void randomize(){
+		for(Connection c : getAllConnections()){
+			int ran = Random.getRandomIntegerValue(100);
+			c.setWeight(Random.getRandomDoubleValue(0, 1));
+			if(ran < 10){
+				double ranWeight = Random.getRandomDoubleValue(0, 1);
+				c.setWeight(ranWeight);
+			}
+		}
+	}
+
 	private void addLayer(int nb) {
 		// System.out.println("Adding Laya");
 		this.layers.add(nb, new Layer(nb));
@@ -222,32 +203,43 @@ public class NeuralNetwork implements Serializable {
 	public void mutate() {
         int ran = Random.getRandomIntegerValue(100);
 
-        if (ran <= 10)
+        if(ran < 5){
+        	//this.weightModification(0.1, false);
+		}
+
+        /*if (ran <= 10)
             this.addRandomConnection();
             if (ran <= 5){
                 mutateRandomConnection();
                 if(ran <= 2){
-                    bigModificationWeight();
+                    this.weightModification(0.7, false);
                 }
             }
         else {
-            this.minimalModificationWeight();
-        }
-	}
-	
-	public void minimalModificationWeight() {
-		int ran = Random.getRandomIntegerValue(this.getAllConnections().size());
-		Connection c = this.getAllConnections().get(ran);
-		double ranModifi = Random.getRandomDoubleValue(-0.2, 0.2);
-		c.setWeight(c.getWeight()+ranModifi);
+            this.weightModification(0.1, false);
+        }*/
+
+		/*int ran = Random.getRandomIntegerValue(100);
+		if(ran < 5) {
+			weightModification(0.1, false);
+		}*/
 	}
 
-	public void bigModificationWeight(){
-	    int ran = Random.getRandomIntegerValue(this.getAllConnections().size());
-	    Connection c = this.getAllConnections().get(ran);
-	    double ranModifi = Random.getRandomDoubleValue(-0.7, 0.7);
-	    c.setWeight(c.getWeight()+ranModifi);
-    }
+	public void weightModification(double magnitude, boolean allConnections){
+		if(!allConnections) {
+			int ran = Random.getRandomIntegerValue(this.getAllConnections().size());
+			Connection c = this.getAllConnections().get(ran);
+			double ranModifi = Random.getRandomDoubleValue(-magnitude, magnitude);
+			c.setWeight(c.getWeight() + ranModifi);
+		}
+		else{
+			for(Connection c : getAllConnections()){
+				double ranModifi = Random.getRandomDoubleValue(-magnitude, magnitude);
+				c.setWeight(c.getWeight() + ranModifi);
+			}
+		}
+	}
+
 
 	public int nbConnections() {
 		int nb = 0;
@@ -281,4 +273,12 @@ public class NeuralNetwork implements Serializable {
     public double getFitness() {
         return fitness;
     }
+
+	public int getNbInputs() {
+		return nbInputs;
+	}
+
+	public int getNbOutputs() {
+		return nbOutputs;
+	}
 }

@@ -89,20 +89,13 @@ public class Map {
     }
 
 	public void setFitnessToEspece(Espece e) {
-		double x = e.getX();
-		double y = e.getY();
-		double scale = 0.01;
+
+		double scale = 0.001;
 
         double averageSpeed = e.totalSpeed / simulation.time;
         int timeLimit = UserPrefs.TIME_LIMIT;
 
-        double fitness = /*(averageSpeed * ((simulation.time - 0.00001) / timeLimit)) **/( scale * e.maxDistanceFromStart) ;// * averageSpeed);
-
-        //double fitness = (scale * e.maxDistanceFromStart);
-
-        //if(e.isDead()){
-        //   fitness = 0.0;
-        //}
+        double fitness = (e.maxDistanceFromStart + e.totalDistanceTraveled) ;
 
         //Quand il se rend a destination
         if(fitness == Double.POSITIVE_INFINITY){
@@ -118,4 +111,16 @@ public class Map {
 
 		e.setFitness(fitness);
 	}
+
+    public Point getDepart() {
+        return depart;
+    }
+
+    public Point getDestination() {
+        return destination;
+    }
+
+    public int getOrientation() {
+        return orientation;
+    }
 }

@@ -6,14 +6,17 @@ import java.util.ArrayList;
 
 import javax.swing.*;
 
+import javafx.scene.input.KeyCode;
 import org.lrima.core.UserPrefs;
 import org.lrima.espece.Espece;
 import org.lrima.espece.network.NetworkPanel;
 import org.lrima.map.MapPanel;
 import org.lrima.simulation.Interface.Actions.*;
+import org.lrima.simulation.Interface.EspeceInfoPanel;
+import org.lrima.simulation.Interface.GraphicPanel;
 import org.lrima.simulation.Interface.SimulationPanel;
 
-public class FrameManager extends JFrame implements MouseListener {
+public class FrameManager extends JFrame implements MouseListener, KeyListener {
 	
 	/**
 	 * 
@@ -24,8 +27,11 @@ public class FrameManager extends JFrame implements MouseListener {
 	
 	public Simulation simulation;
 	public static FrameManager frame;
-	public static SimulationInfos simulationInfos;
+	public static GraphicPanel graphicPanel;
 	public static SimulationPanel simulationPanel;
+	public static EspeceInfoPanel especeInfoPanel;
+
+    public static SimulationInfos simulationInfos;
 
 	//Pour le menu
     private JCheckBoxMenuItem realtime;
@@ -33,6 +39,7 @@ public class FrameManager extends JFrame implements MouseListener {
     private JCheckBoxMenuItem graphique;
     private JCheckBoxMenuItem neuralNet;
     private JCheckBoxMenuItem followBest;
+    private JCheckBoxMenuItem especeInfo;
 
     boolean haveToRestart = false;
 	
@@ -42,17 +49,25 @@ public class FrameManager extends JFrame implements MouseListener {
 		//Setup pour etre plein ecran
 		setExtendedState(JFrame.MAXIMIZED_BOTH);
 
+        this.simulation = simulation;
+        simulationInfos = new SimulationInfos(simulation);
+
+        //setup les paneaux
 		mapPanel = new MapPanel(simulation.getMap(), getSize().width, getSize().height);
-        System.out.println(simulation.especesOpen.size());
 		networkPanel = new NetworkPanel(simulation.especesOpen.get(0), 1000, 200);
-		simulationInfos=new SimulationInfos(simulation);
-		this.simulation = simulation;
+        graphicPanel = new GraphicPanel(simulationInfos);
+		especeInfoPanel = new EspeceInfoPanel(simulation);
+
 		this.add(mapPanel);
 		//this.add(networkPanel, BorderLayout.SOUTH);
 		simulationPanel = new SimulationPanel(simulationInfos);
 		//this.add(simulationPanel, BorderLayout.WEST);
+
+        this.add(graphicPanel, BorderLayout.SOUTH);
+
 		this.addKeyListener(simulation);
 		this.addMouseListener(this);
+		this.addKeyListener(this);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		//this.pack();
 		this.setAutoRequestFocus(true);
@@ -69,8 +84,6 @@ public class FrameManager extends JFrame implements MouseListener {
 	private void createMenu(){
         JMenuBar menuBar = new JMenuBar();
         setJMenuBar(menuBar);
-
-
 
         //Menu file
         JMenu file = new JMenu("File");
@@ -124,6 +137,9 @@ public class FrameManager extends JFrame implements MouseListener {
         neuralNet = new JCheckBoxMenuItem(new WindowAddPanel("Neural Network", this, networkPanel, "South", UserPrefs.KEY_WINDOW_NEURAL_NET));
         window.add(neuralNet);
 
+        especeInfo = new JCheckBoxMenuItem(new WindowAddPanel("Car info", this, especeInfoPanel, "East", UserPrefs.KEY_WINDOW_ESPECE_INFO));
+        window.add(especeInfo);
+
         load_pref();
     }
 
@@ -134,12 +150,16 @@ public class FrameManager extends JFrame implements MouseListener {
 
 	    graphique.setState(UserPrefs.SHOW_WINDOW_GRAPHIQUE);
 	    neuralNet.setState(UserPrefs.SHOW_WINDOW_NEURAL_NETWORK);
+	    especeInfo.setState(UserPrefs.SHOW_WINDOW_ESPECE_INFO);
 
 	    if(graphique.getState()){
             add(simulationPanel, "West");
         }
         if(neuralNet.getState()){
 	        add(networkPanel, "South");
+        }
+        if(especeInfo.getState()){
+	        add(especeInfoPanel, "East");
         }
     }
 
@@ -173,12 +193,12 @@ public class FrameManager extends JFrame implements MouseListener {
 	}
 
 	public static void addGeneration(ArrayList<Espece> especes) {
-		simulationInfos.addGeneration(especes);
-		simulationPanel.update();
+		//simulationInfos.addGeneration(especes);
+		//simulationPanel.update();
 	}
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		this.requestFocus();
+	    this.requestFocus();
 	}
 
 	@Override
@@ -200,4 +220,21 @@ public class FrameManager extends JFrame implements MouseListener {
 	public void mouseExited(MouseEvent e) {
 
 	}
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        if(e.getKeyCode() == KeyEvent.VK_W){
+            simulation.shouldGoToNextGeneration = true;
+        }
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+
+    }
 }

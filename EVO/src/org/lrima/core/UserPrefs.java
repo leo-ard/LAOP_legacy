@@ -15,6 +15,7 @@ public class UserPrefs {
 
     public static boolean SHOW_WINDOW_GRAPHIQUE;
     public static boolean SHOW_WINDOW_NEURAL_NETWORK;
+    public static boolean SHOW_WINDOW_ESPECE_INFO;
 
     //en millis
     public static int TIME_LIMIT = 10_000;
@@ -39,6 +40,7 @@ public class UserPrefs {
 
     final public static String KEY_WINDOW_GRAPHIQUE = "WINDOW_GRAPHIQUE";
     final public static String KEY_WINDOW_NEURAL_NET = "WINDOW_NEURAL_NET";
+    final public static String KEY_WINDOW_ESPECE_INFO = "WINDOW_ESPECE_INFO";
 
     //Defaults
     final public static String DEFAULT_CAR_IMAGE_URL = "/images/voiture.png";
@@ -55,6 +57,7 @@ public class UserPrefs {
 
     final public static boolean DEFAULT_WINDOW_GRAPHIQUE = false;
     final public static boolean DEFAULT_WINDOW_NEURAL_NET = false;
+    final public static boolean DEFAULT_WINDOW_ESPECE_INFO = false;
 
     public UserPrefs(){
         preferences = Preferences.userRoot().node(this.getClass().getName());
@@ -75,5 +78,6 @@ public class UserPrefs {
 
         SHOW_WINDOW_GRAPHIQUE = preferences.getBoolean(KEY_WINDOW_GRAPHIQUE, DEFAULT_WINDOW_GRAPHIQUE);
         SHOW_WINDOW_NEURAL_NETWORK = preferences.getBoolean(KEY_WINDOW_NEURAL_NET, DEFAULT_WINDOW_NEURAL_NET);
+        SHOW_WINDOW_ESPECE_INFO = preferences.getBoolean(KEY_WINDOW_ESPECE_INFO, DEFAULT_WINDOW_ESPECE_INFO);
     }
 }
