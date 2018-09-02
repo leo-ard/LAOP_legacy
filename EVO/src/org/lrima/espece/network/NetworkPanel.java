@@ -55,7 +55,7 @@ public class NetworkPanel extends JPanel{
 	}
 	
 	/**
-	 * Dessine le système de neurone
+	 * Dessine le systeme de neurone
 	 */
 	public void paintComponent(Graphics gra) {
 	    super.paintComponent(gra);
@@ -68,7 +68,7 @@ public class NetworkPanel extends JPanel{
 		g.setColor(Color.black);
 		Font f = new Font("Arial",20,20);
 		g.setFont(f);
-		String text = String.format("Bagage génétique de l'espèce  %s", this.espece.toString(), this.espece.getFitness());
+		String text = String.format("Bagage genetique de l'espece  %s", this.espece.toString(), this.espece.getFitness());
 		g.drawString(text,this.getWidth()/2- getFontMetrics(f).stringWidth(text)/2, 20);
 
 

@@ -54,7 +54,7 @@ public class FrameManager extends JFrame implements MouseListener, KeyListener {
 
         //setup les paneaux
 		mapPanel = new MapPanel(simulation.getMap(), getSize().width, getSize().height);
-		networkPanel = new NetworkPanel(simulation.especesOpen.get(0), 1000, 200);
+		networkPanel = new NetworkPanel(simulation.getEspecesOpen().get(0), 1000, 200);
         graphicPanel = new GraphicPanel(simulationInfos);
 		especeInfoPanel = new EspeceInfoPanel(simulation);
 
@@ -123,9 +123,6 @@ public class FrameManager extends JFrame implements MouseListener, KeyListener {
 
         JMenuItem mapEditor = new JMenuItem(new OpenStudioAction("Open Studio", simulation));
         map.add(mapEditor);
-
-        //JMenuItem changeMap = new JMenuItem(new ChangeMapAction("Get Random Map", this));
-        //map.add(changeMap);
 
         //Menu window
         JMenu window = new JMenu("Window");
@@ -229,7 +226,7 @@ public class FrameManager extends JFrame implements MouseListener, KeyListener {
     @Override
     public void keyPressed(KeyEvent e) {
         if(e.getKeyCode() == KeyEvent.VK_W){
-            simulation.shouldGoToNextGeneration = true;
+            simulation.goToNextGeneration();
         }
     }
 

@@ -21,12 +21,16 @@ public class Map {
 	
 	public int w, h;
 	public int orientation;
-	
-	public Map(String s, Simulation sim) {
+
+
+    /**
+     * Initialize a map with a simulation
+     * @param sim the simulation that runs the map
+     */
+	public Map(Simulation sim) {
 		
 		this.simulation = sim;
         orientation = 0;
-		//createRandomMap();
         reloadMap();
 
 		this.orientation = 0;
@@ -92,10 +96,10 @@ public class Map {
 
 		double scale = 0.001;
 
-        double averageSpeed = e.totalSpeed / simulation.time;
+        double averageSpeed = e.getTotalSpeed() / simulation.getCurrentTime();
         int timeLimit = UserPrefs.TIME_LIMIT;
 
-        double fitness = (e.maxDistanceFromStart + e.totalDistanceTraveled) ;
+        double fitness = (e.getMaxDistanceFromStart() + e.getTotalDistanceTraveled()) ;
 
         //Quand il se rend a destination
         if(fitness == Double.POSITIVE_INFINITY){
@@ -105,7 +109,7 @@ public class Map {
             fitness = 0.0;
         }
 
-		if(e.maxDistanceFromStart < 800){
+		if(e.getMaxDistanceFromStart() < 800){
 		    fitness = 0.0;
         }
 

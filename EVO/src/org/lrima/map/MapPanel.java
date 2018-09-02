@@ -9,22 +9,15 @@ import java.awt.event.MouseWheelListener;
 import java.awt.font.FontRenderContext;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
 import org.lrima.core.EVO;
 import org.lrima.core.UserPrefs;
 import org.lrima.espece.Espece;
-import org.lrima.espece.capteur.Capteur;
 import org.lrima.map.Studio.Drawables.Obstacle;
-import org.lrima.simulation.Interface.EspeceInfoPanel;
-import org.omg.CORBA.Bounds;
 
 public class MapPanel extends JPanel implements MouseMotionListener, MouseListener, MouseWheelListener{
 	
@@ -147,7 +140,7 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 		g.drawRect(0, 0, map.w, map.h);
 		
 		g.setColor(Color.blue);
-		for(Espece e : map.simulation.getEspeces()) {
+		for(Espece e : map.simulation.getAllEspeces()) {
 			if(e!= null)
 				e.draw(g);
 		}
@@ -155,7 +148,7 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 		g.setTransform(new AffineTransform());
 		g.setColor(Color.black);
 		g.drawString("Version alpha 1.1 - Laboratoire de recherche LRIMA", 10, 20);
-		g.drawString(""+map.simulation.time/1000, 10,40);
+		g.drawString(""+map.simulation.getCurrentTime()/1000, 10,40);
 		g.drawImage(IMG_LRIMA,this.getWidth()-150,this.getHeight()-105,null);
 
 
@@ -178,7 +171,7 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 		g.drawString(generationText, xTextLocation - (float)generationTextWidth, yTextLocation);
 
 		//Time since generation started
-		String timeText = "Time: " + map.simulation.time / 1000;
+		String timeText = "Time: " + map.simulation.getCurrentTime() / 1000;
 		Rectangle2D timeTextBounds = font.getStringBounds(timeText, frc);
 		double timeTextWidth = minTextWidth;
 		double timeTextHeight = timeTextBounds.getHeight();
@@ -207,9 +200,9 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 		int ex = (int) ((e.getX()-viewX-offX)*(1.0/(double)zoom));
 		int ey = (int) ((e.getY()-viewY-offY)*(1.0/(double)zoom));
 
-		Espece selected = map.simulation.getEspeces().get(0);
+		Espece selected = map.simulation.getAllEspeces().get(0);
 		int proche = selected.distanceFrom(new Point(ex,ey));
-		for(Espece espece : map.simulation.getEspeces()) {
+		for(Espece espece : map.simulation.getAllEspeces()) {
 			//Reset selected
 			espece.selected = false;
 

@@ -16,9 +16,9 @@ public class PauseAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        simulation.pausing = !simulation.pausing;
+        simulation.setPausing(!simulation.isPausing());
 
-        if(simulation.pausing){
+        if(simulation.isPausing()){
             this.putValue(Action.NAME, "Play");
         }
         else{

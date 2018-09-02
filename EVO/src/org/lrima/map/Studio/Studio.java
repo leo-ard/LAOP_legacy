@@ -39,7 +39,7 @@ public class Studio extends JFrame implements ActionListener {
             @Override
             public void windowClosing(WindowEvent e) {
                 super.windowClosing(e);
-                simulation.pausing = false;
+                simulation.setPausing(false);
             }
         });
 

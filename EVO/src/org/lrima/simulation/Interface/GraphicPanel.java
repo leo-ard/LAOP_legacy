@@ -1,7 +1,6 @@
 package org.lrima.simulation.Interface;
 
 import org.knowm.xchart.*;
-import org.knowm.xchart.internal.ChartBuilder;
 import org.lrima.espece.Espece;
 import org.lrima.simulation.Simulation;
 import org.lrima.simulation.SimulationInfos;
@@ -46,7 +45,7 @@ public class GraphicPanel extends JPanel {
         ArrayList<Integer> xData = new ArrayList<>();
         ArrayList<Double> yData = new ArrayList<>();
 
-        for(Espece e : simulation.getEspeces()){
+        for(Espece e : simulation.getAllEspeces()){
             xData.add(simulation.getGeneration());
             yData.add(e.getFitness());
         }

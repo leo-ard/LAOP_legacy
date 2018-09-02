@@ -10,7 +10,6 @@ public class UserPrefs {
     public static double TURNRATE;
 
     public static boolean REAL_TIME;
-    public static boolean RANDOM_MAP;
     public static boolean FOLLOW_BEST;
 
     public static boolean SHOW_WINDOW_GRAPHIQUE;
@@ -35,7 +34,6 @@ public class UserPrefs {
     final public static String KEY_USE_LAST_SAVED = "USE_LAST_SAVED";
 
     final public static String KEY_REAL_TIME = "REAL_TIME";
-    final public static String KEY_RANDOM_MAP = "RANDOM_MAP";
     final public static String KEY_FOLLOW_BEST = "FOLLOW_BEST";
 
     final public static String KEY_WINDOW_GRAPHIQUE = "WINDOW_GRAPHIQUE";
@@ -73,7 +71,6 @@ public class UserPrefs {
         USE_BEST = preferences.getBoolean(KEY_USE_LAST_SAVED, DEFAULT_USE_LAST_SAVED);
 
         REAL_TIME = preferences.getBoolean(KEY_REAL_TIME, DEFAULT_REAL_TIME);
-        RANDOM_MAP = preferences.getBoolean(KEY_RANDOM_MAP, DEFAULT_RANDOM_MAP);
         FOLLOW_BEST = preferences.getBoolean(KEY_FOLLOW_BEST, DEFAULT_FOLLOW_BEST);
 
         SHOW_WINDOW_GRAPHIQUE = preferences.getBoolean(KEY_WINDOW_GRAPHIQUE, DEFAULT_WINDOW_GRAPHIQUE);

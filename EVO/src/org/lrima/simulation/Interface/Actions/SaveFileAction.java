@@ -27,7 +27,7 @@ public class SaveFileAction extends AbstractAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         //Met en pause la simulation
-        this.simulation.pausing = true;
+        this.simulation.setPausing(true);
 
         this.nn = NaturalSelection.best.neuralNetwork;
 
@@ -42,7 +42,7 @@ public class SaveFileAction extends AbstractAction {
             save(savedFileSelected);
 
             //Reprend la simulation
-            simulation.pausing = false;
+            simulation.setPausing(false);
         }
     }
 

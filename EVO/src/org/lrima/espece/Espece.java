@@ -14,109 +14,121 @@ import org.lrima.simulation.Simulation;
 
 public class Espece {
 	
-	//Width doit etre plus grand que height
+	//Width has to be bigger than height
 	public static final int ESPECES_WIDTH = 74, ESPECES_HEIGHT = 50;
 
+	//Stores the position of the car
 	@DisplayInfo
 	private double x, y;
-	private int w, h;
 
+	//Is the car still alive?
 	@DisplayInfo
 	private boolean alive;
 
+	//Orientation of the car in radian
 	@DisplayInfo
 	private double orientationRad;
+
+	//Speed of the car
 	@DisplayInfo
 	private double vitesse;
+
+	//Acceleration of the car
 	@DisplayInfo
 	private double acceleration;
 
+	//The fitness of the car.
+	//The fitness is used to classify the car based on how good it did
 	@DisplayInfo
 	private double fitness;
-	
+
+	//Array to store all the sensors
 	private ArrayList<Capteur> capteurs = new ArrayList<Capteur>();
+	private int NB_CAPTEUR = 6; //Maxiumum of 180
 
-	//MAX 180
-	private int NB_CAPTEUR = 6;
-	
+	//The neural network of the car
 	public NeuralNetwork neuralNetwork;
-	
-	private Point oldPos;
-	
-	public static int conter;
 
+	//Is the car currently selected ?
 	public boolean selected;
-	public double totalSpeed;
-	@DisplayInfo
-	public double maxDistanceFromStart;
 
+	//Used to get the average speed
+	private double totalSpeed;
+
+	//Used to calculate the fitness
 	@DisplayInfo
-	public double totalDistanceTraveled;
+	private double maxDistanceFromStart;
+
+	//Also used to calculate the fitness
+	@DisplayInfo
+	private double totalDistanceTraveled;
+
+	//Used to calculate the total distance
 	private Point lastPointTraveled;
+
+	//Used to know at what generation the car was created (higher number = the car is good)
+	@DisplayInfo
 	public int bornOnGeneration = 0;
 
-	public double manual_right = 0.0;
-	public double manual_left = 0.0;
-	public boolean shouldListenToNN = true;
-
+	//The map that the car is in
 	private Map map;
 
-	public Point topLeft, topRight, bottomRight, bottomLeft;
-
+	//Used to store the color of the car
 	Color voitureColor = Color.RED;
 
 	/**
-	 * Créer une espèce avec la position et l'orientation spécifiée
-	 *
+	 * Initialize the car with the map to put him into
+	 * The starting position and orientation is determined by the map
+	 * @param map the map to put the car in
 	 */
 	public Espece(Map map) {
+		//Do the base configuration
 		this();
 
+		//Set the map and get the starting parameters from it
 		this.map = map;
 		this.x = map.depart.x;
 		this.y = map.depart.y;
 		this.orientationRad = map.orientation;
 
+		//Used to calculate the total distance traveled
 		this.lastPointTraveled = new Point((int)x, (int)y);
 
-        //Load la meilleure org.lrima.espece
-
-
+		//Setup a base neural network for the car to have
+		//If you want to choose which neural network to use, call Espece(Map, NeuralNetwork)
 		neuralNetwork = new NeuralNetwork(NB_CAPTEUR, 2, true);
-
-
     }
 
-    public Espece(Map map, NeuralNetwork nn){
+	/**
+	 * Initialize a car with a neural network
+	 * @param map the map to put the car in
+	 * @param neuralNetwork the neural network to copy to the car
+	 */
+	public Espece(Map map, NeuralNetwork neuralNetwork){
 	    this(map);
-	    this.neuralNetwork = nn;
+	    this.neuralNetwork = neuralNetwork;
 	    this.neuralNetwork.randomize();
     }
-	
-	public Espece() {
-		this.w = ESPECES_WIDTH;
-		this.h = ESPECES_HEIGHT;
 
-		//Setup les capteurs
+	/**
+	 * Initialize the base configuration of the car
+	 */
+	private Espece() {
+
+		//Setup the sensors base on the number of sensors
+		//Note that the maximum number of sensors is limited to 180 because of this
         for(int i = 90 ; i > -90 ; i -= 180 / NB_CAPTEUR){
-            if(i > 0 && i < 90){
-                capteurs.add(new Capteur(this, i, 0, 0));
-            }
-            else if(i == 0){
-                capteurs.add(new Capteur(this, i, 0, 0));
-            }
-            else{
-                capteurs.add(new Capteur(this, i, 0, 0));
-            }
-
+        	capteurs.add(new Capteur(this, i, 0, 0));
         }
 
+        //The car is considered alive at the start of the simulation
 		alive = true;
 	}
 
+	//TODO: Doesn't work
 	/**
-	 * Met la couleur de la voiture dépendant de son fitness.
-	 * Plus son fitness se rapproche du meilleur, plus elle est verte, sinon elle est plus rouge
+	 * Set the color of the car depending on its fitness
+	 * The better the fitness, the greener it gets. The worst the fitness is, the more it is red
 	 */
 	private void setColor(){
 		double bestFitness = map.simulation.getBestFitness();
@@ -125,11 +137,12 @@ public class Espece {
 		this.voitureColor = new Color(255 - (int)(255 *  percentageFitness), (int)(255 * percentageFitness), 124, 124);
 	}
 
-	public Espece(Espece e) {
-		neuralNetwork = e.getNeuralNetwork();
-	}
-	
-	public double[] capteursToArray() {
+
+	/**
+	 * Transfer all the value of the sensors into a single array
+	 * @return an array containing all the values of the sensors
+	 */
+	private double[] capteursToArray() {
 		double[] capteursValue = new double[this.capteurs.size()];
 		for (int i = 0; i < capteursValue.length; i++) {
 			capteursValue[i] = this.capteurs.get(i).getValue();
@@ -139,122 +152,129 @@ public class Espece {
 		
 	}
 	
-	public void update(double dt, double D, double G) {
+	public void update(double dt) {
+		//No need to update if car is not alive
 		if(!alive) {
 			return;
 		}
 
-		//Set le fitness
+		//Set the fitness to the car
 		map.setFitnessToEspece(this);
+		calculateCarFitnessInformation();
+
+		//Set the color of the car based on its fitness
 		setColor();
-
-		//Calcul la distance la plus loin que l'auto se rend
-		if(this.map != null){
-		    double currentDistance = distanceFrom(map.depart);
-		    if(maxDistanceFromStart < currentDistance){
-		        maxDistanceFromStart = currentDistance;
-            }
-        }
-
-        //Calcule la distance totale de la voiture
-		totalDistanceTraveled += distanceFrom(lastPointTraveled);
-		lastPointTraveled = new Point((int)x, (int)y);
 		
-		//Update le résaux de neuronnes avec la valeur des capteurs
-		double[] capteurArray = capteursToArray();
+		//Set the speed of the right and left side of the car from the neural network's output
+		double[] speeds = getSpeedFromNeuralNetwork();
+		double rightSpeed = speeds[0];
+		double leftSpeed = speeds[1];
 
-		neuralNetwork.update(capteurArray);
-
-		double[] values = neuralNetwork.getOutputValues();
-		if(shouldListenToNN) {
-            D = values[0];
-            G = values[1];
-        }
-        else{
-		    D = manual_right;
-		    G = manual_left;
-        }
-
+		//Get the car speed and turn rate from the settings
         int savedCarSpeed = UserPrefs.preferences.getInt(UserPrefs.KEY_CAR_SPEED, UserPrefs.DEFAULT_CAR_SPEED);
         double savedTurnRate = UserPrefs.preferences.getDouble(UserPrefs.KEY_TURN_RATE, UserPrefs.DEFAULT_TURN_RATE);
 
-
-		orientationRad -= Math.toRadians(G*dt - D*dt)*savedTurnRate;
-		acceleration = D*dt*savedCarSpeed/100 + G*dt*savedCarSpeed/100;
+		//Applies the speed of each side of the car to move it to the next position
+		orientationRad -= Math.toRadians(leftSpeed*dt - rightSpeed*dt)*savedTurnRate;
+		acceleration = rightSpeed*dt*savedCarSpeed/100 + leftSpeed*dt*savedCarSpeed/100;
 		vitesse += acceleration - vitesse;
-		
+		this.x += vitesse*Math.cos(orientationRad);
+		this.y += vitesse*Math.sin(orientationRad);
+
+		//The car can't go backward
 		if(vitesse < 0) {
 			vitesse = 0;
 		}
 
-		//Pour avoir la vitesse moyenne
+		//To get the average speed
 		totalSpeed += vitesse;
-		
-		x += vitesse*Math.cos(orientationRad);
-		y += vitesse*Math.sin(orientationRad);
 
+		//TODO: Better way to do this
+		//Get the information of the car in the EspeceInfoPanel if it is selected
 		if(selected){
 			EspeceInfoPanel.update(this);
 		}
-		
+
 	}
-	
+
 	public void draw(Graphics2D g) {
-		setCorners(); //Calcule les quatres coins de la voiture
 		g.setColor(Color.CYAN);
 
-		//g.setColor(voitureColor);
-
-		if(bornOnGeneration != Simulation.generation){
+		//TODO: Make the color based on the fitness of the car
+		if(bornOnGeneration != map.simulation.getGeneration()){
 			g.setColor(new Color(0, 255, 0, 127));
 		}
 		else{
 			g.setColor(new Color(255, 0, 0, 127));
 		}
 
-		//Dessine l'auto
-		int[] pointX = {topLeft.x, topRight.x, bottomRight.x, bottomLeft.x, topLeft.x};
-		int[] pointY = {topLeft.y, topRight.y, bottomRight.y, bottomLeft.y, topLeft.y};
+		//Get all the points of the car and draws it
+		int[] pointX = {getTopLeft().x, getTopRight().x, getBottomRight().x, getBottomLeft().x, getTopLeft().x};
+		int[] pointY = {getTopLeft().y, getTopRight().y, getBottomRight().y, getBottomLeft().y, getTopLeft().y};
 		g.fillPolygon(pointX, pointY, 5);
 
-		//Draw hitboxe
+		//Draw the contour of the car.
+		//If the car is selected. Set the color of the contour to blue
 		g.setStroke(new BasicStroke(5));
-
 		g.setColor(Color.BLACK);
 		if(selected){
 			g.setColor(Color.BLUE);
 		}
 		g.drawPolyline(pointX, pointY, 5);
 
-
+		//TODO: Make the sensors start in the middle of the car and not on the bottom left
 		g.setStroke(new BasicStroke(3));
 		g.rotate(orientationRad,x, y);
-		//Draw les capteurs
-        if(selected) {
-            for (Capteur c : capteurs) {
-                g.setColor(Color.CYAN);
-            	/*for(Obstacle o : map.obstacles){
-            	    if(o.type.equals(Obstacle.TYPE_LINE)){
-            	        Line line = (Line) o;
 
-            	        if(line.isCollideWith(c)){
-            	            g.setColor(Color.GREEN);
-                        }
-                    }
-                }*/
-                c.draw(g);
-            }
-        }
-        g.rotate(-orientationRad, x, y);
+		//Draw the sensors
+		if(selected) {
+			for (Capteur c : capteurs) {
+				g.setColor(Color.CYAN);
+				c.draw(g);
+			}
+		}
+		//Resets the orientation
+		g.rotate(-orientationRad, x, y);
 	}
 
-	private void setCorners(){
-		getTopLeft();
-		getTopRight();
-		getBottomRight();
-		getBottomLeft();
+	/**
+	 * Get the output of the neural network based on the values that the sensors has
+	 * @return the speed that the left wheel of the car should go [1] and the speed that the
+	 * 			right wheel of the car should go [0]
+	 */
+	private double[] getSpeedFromNeuralNetwork(){
+		double[] capteurArray = capteursToArray();
+		neuralNetwork.update(capteurArray);
+		//The speed that the car has to go left and right
+		double[] speeds = neuralNetwork.getOutputValues();
+
+		return speeds;
 	}
 
+	/**
+	 * Calculate all the variables required to get the fitness of the car
+	 * It calculates the biggest distance it gets from the start and
+	 * the total distance traveled
+	 */
+	private void calculateCarFitnessInformation(){
+		//Calculate the biggest distance the car gets to from the start
+		if(this.map != null){
+			double currentDistance = distanceFrom(map.depart);
+			if(maxDistanceFromStart < currentDistance){
+				maxDistanceFromStart = currentDistance;
+			}
+		}
+
+		//Calculate the total distance of the car
+		totalDistanceTraveled += distanceFrom(lastPointTraveled);
+		lastPointTraveled = new Point((int)x, (int)y);
+	}
+
+	/**
+	 * Get the position of a point based on the orientation of the car
+	 * @param point the point to rotate
+	 * @return the true position based on the rotation of the car
+	 */
 	private Point rotatePoint(Point point){
 		int centerX = (int)x;
 		int centerY = (int)y;
@@ -265,59 +285,113 @@ public class Espece {
 		return new Point(newX, newY);
 	}
 
-	public Point getTopLeft() {
-		double x = this.x;
-		double y = this.y;
-
-		topLeft = rotatePoint(new Point((int)x, (int)y));
-		return topLeft;
-	}
-
-	public Point getTopRight() {
-		double x = this.x;
-		double y = this.y;
-
-		topRight = rotatePoint(new Point((int)x + w, (int)y));
-		return topRight;
-	}
-
-	public Point getBottomRight() {
-		double x = this.x;
-		double y = this.y;
-
-		bottomRight = rotatePoint(new Point((int)x + w, (int)y + h));
-		return bottomRight;
-	}
-
-	public Point getBottomLeft() {
-		double x = this.x;
-		double y = this.y;
-
-		bottomLeft = rotatePoint(new Point((int)x, (int)y + h));
-		return bottomLeft;
-	}
-
+	/**
+	 * Set the alive status of the car to false
+	 */
 	public void kill() {
 		alive = false;
 	}
-	
-	public void tp(Point p) {
-		this.x = p.x;
-		this.y = p.y;
-	}
 
+	/**
+	 * Reset all the sensors to a value of 1
+	 */
 	public void resetCapteur() {
 		for(Capteur c : capteurs) {
 			c.reset();
 		}
 	}
+
+	/**
+	 * Get the distance from a certain point to the car
+	 * @param point the point
+	 * @return the distance from the point to the car
+	 */
+	public int distanceFrom(Point point) {
+		return (int) ((point.x - this.x)*(point.x - this.x) + (point.y - this.y)*(point.y - this.y));
+	}
+
+	/**
+	 * Mutate the neural network of the car
+	 */
+	public void mutate() {
+		this.neuralNetwork.mutate();
+	}
+
+	//TODO: Is it really necessary?
+	/**
+	 * Tp la voiure au point d?part et lui donne une orientation orientation.
+	 *
+	 * De plus, l'acceleration et la vitesse sont mise a z?ro
+	 *
+	 * @param depart
+	 * @param orientation
+	 */
+	public void tpLikeNew(Point depart, int orientation) {
+		this.acceleration = 0;
+		this.vitesse = 0;
+		this.x = depart.getX();
+		this.y = depart.getY();
+		this.orientationRad = Math.toRadians(orientation);
+		this.alive = true;
+		this.resetCapteur();
+
+	}
+
+	/*******
+	 * ACCESSORS AND MUTATORS
+	 * ACCESSORS AND MUTATORS
+	 ********/
+
+	/**
+	 * Get the position of the top left of the car based on its position and orientation
+	 * @return the position of the top left point of the car
+	 */
+	public Point getTopLeft() {
+		double x = this.x;
+		double y = this.y;
+
+		Point topLeft = rotatePoint(new Point((int)x, (int)y));
+		return topLeft;
+	}
+
+	/**
+	 * Get the position of the top right of the car based on its position and orientation
+	 * @return the position of the top right point of the car
+	 */
+	public Point getTopRight() {
+		double x = this.x;
+		double y = this.y;
+
+		Point topRight = rotatePoint(new Point((int)x + Espece.ESPECES_WIDTH, (int)y));
+		return topRight;
+	}
+
+	/**
+	 * Get the position of the bottom right of the car based on its position and orientation
+	 * @return the position of the bottom right point of the car
+	 */
+	public Point getBottomRight() {
+		double x = this.x;
+		double y = this.y;
+
+		Point bottomRight = rotatePoint(new Point((int)x + Espece.ESPECES_WIDTH, (int)y + Espece.ESPECES_HEIGHT));
+		return bottomRight;
+	}
+
+	/**
+	 * Get the position of the bottom left of the car based on its position and orientation
+	 * @return the position of the bottom left point of the car
+	 */
+	public Point getBottomLeft() {
+		double x = this.x;
+		double y = this.y;
+
+		Point bottomLeft = rotatePoint(new Point((int)x, (int)y + Espece.ESPECES_HEIGHT));
+		return bottomLeft;
+	}
 	
 	public double getOrientation() {
 		return orientationRad;
-	}
-	
-	public void setOrientation(double oriRad) {
-		orientationRad = oriRad;
 	}
 
 	public double getX() {
@@ -326,14 +400,6 @@ public class Espece {
 
 	public double getY() {
 		return y;
-	}
-
-	public int getWidth() {
-		return w;
-	}
-
-	public int getHeight() {
-		return h;
 	}
 
 	public double getFitness() {
@@ -348,38 +414,6 @@ public class Espece {
 		return capteurs;
 	}
 
-	public int distanceFrom(Point point) {
-		return (int) ((point.x - this.x)*(point.x - this.x) + (point.y - this.y)*(point.y - this.y));
-	}
-
-	/**
-	 * Tp la voiure au point départ et lui donne une orientation orientation.
-	 * 
-	 * De plus, l'acceleration et la vitesse sont mise a zéro
-	 * 
-	 * @param depart
-	 * @param orientation
-	 */
-	public void tpLikeNew(Point depart, int orientation) {
-		this.acceleration = 0;
-		this.vitesse = 0;
-		this.x = depart.getX();
-		this.y = depart.getY();
-		this.orientationRad = Math.toRadians(orientation);
-		this.alive = true;
-		this.resetCapteur();
-		
-	}
-
-	public boolean isDead() {
-		// TODO Auto-generated method stub
-		return !alive;
-	}
-	
-	public void mutate() {
-		this.neuralNetwork.mutate();
-	}
-
 
     public void setFitness(double fitness) {
 		this.fitness = fitness;
@@ -388,8 +422,8 @@ public class Espece {
 
 
 	/**
-	 * Set l'espece selected et update le paneau d'information pour prendre la nouvelle espece
-	 * @param selected espece selected
+	 * Set the car to selected and make sure it is the only car selected by deselecting all the others
+	 * @param selected Should this car be selected?
 	 */
 	public void setSelected(boolean selected) {
 		//Reset la selection des especes a false
@@ -397,5 +431,17 @@ public class Espece {
 			map.simulation.resetSelected();
 		}
 		this.selected = selected;
+	}
+
+	public double getTotalSpeed() {
+		return totalSpeed;
+	}
+
+	public double getMaxDistanceFromStart() {
+		return maxDistanceFromStart;
+	}
+
+	public double getTotalDistanceTraveled() {
+		return totalDistanceTraveled;
 	}
 }

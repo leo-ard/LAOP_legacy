@@ -17,7 +17,7 @@ public class OpenStudioAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        simulation.pausing = true;
+        simulation.setPausing(true);
 
         Studio studio = new Studio(simulation);
         studio.setVisible(true);

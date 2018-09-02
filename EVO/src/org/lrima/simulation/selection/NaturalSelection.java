@@ -55,17 +55,13 @@ public class  NaturalSelection {
 		int numberOfCar = UserPrefs.preferences.getInt(UserPrefs.KEY_NUMBER_OF_CAR, UserPrefs.DEFAULT_NUMBER_OF_CAR);
 
 		while(especes.size() < numberOfCar) {
-			//int nb =  (int)Math.pow(Random.getRandomDoubleValue(Math.sqrt(especes.size())), 2);
-
 			NeuralNetwork newNeuralNetwork = best.getNeuralNetwork();
 			newNeuralNetwork.randomize();
 
 			newNeuralNetwork = new NeuralNetwork(6, 2, true);
 
 			Espece e = new Espece(m, newNeuralNetwork);
-			e.bornOnGeneration = Simulation.generation;
-			//e.mutate();
-			//e.neuralNetwork.minimalModificationWeight();
+			e.bornOnGeneration = m.simulation.getGeneration();
 			especes.add(e);
 		}
 		
