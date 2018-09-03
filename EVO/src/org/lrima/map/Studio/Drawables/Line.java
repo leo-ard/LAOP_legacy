@@ -3,49 +3,21 @@ package org.lrima.map.Studio.Drawables;
 import org.lrima.espece.Espece;
 import org.lrima.espece.capteur.Capteur;
 
-import javax.swing.*;
 import java.awt.*;
 import java.io.Serializable;
 
-public class Line extends Obstacle implements Serializable {
+public class Line implements Serializable {
+    Point start = null, end = null;
 
-    public Point start;
-    public Point end;
-    public int strokeWidth = 10;
-
-    public Line(Obstacle obstacle){
-        super(obstacle);
-        start = ((Line) obstacle).start;
-        end = ((Line) obstacle).end;
-        placingIcon = false;
-        isSquare = false;
+    public Line(Point start, Point end){
+        this.start = start;
+        this.end = end;
     }
 
-    public Line() {
-        super(Obstacle.TYPE_LINE);
-        placingIcon = false;
-        icon = new ImageIcon(getClass().getResource("/images/icons/Map_Studio/line.gif"));
+    public void draw(Graphics2D graphics){
+        graphics.drawLine(start.x, start.y, end.x, end.y);
     }
 
-    @Override
-    public void draw(Graphics2D g) {
-        super.draw(g);
-        g.setStroke(new BasicStroke(10));
-        g.drawLine(start.x, start.y, end.x, end.y);
-    }
-
-    /*public double distanceFrom(Espece e){
-        System.out.println(position);
-
-        if(position != null) {
-            return Math.sqrt(Math.pow(e.getX() - position.x, 2) + Math.pow(e.getY() - position.y, 2));
-        }
-        else{
-            return 0;
-        }
-    }*/
-
-    @Override
     public boolean collisionWithRect(Espece espece) {
 
         //Get the four corners of the square;
@@ -84,6 +56,7 @@ public class Line extends Obstacle implements Serializable {
 
         return((r >= 0 && r <= 1) && (s >= 0 && s <= 1));
     }
+
     public boolean isCollideWith(Point start2, Point end2){
         double denominator = ((end.x - start.x) * (end2.y - start2.y)) - ((end.y - start.y) * (end2.x - start2.x));
         double numerator1 = ((start.y - start2.y) * (end2.x - start2.x)) - ((start.x - start2.x) * (end2.y - start2.y));

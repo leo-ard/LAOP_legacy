@@ -8,6 +8,7 @@ import org.lrima.core.UserPrefs;
 
 import org.lrima.espece.capteur.Capteur;
 import org.lrima.espece.network.NeuralNetwork;
+import org.lrima.map.Studio.Drawables.Line;
 import org.lrima.map.Studio.Drawables.Obstacle;
 import org.lrima.simulation.Interface.EspeceInfoPanel;
 import org.lrima.simulation.Simulation;
@@ -372,15 +373,17 @@ public class Espece {
 		if(this.alive) {
 			for (Obstacle o : map.getObstacles()) {
 				//Si l'espece touche un mur
-				if (o.collisionWithRect(this)) {
-					try {
-						this.simulation.addEspeceToClosed(this);
-						this.kill();
+				for(Line line : o.getLines()) {
+					if (line.collisionWithRect(this)) {
+						try {
+							this.simulation.addEspeceToClosed(this);
+							this.kill();
 
-						return true;
-					} catch (Exception e1) {
-						e1.printStackTrace();
-						simulation.setRunning(false);
+							return true;
+						} catch (Exception e1) {
+							e1.printStackTrace();
+							simulation.setRunning(false);
+						}
 					}
 				}
 			}

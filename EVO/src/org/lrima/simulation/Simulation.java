@@ -12,6 +12,7 @@ import org.lrima.espece.capteur.Capteur;
 import org.lrima.espece.network.NeuralNetwork;
 import org.lrima.map.Map;
 import org.lrima.map.Studio.Drawables.Line;
+import org.lrima.map.Studio.Drawables.LineObstacle;
 import org.lrima.map.Studio.Drawables.Obstacle;
 import org.lrima.simulation.selection.NaturalSelection;
 
@@ -52,7 +53,8 @@ public class Simulation extends Thread{
 		super();
 		running = true;
 		Simulation.currentTime = 0;
-		map = new Map(10000, 10000);
+		//map = new Map(10000, 10000);
+		map = Map.loadMapFromFile("test.map");
 
 		this.initializeCars(null);
 	}
@@ -136,8 +138,10 @@ public class Simulation extends Thread{
 	 */
 	private void loopSetCapteur(Espece espece){
 		for(Capteur capteur : espece.getCapteursList()){
-			for(Line obstacle : map.getObstacles()){
-				capteur.setValue(obstacle);
+			for(Obstacle obstacle : map.getObstacles()){
+				for(Line line : obstacle.getLines()){
+					capteur.setValue(line);
+				}
 			}
 		}
 	}
