@@ -135,12 +135,9 @@ public class Espece {
 	private void setupSensors(){
 		//Setup the sensors base on the number of sensors
 		//Note that the maximum number of sensors is limited to 180 because of this
-        for(int i = 90 ; i > -90 ; i -= 180 / NB_CAPTEUR){
-        	capteurs.add(new Capteur(this, i, ESPECES_WIDTH/2, ESPECES_HEIGHT/2));
-        }
-
-        //The car is considered alive at the start of the simulation
-		alive = true;
+		for(int i = 90 ; i > -90 ; i -= 180 / NB_CAPTEUR){
+			capteurs.add(new Capteur(this, i, 0, 0));
+		}
 	}
 
 	//TODO: Doesn't work

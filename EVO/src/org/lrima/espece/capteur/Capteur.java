@@ -13,7 +13,7 @@ public class Capteur {
 	public Espece e;
 	private double angle;
 	private double calAngle;
-	private int x, y;
+	private double x, y;
 	private double value;
 
 	public Obstacle lastObstacleCollided;
@@ -58,7 +58,7 @@ public class Capteur {
 
 
 
-		g.drawLine(x1, y1,x1+lx,y1-ly);
+		g.drawLine(x1,y1,x1+lx,y1-ly);
 		g.setColor(Color.BLACK);
 		g.drawRect(x1+ (int)(lx*value),y1- (int)(ly*value), 1, 1);
 	}
