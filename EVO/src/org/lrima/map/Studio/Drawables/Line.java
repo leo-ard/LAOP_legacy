@@ -141,7 +141,7 @@ public class Line extends Obstacle implements Serializable {
         }
         else{
             //Si aucune collision
-            return -1.0;
+            return 1.0;
         }
     }
 }

@@ -15,8 +15,8 @@ public class GraphicPanel extends JPanel {
 
     private SimulationInfos simulationInfos;
     private XYChart chart;
-    XChartPanel<XYChart> chartPanel;
-    Dimension screenSize;
+    private XChartPanel<XYChart> chartPanel;
+    private Dimension screenSize;
 
     public GraphicPanel(Simulation simulation){
         this.simulationInfos = simulation.getSimulationInformation();
