@@ -8,6 +8,10 @@ import java.awt.event.*;
 import java.io.*;
 import java.util.ArrayList;
 
+
+/**
+ * Todo: Refaire cette classe, en sauvegardant un Map dans le fichier au lieu d'un arraylist
+ */
 public class Studio extends JFrame implements ActionListener {
 
     Simulation simulation;
@@ -136,7 +140,11 @@ public class Studio extends JFrame implements ActionListener {
 
             System.out.println("Saving: " + drawingPanel.placedObstacles.size());
 
-            oos.writeObject(drawingPanel.placedObstacles);
+            //Todo: Popup si getStart == null
+            if(drawingPanel.getStart() != null) {
+                oos.writeObject(drawingPanel.getStart());
+                oos.writeObject(drawingPanel.placedObstacles);
+            }
         }catch (Exception e){
             e.printStackTrace();
         }

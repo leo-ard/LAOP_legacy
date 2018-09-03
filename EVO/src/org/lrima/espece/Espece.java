@@ -8,8 +8,10 @@ import org.lrima.core.UserPrefs;
 
 import org.lrima.espece.capteur.Capteur;
 import org.lrima.espece.network.NeuralNetwork;
+import org.lrima.map.Studio.Drawables.Obstacle;
 import org.lrima.simulation.Interface.EspeceInfoPanel;
 import org.lrima.simulation.Simulation;
+import org.lrima.map.Map;
 
 public class Espece {
 	
@@ -166,8 +168,12 @@ public class Espece {
 		return capteursValue;
 		
 	}
-	
-	public void update(double dt) {
+
+	/**
+	 * Get the fitness and update the speed of the wheels from the neural network
+	 * @param timePassed the time that passed since the last call of update
+	 */
+	public void update(double timePassed) {
 		//No need to update if car is not alive
 		if(!alive) {
 			return;
@@ -189,8 +195,8 @@ public class Espece {
         double savedTurnRate = UserPrefs.preferences.getDouble(UserPrefs.KEY_TURN_RATE, UserPrefs.DEFAULT_TURN_RATE);
 
 		//Applies the speed of each side of the car to move it to the next position
-		orientationRad -= Math.toRadians(leftSpeed*dt - rightSpeed*dt)*savedTurnRate;
-		acceleration = rightSpeed*dt*savedCarSpeed/100 + leftSpeed*dt*savedCarSpeed/100;
+		orientationRad -= Math.toRadians(leftSpeed*timePassed - rightSpeed*timePassed)*savedTurnRate;
+		acceleration = rightSpeed*timePassed*savedCarSpeed/100 + leftSpeed*timePassed*savedCarSpeed/100;
 		vitesse += acceleration - vitesse;
 		this.x += vitesse*Math.cos(orientationRad);
 		this.y += vitesse*Math.sin(orientationRad);
@@ -208,6 +214,9 @@ public class Espece {
 		if(selected){
 			EspeceInfoPanel.update(this);
 		}
+
+		//Reset the sensors
+		this.resetCapteur();
 
 	}
 
@@ -350,6 +359,34 @@ public class Espece {
 		this.alive = true;
 		this.resetCapteur();
 
+	}
+
+	/**
+	 * If the car is alive, it checks if it is coliding with an obstale.
+	 * If it is, it adds it to the closed set and kills it
+	 * @param map the map to retreive the walls from the map
+	 * @return true if it should die, false otherwise
+	 */
+	public boolean shouldDie(Map map){
+		//Regarde si l'espèce meurt
+		if(this.alive) {
+			for (Obstacle o : map.getObstacles()) {
+				//Si l'espece touche un mur
+				if (o.collisionWithRect(this)) {
+					try {
+						this.simulation.addEspeceToClosed(this);
+						this.kill();
+
+						return true;
+					} catch (Exception e1) {
+						e1.printStackTrace();
+						simulation.setRunning(false);
+					}
+				}
+			}
+			return false;
+		}
+		return true; // If the car is dead
 	}
 
 	//*******===========================================================================

@@ -3,6 +3,7 @@ package org.lrima.espece.capteur;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import org.lrima.espece.Espece;
+import org.lrima.map.Studio.Drawables.Line;
 import org.lrima.map.Studio.Drawables.Obstacle;
 import org.lrima.simulation.Simulation;
 
@@ -36,11 +37,12 @@ public class Capteur {
 	
 	/**
 	 * Set la valeur la plus basse, car l'algorith va favoriser les jonctions plus proche du v�hicule que celle plus loins. Aussi a noter que la valeur des capteurs est reset � chaque tick.
-	 * @param v
+	 * @param obstacle the obstacle that colided with this sensor
 	 */
-	public void setValue(double v) {
-		if(v <= value) {
-			value= v;
+	public void setValue(Line obstacle) {
+		double capteurValue = obstacle.getCapteurValue(this);
+		if(capteurValue <= value) {
+			value= capteurValue;
 		}
 	}
 	/**

@@ -29,6 +29,7 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
     int mapWidth = 10000;
     int mapHeight = 10000;
 
+    private Point start = null;
     boolean placedStart = false;
     boolean placedEnd = false;
 
@@ -95,6 +96,12 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
 
             currentObstacle.draw(g);
         }
+
+        //Draw le start
+        if(start != null) {
+            g.setColor(Color.GREEN);
+            g.fillRect(start.x, start.y, 20, 20);
+        }
     }
 
     public void setSelectedObstacle(Obstacle selectedObstacle) { this.selectedObstacle = selectedObstacle; }
@@ -139,7 +146,14 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
             //Si il place une icon
             if (selectedObstacle != null && selectedObstacle.placingIcon) {
                 selectedObstacle.move(mousePositionOnMap);
-                placedObstacles.add(selectedObstacle);
+
+                //Au lieu de store start comme un obstacle, store le comme un point
+                if(!selectedObstacle.type.equals(Obstacle.TYPE_START)) {
+                    placedObstacles.add(selectedObstacle);
+                }
+                else{
+                    this.start = mousePositionOnMap;
+                }
 
                 //On place seulement start et end une fois
                 if(selectedObstacle.type.equals(Obstacle.TYPE_START)){
@@ -253,5 +267,9 @@ public class DrawingPanel extends JPanel implements MouseMotionListener, MouseLi
         this.placedEnd = false;
         this.placedStart = false;
         this.placedObstacles = new ArrayList<Obstacle>();
+    }
+
+    public Point getStart() {
+        return start;
     }
 }

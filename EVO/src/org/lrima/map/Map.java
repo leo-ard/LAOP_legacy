@@ -8,13 +8,14 @@ import java.util.Iterator;
 
 import org.lrima.core.UserPrefs;
 import org.lrima.espece.Espece;
+import org.lrima.map.Studio.Drawables.Line;
 import org.lrima.map.Studio.Drawables.Obstacle;
 import org.lrima.simulation.Simulation;
 
 public class Map {
 
     //All the obstacles in the map
-	private ArrayList<Obstacle> obstacles;
+	private ArrayList<Line> obstacles;
 	//Where the cars should span
 	private Point depart = null;
 
@@ -36,7 +37,7 @@ public class Map {
      * @param filePath the path to the map file
      */
     private void loadMapFromFile(String filePath){
-        this.obstacles = new ArrayList<Obstacle>();
+        this.obstacles = new ArrayList<Line>();
 
         try {
             //Open the file
@@ -44,10 +45,11 @@ public class Map {
             ObjectInputStream ois = new ObjectInputStream(fis);
 
             //Get all the obstacles stored in the file
-            this.obstacles = (ArrayList<Obstacle>) ois.readObject();
+            this.depart = (Point) ois.readObject();
+            this.obstacles = (ArrayList<Line>) ois.readObject();
 
             //Find the start position
-            Iterator<Obstacle> iterator = obstacles.iterator();
+            Iterator<Line> iterator = obstacles.iterator();
             while (iterator.hasNext()){
                 Obstacle obstacle = iterator.next();
                 if(obstacle.type.equals(Obstacle.TYPE_START)){
@@ -70,7 +72,7 @@ public class Map {
         return depart;
     }
 
-    public ArrayList<Obstacle> getObstacles() {
+    public ArrayList<Line> getObstacles() {
         return obstacles;
     }
 

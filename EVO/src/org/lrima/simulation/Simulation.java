@@ -32,7 +32,7 @@ public class Simulation extends Thread{
 	//Used for the main loop
 	private boolean running = true;
 	private boolean pausing = false;
-	private double msBetweenFrames = 8;
+	private double msBetweenFrames = 10;
 
 	//Used to trigger an action in the main loop
     private boolean shouldResetAndAddEspece = false;
@@ -62,93 +62,84 @@ public class Simulation extends Thread{
 	 */
 	public void run() {
 
-		long currTime = System.currentTimeMillis();
-		long timePassed;
+		long currentTime = System.currentTimeMillis();
+		long timePassed = 0;
 		while(running) {
 			if(!pausing) {
 				if(especesOpen.size() != 0 && Simulation.currentTime < UserPrefs.TIME_LIMIT) {
-					currTime = System.currentTimeMillis();
-					for(Espece e : especesOpen) {
-					    e.update(msBetweenFrames);
-					}
-
+					//Add the current time to the Simulation.currentTime
+					currentTime = System.currentTimeMillis();
 					Simulation.currentTime += msBetweenFrames;
+
+					//Iterate through all the cars to get the value of the sensors
 					Iterator<Espece> iterator = especesOpen.iterator();
-
 					while (((Iterator) iterator).hasNext()){
-						Espece e = iterator.next();
-						e.resetCapteur();
-						boolean died = false;
-						if(!died) {
-							for (Capteur c : e.getCapteursList()) {
-								double minCapteurValue = 100.0; // Pour avoir le capteur le plus proche possible
-								for (Obstacle o : map.getObstacles()) {
-									if (o.type.equals(Obstacle.TYPE_LINE)) {
-										Line line = (Line) o;
-										double capteurValue = line.getCapteurValue(c);
-										if (capteurValue < minCapteurValue && capteurValue != -1.0) {
-											//Si il y a eu une collision
-											c.setValue(capteurValue);
-											c.lastObstacleCollided = o;
-											minCapteurValue = capteurValue;
-										}
-									}
+						Espece espece = iterator.next();
+						espece.update(msBetweenFrames);
+						this.loopSetCapteur(espece);
 
-								}
-							}
-
-							//Regarde si l'espèce meurt
-							for (Obstacle o : map.getObstacles()) {
-								//Si l'espece touche un mur
-								if (!died && o.collisionWithRect(e)) {
-									try {
-										especesClosed.add(e);
-										e.kill();
-
-										iterator.remove();
-										died = true;
-									} catch (Exception e1) {
-										e1.printStackTrace();
-										running = false;
-									}
-								}
-							}
+						//If the car should die, remove it from the espece open
+						if(espece.shouldDie(this.map)){
+							iterator.remove();
 						}
 					}
 
-
-					//Trigger actions
-                    if(shouldResetAndAddEspece){
-                        if(neuralNetworkToUse != null){
-                            initializeCars(neuralNetworkToUse);
-                        }
-                        else{
-                            initializeCars(neuralNetworkToUse);
-                        }
-                        shouldResetAndAddEspece = false;
-                    }
-					if(shouldGoToNextGeneration){
-						nextGeneration();
-						shouldGoToNextGeneration = false;
-					}
+					this.loopEnd();
 				}
 				else {
 					//Goes to the next generation
 					nextGeneration();
 				}
 			}
+			this.waitForRealTime(timePassed, currentTime);
+		}
+	}
 
-			//If the simulation is in real time
-			if(UserPrefs.REAL_TIME) {
-				try {
-					timePassed = System.currentTimeMillis() - currTime;
-					Simulation.sleep((long) ((msBetweenFrames - timePassed) > 0 ?msBetweenFrames - timePassed: 0));
-				} catch (InterruptedException e1) {
-					e1.printStackTrace();
-				}
+	/**
+	 * If the simulation should run in real time, have a constant refresh rate
+	 * @param timePassed the time for calculations
+	 * @param currTime the current time
+	 */
+	private void waitForRealTime(long timePassed, long currTime){
+		if(UserPrefs.REAL_TIME) {
+			try {
+				timePassed = System.currentTimeMillis() - currTime;
+				Simulation.sleep((long) ((msBetweenFrames - timePassed) > 0 ?msBetweenFrames - timePassed: 0));
+			} catch (InterruptedException e1) {
+				e1.printStackTrace();
 			}
 		}
+	}
 
+	//Todo: Avoir un arraylist avec les actions a perform at the end of the loop
+	/**
+	 * Thing to do at the end of the main loop
+	 */
+	private void loopEnd(){
+		if(shouldResetAndAddEspece){
+			if(neuralNetworkToUse != null){
+				initializeCars(neuralNetworkToUse);
+			}
+			else{
+				initializeCars(neuralNetworkToUse);
+			}
+			shouldResetAndAddEspece = false;
+		}
+		if(shouldGoToNextGeneration){
+			nextGeneration();
+			shouldGoToNextGeneration = false;
+		}
+	}
+
+	/**
+	 * Used in the main loop to set the value of the sensors
+	 */
+	private void loopSetCapteur(Espece espece){
+		for(Capteur capteur : espece.getCapteursList()){
+			for(Line obstacle : map.getObstacles()){
+				capteur.setValue(obstacle);
+			}
+		}
 	}
 
 	/**
@@ -289,6 +280,14 @@ public class Simulation extends Thread{
 		this.shouldGoToNextGeneration = true;
 	}
 
+	/**
+	 * Add a car to the closed set
+	 * @param e the car to put into the array
+	 */
+	public void addEspeceToClosed(Espece e){
+		especesClosed.add(e);
+	}
+
 	//*******===========================================================================
 	//* ACCESSORS AND MUTATORS
 	//* ACCESSORS AND MUTATORS
@@ -316,6 +315,10 @@ public class Simulation extends Thread{
 
 	public int getGeneration() {
 		return generation;
+	}
+
+	public void setRunning(boolean running) {
+		this.running = running;
 	}
 
 	public ArrayList<Espece> getEspecesClosed() {
