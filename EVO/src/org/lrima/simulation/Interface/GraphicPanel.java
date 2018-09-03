@@ -10,6 +10,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Random;
 
+//TODO: Finir le graphique
 public class GraphicPanel extends JPanel {
 
     private SimulationInfos simulationInfos;
@@ -17,8 +18,8 @@ public class GraphicPanel extends JPanel {
     XChartPanel<XYChart> chartPanel;
     Dimension screenSize;
 
-    public GraphicPanel(SimulationInfos infos){
-        this.simulationInfos = infos;
+    public GraphicPanel(Simulation simulation){
+        this.simulationInfos = simulation.getSimulationInformation();
         screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         setBackground(Color.CYAN);
 

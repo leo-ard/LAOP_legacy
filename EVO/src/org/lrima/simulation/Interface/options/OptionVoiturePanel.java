@@ -4,47 +4,27 @@ import org.lrima.core.UserPrefs;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
-import java.util.prefs.Preferences;
 
-public class VoiturePanel extends JPanel implements OptionPanel, ActionListener {
+public class OptionVoiturePanel extends JPanel implements OptionPanel {
 
 
 
-    private JLabel carImageLabel;
     private JLabel numberOfCarLabel;
     private JLabel carSpeedLabel;
     private JLabel turnrateLabel;
 
-    private JTextField carImageURL;
     private JTextField numberOfCarTextField;
     private JTextField carSpeedTextField;
     private JTextField turnrateTextField;
 
-    private JFileChooser fileChooser;
-    JButton carImageOpenButton;
-
-    public VoiturePanel(){
+    /**
+     * Creates a JPanel with all the options fields for the car
+     */
+    public OptionVoiturePanel(){
         Box box = Box.createVerticalBox();
         add(box);
 
         FlowLayout sectionLayout = new FlowLayout(FlowLayout.LEFT, 15, 5);
-        //Car image
-        fileChooser = new JFileChooser();
-        fileChooser.setCurrentDirectory(new File("."));
-
-        JPanel carImagePanel = new JPanel(sectionLayout);
-        carImageLabel = new JLabel("Car image:");
-        carImageURL = new JTextField(20);
-        carImageOpenButton = new JButton("Open");
-        carImageOpenButton.addActionListener(this);
-
-        carImagePanel.add(carImageLabel);
-        carImagePanel.add(carImageURL);
-        carImagePanel.add(carImageOpenButton);
-        box.add(carImagePanel);
 
         //Number of car
         JPanel numberOfCarPanel = new JPanel(sectionLayout);
@@ -78,7 +58,7 @@ public class VoiturePanel extends JPanel implements OptionPanel, ActionListener 
     }
 
     /**
-     * Mets les options sauvegardés dans les textfields
+     * Loads the user preferences and put the values into the form
      */
     private void load_prefs(){
         UserPrefs.load();
@@ -86,7 +66,6 @@ public class VoiturePanel extends JPanel implements OptionPanel, ActionListener 
         numberOfCarTextField.setText("" + UserPrefs.NUMBERCARS);
         carSpeedTextField.setText("" + UserPrefs.VITESSE_VOITURE);
         turnrateTextField.setText("" + UserPrefs.TURNRATE);
-        carImageURL.setText(UserPrefs.SRC_VOITURE);
     }
 
     @Override
@@ -94,35 +73,23 @@ public class VoiturePanel extends JPanel implements OptionPanel, ActionListener 
         int numberOfCar, carSpeed;
         double turnRate;
 
+        //Check if the user entered numbers
         try {
             numberOfCar = Integer.parseInt(numberOfCarTextField.getText());
             carSpeed = Integer.parseInt(carSpeedTextField.getText());
             turnRate = Double.parseDouble(turnrateTextField.getText());
         }catch (NumberFormatException e){
-            System.out.println("EREUR D'entré");
-            return false; //Si le user entre des lettres ou quelque chose d'imprévue
+            System.out.println("EREUR D'entrée");
+            return false;
         }
 
+        //Save the new preferences
         UserPrefs.preferences.putInt(UserPrefs.KEY_NUMBER_OF_CAR, numberOfCar);
         UserPrefs.preferences.putInt(UserPrefs.KEY_CAR_SPEED, carSpeed);
         UserPrefs.preferences.putDouble(UserPrefs.KEY_TURN_RATE, turnRate);
-        UserPrefs.preferences.put(UserPrefs.KEY_CAR_IMAGE_URL, carImageURL.getText());
 
         System.out.println(UserPrefs.preferences.getInt(UserPrefs.KEY_NUMBER_OF_CAR, 10));
 
         return true;
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if(e.getSource() == carImageOpenButton){
-            int returnVal = fileChooser.showOpenDialog(this);
-
-            if(returnVal == JFileChooser.APPROVE_OPTION){
-                File selectedFile = fileChooser.getSelectedFile();
-                String absolutePath = selectedFile.getAbsolutePath();
-                this.carImageURL.setText(absolutePath);
-            }
-        }
     }
 }

@@ -9,88 +9,105 @@ import java.awt.event.MouseWheelListener;
 import java.awt.font.FontRenderContext;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
 import org.lrima.core.EVO;
 import org.lrima.core.UserPrefs;
 import org.lrima.espece.Espece;
 import org.lrima.map.Studio.Drawables.Obstacle;
+import org.lrima.simulation.Simulation;
 
 public class MapPanel extends JPanel implements MouseMotionListener, MouseListener, MouseWheelListener{
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	final int ZOOM_MINIMUM = 0;
-	final int ZOOM_MAXIMUM = 100;
-	
+
+	//The map to display
 	private Map map;
-	
+
 	//View range
+	//TODO: Trouver noms plus descriptifs
 	private int viewX, viewY;
 	private int offX, offY;
 	private float zoom;
-	
-	//drag n drop
+
+	//Used for the drag motion on the map
 	private int lastMousePositionX, lastMousePositionY;
-	private boolean dragging;
-	
-	//temp
-	boolean D, G;
-	
-	//images;
-	public static Image IMG_VOITURE;
-	public static Image IMG_LRIMA;
 
-	public boolean followBest = UserPrefs.FOLLOW_BEST;
+	//Stores the logo of LRIMA;
+	private BufferedImage LRIMA_image;
+
+	//The simulation to use
+	private Simulation simulation;
+
+	//Colors used on the map
+	private final Color COLOR_BACKGROUND = new Color(238, 238, 238);
+	private final Color COLOR_BACKGROUND_LINES = new Color(136, 136, 136);
+	private final Color COLOR_OBSTACLE = new Color(176, 176, 176);
+	private final Color COLOR_TEXT = new Color(0, 0, 0);
+
+	//Used for the text
+	private final int TEXT_MARGIN = 20;
+	private final int FONT_SIZE = 32;
 
 
-	public MapPanel(Map map, int w, int h) {
-		this.setPreferredSize(new Dimension(w, h));
-		this.map = map;
-		
-		this.zoom = 1.50f;
-		this.viewX =(int) ((-map.depart.x+ w/2)*zoom);
-		this.viewY =(int) ((-map.depart.y+ h/2)*zoom);
 
+	public MapPanel(Simulation simulation) {
+		//Setup variables
+		this.simulation = simulation;
+		this.map = simulation.getMap();
+		this.zoom = 0.5f;
+
+		//Try to load te LRIMA logo image
+		try {
+			URL imagePath = getClass().getResource("/images/LRIMA.png");
+			this.LRIMA_image = ImageIO.read(new File(imagePath.getPath()));
+		}catch (IOException e){
+			System.out.println("Could load LRIMA logo image");
+		}
+
+		//TODO: getSize retourne 0 dans le constructeur
+		//Centers the view on the start point
+		this.viewX =(int) ((-map.getDepart().x+ this.getSize().getWidth()/2)*zoom);
+		this.viewY =(int) ((-map.getDepart().y+ this.getSize().getHeight()/2)*zoom);
+
+		//Add all the listeners
 		this.addMouseMotionListener(this);
 		this.addMouseWheelListener(this);
 		this.addMouseListener(this);
-
-		//this.mouseWheelMoved(new MouseWheelEvent(this, 0, 0, 0, 0, 0, 0, true, 0, 0, 0));
-		
 	}
-	
+
+	/**
+	 * Used to constantly repaint the map
+	 */
 	public void start() {
 		Timer uploadCheckerTimer = new Timer(false);
 		uploadCheckerTimer.scheduleAtFixedRate(
-		    new TimerTask() {
-		      public void run() { repaint(); }
-		    }, 0, 16);
+				new TimerTask() {
+					public void run() { repaint(); }
+				}, 0, 16);
 	}
-	
+
 	@Override
-	public void paintComponent(Graphics g1d) {
-		Graphics2D g = (Graphics2D) g1d;
-		super.paintComponent(g);
+	public void paintComponent(Graphics g) {
+		Graphics2D graphics = (Graphics2D) g;
+		super.paintComponent(graphics);
 
 		double translateX, translateY;
 
-
-		if(followBest){
-			Espece bestEspece = map.simulation.getBest();
-			viewX = (int) -bestEspece.getX() + getWidth() / 2;
-			viewY = (int) -bestEspece.getY() + getHeight() / 2;
+		UserPrefs.load();
+		if(UserPrefs.FOLLOW_BEST){
+			Espece bestEspece = simulation.getBest();
+			translateX = (int) -bestEspece.getX() + getWidth() / 2;
+			translateY = (int) -bestEspece.getY() + getHeight() / 2;
 
 			//TODO: faire qu'on puisse modifier le zoom
 			zoom = 1.0f;
-
-			translateX = (viewX);
-			translateY = (viewY);
 
 			bestEspece.setSelected(true);
 		}
@@ -99,110 +116,114 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 			translateY = (viewY+offY)*(1.0/(double)zoom);
 		}
 
+		//Zoom based on mouse wheel
+		graphics.scale(zoom, zoom);
+		graphics.translate(translateX, translateY);
 
+		drawBackground(graphics);
+		drawObstacles(graphics);
+		drawCars(graphics);
 
-		g.scale(zoom, zoom);
-		g.translate(translateX, translateY);
-		
-		//background
-		g.setColor(new Color(238, 238, 238));
-		g.fillRect(0, 0, map.w, map.h);
+		//Reset the zoom and translations
+		graphics.setTransform(new AffineTransform());
 
-		//Cadriller
-		g.setColor(new Color(136, 136, 136));
-		for(int i = 0 ; i < map.w ; i += map.w / 40){
-			g.drawLine(i, 0, i, map.h);
-		}
-		for(int i = 0 ; i < map.h ; i += map.h / 40){
-			g.drawLine(0, i, map.w, i);
-		}
-		
-		
-		//ellipse size
-		int s = 100;
-		g.setColor(Color.green);
-		g.fillOval(map.depart.x-s/2, map.depart.y-s/2, s, s);
-		
-		g.setColor(Color.YELLOW);
-		//g.fillOval(org.lrima.map.destination.x-s/2, org.lrima.map.destination.y-s/2, s, s);
-		
-		
-		
-		//draws org.lrima.map obstacle
+		//Write the informations
+		drawInformation(graphics);
 
-		for(Obstacle o : map.obstacles) {
-            g.setColor(new Color(255, 51, 51));
-			o.draw(g);
-		}
-		
-		//contour
-		g.setColor(Color.black);
-		g.drawRect(0, 0, map.w, map.h);
-		
-		g.setColor(Color.blue);
-		for(Espece e : map.simulation.getAllEspeces()) {
-			if(e!= null)
-				e.draw(g);
-		}
-		
-		g.setTransform(new AffineTransform());
-		g.setColor(Color.black);
-		g.drawString("Version alpha 1.1 - Laboratoire de recherche LRIMA", 10, 20);
-		g.drawString(""+map.simulation.getCurrentTime()/1000, 10,40);
-		g.drawImage(IMG_LRIMA,this.getWidth()-150,this.getHeight()-105,null);
-
-
-		//Écrit les information de la génération
-		float yTextLocation = getHeight() / 10;
-		float xTextLocation = getWidth() - getWidth() / 5;
-		float minTextWidth = 100;
-
-		Font font = new Font("TimesRoman", Font.PLAIN, 25);
-		AffineTransform affinetransform = new AffineTransform();
-		FontRenderContext frc = new FontRenderContext(affinetransform,true,true);
-		g.setFont(font);
-
-		//Generation text
-		String generationText = "Generation: " + map.simulation.getGeneration();
-		Rectangle2D generationTextBounds = font.getStringBounds(generationText, frc);
-		double generationTextWidth = minTextWidth;
-		double generationTextHeight = generationTextBounds.getHeight();
-		yTextLocation += generationTextHeight;
-		g.drawString(generationText, xTextLocation - (float)generationTextWidth, yTextLocation);
-
-		//Time since generation started
-		String timeText = "Time: " + map.simulation.getCurrentTime() / 1000;
-		Rectangle2D timeTextBounds = font.getStringBounds(timeText, frc);
-		double timeTextWidth = minTextWidth;
-		double timeTextHeight = timeTextBounds.getHeight();
-		yTextLocation += timeTextHeight;
-		g.drawString(timeText, xTextLocation - (float) timeTextWidth, (float) yTextLocation);
-
-		//Selected espece info
-		Espece selectedEspece = map.simulation.getSelectedEspece();
-		double fitness = 0.0;
-
-		if(selectedEspece != null){
-			fitness = selectedEspece.getFitness();
-		}
-
-		//Fitness text
-		String fitnessText = "Fitnessasdfsadfsafasfdasdfasfd: " + fitness;
-		Rectangle2D fitnessTextBounds = font.getStringBounds(fitnessText, frc);
-		double fitnessTextWidth = minTextWidth;
-		double fitnessTextHeight = fitnessTextBounds.getHeight();
-		yTextLocation += fitnessTextHeight;
-		g.drawString(fitnessText, xTextLocation - (float)fitnessTextWidth, (float)yTextLocation);
+		//Put the LRIMA image on the top left
+		graphics.drawImage(this.LRIMA_image,0, 0,null);
 	}
-	
+
+	/**
+	 * Draws the background of the map and the lines
+	 * @param graphics the graphics to put a map into
+	 */
+	private void drawBackground(Graphics2D graphics){
+		//Set the background color
+		graphics.setColor(COLOR_BACKGROUND);
+		graphics.fillRect(0, 0, map.getMapWidth(), map.getMapHeight());
+
+		//Draw the lines
+		graphics.setColor(COLOR_BACKGROUND_LINES);
+		for(int i = 0 ; i < map.getMapWidth() ; i += map.getMapWidth() / 40){
+			//Vertical lines
+			graphics.drawLine(i, 0, i, map.getMapHeight());
+		}
+		for(int i = 0 ; i < map.getMapHeight() ; i += map.getMapHeight() / 40){
+			//Horizontal lines
+			graphics.drawLine(0, i, map.getMapWidth(), i);
+		}
+	}
+
+	/**
+	 * Draws all the obstacles
+	 * @param graphics the graphics to put the obstacles into
+	 */
+	private void drawObstacles(Graphics2D graphics){
+		for(Obstacle o : map.getObstacles()) {
+			graphics.setColor(COLOR_OBSTACLE);
+			o.draw(graphics);
+		}
+	}
+
+	/**
+	 * Draw the cars
+	 * @param graphics the graphics to put the cars into
+	 */
+	private void drawCars(Graphics2D graphics){
+		graphics.setColor(Color.blue);
+		for(Espece e : this.simulation.getAllEspeces()) {
+			e.draw(graphics);
+		}
+	}
+
+	/**
+	 * Draw additional information such as the current generation, the time
+	 * @param graphics the graphics to put the information into
+	 */
+	private void drawInformation(Graphics2D graphics){
+		graphics.setColor(COLOR_TEXT);
+		graphics.setFont(new Font("Helvetica", Font.PLAIN, FONT_SIZE));
+
+		String text = 	"Generation: " + this.simulation.getGeneration();
+		text += 		"\nTime: " + Simulation.currentTime / 1000;
+
+		drawText(graphics,text, new Point(TEXT_MARGIN, getHeight() * 2 - TEXT_MARGIN), "up");
+	}
+
+	/**
+	 * Draws text on the screen. Works with line breaks.
+	 * @param graphics the graphic context to put the text onto
+	 * @param text the text to display
+	 * @param startPosition the starting position of the text
+	 * @param direction the direction the text should go if there are new lines (up or down)
+	 */
+	private void drawText(Graphics2D graphics, String text, Point startPosition, String direction){
+
+		for(String line : text.split("\n")){
+			graphics.drawString(line, startPosition.x, startPosition.y);
+
+			switch (direction.toUpperCase()){
+				case("UP"):
+					//The next line is on top of the last one
+					startPosition.y -= graphics.getFontMetrics().getHeight();
+					break;
+				case ("DOWN"):
+					//The next line is on the bottom of the last one
+					startPosition.y += graphics.getFontMetrics().getHeight();
+					break;
+			}
+		}
+	}
+
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		int ex = (int) ((e.getX()-viewX-offX)*(1.0/(double)zoom));
 		int ey = (int) ((e.getY()-viewY-offY)*(1.0/(double)zoom));
 
-		Espece selected = map.simulation.getAllEspeces().get(0);
+		Espece selected = this.simulation.getAllEspeces().get(0);
 		int proche = selected.distanceFrom(new Point(ex,ey));
-		for(Espece espece : map.simulation.getAllEspeces()) {
+		for(Espece espece : this.simulation.getAllEspeces()) {
 			//Reset selected
 			espece.selected = false;
 
@@ -214,57 +235,47 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 		}
 		selected.setSelected(true);
 
+		//TODO: Meilleure facon de faire ca?
 		EVO.frame.changeNetworkFocus(selected);
-	}
-
-	public Point.Double getPointOnMap(Point point){
-		double mouseXOnMap = -((viewX+offX)*(1.0/(double)zoom) - point.x*(1.0/(double)zoom));
-		double mouseYOnMap = -((viewY+offY)*(1.0/(double)zoom) - point.y*(1.0/(double)zoom));
-
-		return new Point.Double(mouseXOnMap, mouseYOnMap);
 	}
 
 	@Override
 	public void mousePressed(MouseEvent e) {
 		lastMousePositionX = e.getX()-viewX;
 		lastMousePositionY = e.getY()-viewY;
-		
-		
 	}
+
 	@Override
-	public void mouseReleased(MouseEvent e) {
-		viewX = (int) (e.getX()-lastMousePositionX);
-		viewY = (int) (e.getY()-lastMousePositionY);
-	}
+	public void mouseReleased(MouseEvent e) { }
 
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
 
-			double delta = e.getWheelRotation() / 10.0;
-			double zoomOld = zoom;
-			zoom /= Math.exp(delta);
+		double delta = e.getWheelRotation() / 10.0;
+		double zoomOld = zoom;
+		zoom /= Math.exp(delta);
 
-			//if (zoom <= 0.5) {
-			//	zoom = 0.5f;
-			//}
-			if (zoom >= 2.5) {
-				zoom = 2.5f;
-			}
+		//Allow a maximum ammount of zoom
+		if (zoom <= 0.2) {
+			zoom = 0.2f;
+		}
+		if (zoom >= 2.5) {
+			zoom = 2.5f;
+		}
 
-			double mouseXOnMap = (viewX + offX) * (1.0 / (double) zoomOld) - e.getX() * (1.0 / (double) zoomOld);
-			double mouseYOnMap = (viewY + offY) * (1.0 / (double) zoomOld) - e.getY() * (1.0 / (double) zoomOld);
+		//Get the position of the mouse when the user is scrolling
+		double mouseXOnMap = (viewX + offX) * (1.0 / (double) zoomOld) - e.getX() * (1.0 / (double) zoomOld);
+		double mouseYOnMap = (viewY + offY) * (1.0 / (double) zoomOld) - e.getY() * (1.0 / (double) zoomOld);
 
-			offX += (int) (-mouseXOnMap * -(zoom - zoomOld));
-			offY += (int) (-mouseYOnMap * -(zoom - zoomOld));
-
-		//repaint();
+		//Make it looks like it is zooming where the mouse is
+		offX += (int) (-mouseXOnMap * -(zoom - zoomOld));
+		offY += (int) (-mouseYOnMap * -(zoom - zoomOld));
 	}
 
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		viewX = (int) (e.getX()-lastMousePositionX);
 		viewY = (int) (e.getY()-lastMousePositionY);
-		//repaint();
 	}
 
 	@Override

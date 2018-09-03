@@ -15,7 +15,10 @@ import org.lrima.map.Studio.Drawables.Line;
 import org.lrima.map.Studio.Drawables.Obstacle;
 import org.lrima.simulation.selection.NaturalSelection;
 
-public class Simulation extends Thread implements KeyListener{
+public class Simulation extends Thread{
+
+	public static double currentTime = 0.0;
+
 	//Stores the map information
 	private Map map;
 
@@ -29,7 +32,6 @@ public class Simulation extends Thread implements KeyListener{
 	//Used for the main loop
 	private boolean running = true;
 	private boolean pausing = false;
-	private double time;
 	private double msBetweenFrames = 8;
 
 	//Used to trigger an action in the main loop
@@ -39,6 +41,9 @@ public class Simulation extends Thread implements KeyListener{
     //The neural network that the cars in the next generation will have
     private NeuralNetwork neuralNetworkToUse = null;
 
+    //Stores information about this simulation
+    private SimulationInfos simulationInformation;
+
 
 	/**
 	 * Initialize variables
@@ -46,10 +51,10 @@ public class Simulation extends Thread implements KeyListener{
 	public Simulation() {
 		super();
 		running = true;
-		time = 0;
-		map = new Map(this);
-		this.initializeCars(null);
+		Simulation.currentTime = 0;
+		map = new Map(10000, 10000);
 
+		this.initializeCars(null);
 	}
 
 	/**
@@ -61,13 +66,13 @@ public class Simulation extends Thread implements KeyListener{
 		long timePassed;
 		while(running) {
 			if(!pausing) {
-				if(especesOpen.size() != 0 && time < UserPrefs.TIME_LIMIT) {
+				if(especesOpen.size() != 0 && Simulation.currentTime < UserPrefs.TIME_LIMIT) {
 					currTime = System.currentTimeMillis();
 					for(Espece e : especesOpen) {
 					    e.update(msBetweenFrames);
 					}
 
-					time += msBetweenFrames;
+					Simulation.currentTime += msBetweenFrames;
 					Iterator<Espece> iterator = especesOpen.iterator();
 
 					while (((Iterator) iterator).hasNext()){
@@ -77,7 +82,7 @@ public class Simulation extends Thread implements KeyListener{
 						if(!died) {
 							for (Capteur c : e.getCapteursList()) {
 								double minCapteurValue = 100.0; // Pour avoir le capteur le plus proche possible
-								for (Obstacle o : map.obstacles) {
+								for (Obstacle o : map.getObstacles()) {
 									if (o.type.equals(Obstacle.TYPE_LINE)) {
 										Line line = (Line) o;
 										double capteurValue = line.getCapteurValue(c);
@@ -93,7 +98,7 @@ public class Simulation extends Thread implements KeyListener{
 							}
 
 							//Regarde si l'espèce meurt
-							for (Obstacle o : map.obstacles) {
+							for (Obstacle o : map.getObstacles()) {
 								//Si l'espece touche un mur
 								if (!died && o.collisionWithRect(e)) {
 									try {
@@ -181,7 +186,7 @@ public class Simulation extends Thread implements KeyListener{
         this.mutate();
 
         //Reset the time of the simulation
-        time = 0;
+        Simulation.currentTime = 0;
     }
 
 	/**
@@ -201,11 +206,11 @@ public class Simulation extends Thread implements KeyListener{
 		while(especesOpen.size() < numberOfCar) {
 			//If the neural network to use hasn't been specified
 		    if(neuralNetworkToUse == null) {
-                especesOpen.add(new Espece(this.map));
+                especesOpen.add(new Espece(this));
             }
             else{
 		        //Assign a neural network to the new car
-		        especesOpen.add(new Espece(this.map, neuralNetworkToUse));
+		        especesOpen.add(new Espece(this, neuralNetworkToUse));
             }
 		}
 		
@@ -216,7 +221,7 @@ public class Simulation extends Thread implements KeyListener{
 	 * from the especesClosed array and retreive the new array to especesOpen
 	 */
 	public void mutate() {
-		NaturalSelection selection = new NaturalSelection(especesClosed);
+		NaturalSelection selection = new NaturalSelection(this, especesClosed);
 		this.especesOpen = selection.getMutatedList(map);
 		this.especesClosed = new ArrayList<Espece>();
 	}
@@ -278,21 +283,16 @@ public class Simulation extends Thread implements KeyListener{
 	}
 
 	/**
-	 * Press Q to go to next generation
+	 * Wait for the main loop to finish its iteration then goes to the next generation
 	 */
-	@Override
-	public void keyPressed(KeyEvent e) {
-
-	    if(e.getKeyCode() == KeyEvent.VK_Q){
-            nextGeneration();
-        }
+	public void goToNextGeneration(){
+		this.shouldGoToNextGeneration = true;
 	}
 
-	@Override
-	public void keyReleased(KeyEvent e) { }
-
-	@Override
-	public void keyTyped(KeyEvent e) {}
+	//*******===========================================================================
+	//* ACCESSORS AND MUTATORS
+	//* ACCESSORS AND MUTATORS
+	//********============================================================================/
 
 	/**
 	 * Create an array containing all cars (dead or alive)
@@ -334,11 +334,7 @@ public class Simulation extends Thread implements KeyListener{
 		this.pausing = pausing;
 	}
 
-	public void goToNextGeneration(){
-		this.shouldGoToNextGeneration = true;
-	}
-
-	public double getCurrentTime(){
-		return this.time;
+	public SimulationInfos getSimulationInformation() {
+		return simulationInformation;
 	}
 }

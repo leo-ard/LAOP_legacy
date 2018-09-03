@@ -9,6 +9,7 @@ import java.util.TimerTask;
 import javax.swing.*;
 
 import org.lrima.espece.Espece;
+import org.lrima.simulation.Simulation;
 import org.lrima.simulation.selection.NaturalSelection;
 
 public class NetworkPanel extends JPanel{
@@ -25,12 +26,11 @@ public class NetworkPanel extends JPanel{
 	public final int OFFSETY = 10;
 	public final int OVALSIZE = 40;
 	
-	public NetworkPanel(Espece e, int w, int h) {
+	public NetworkPanel(Simulation simulation) {
 		super();
-		this.setPreferredSize(new Dimension(w, h));
-		this.network = e.getNeuralNetwork();
-		this.espece = e;
-
+		this.setPreferredSize(new Dimension(500, 500));
+		this.espece = simulation.getEspecesOpen().get(0);
+		this.network = espece.getNeuralNetwork();
 	}
 
 	/**

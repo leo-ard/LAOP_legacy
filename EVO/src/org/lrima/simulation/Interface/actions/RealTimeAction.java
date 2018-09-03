@@ -1,11 +1,13 @@
-package org.lrima.simulation.Interface.Actions;
+package org.lrima.simulation.Interface.actions;
 
 import org.lrima.core.UserPrefs;
-import org.lrima.simulation.Simulation;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 
+/**
+ * Toggles the real time preference
+ */
 public class RealTimeAction extends AbstractAction {
 
     public RealTimeAction(String nom){

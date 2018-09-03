@@ -1,27 +1,23 @@
-package org.lrima.simulation.Interface.Actions;
+package org.lrima.simulation.Interface.actions;
 
 import org.lrima.core.UserPrefs;
-import org.lrima.map.MapPanel;
-import org.lrima.simulation.Simulation;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 
+/**
+ * Toggles the follow best car preference
+ */
 public class FollowBestAction extends AbstractAction {
 
-    MapPanel panel;
-
-    public FollowBestAction(String name, MapPanel panel){
+    public FollowBestAction(String name){
         super(name);
-        this.panel = panel;
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        //Sets the state of the checkbox into the preferences of the user
         boolean state = ((JCheckBoxMenuItem)e.getSource()).getState();
-
         UserPrefs.preferences.putBoolean(UserPrefs.KEY_FOLLOW_BEST, state);
-
-        panel.followBest = state;
     }
 }

@@ -5,7 +5,6 @@ import java.util.*;
 
 import org.lrima.annotations.DisplayInfo;
 import org.lrima.core.UserPrefs;
-import org.lrima.map.Map;
 
 import org.lrima.espece.capteur.Capteur;
 import org.lrima.espece.network.NeuralNetwork;
@@ -14,7 +13,7 @@ import org.lrima.simulation.Simulation;
 
 public class Espece {
 	
-	//Width has to be bigger than height
+	//Width has to be bigger than the height
 	public static final int ESPECES_WIDTH = 74, ESPECES_HEIGHT = 50;
 
 	//Stores the position of the car
@@ -70,26 +69,31 @@ public class Espece {
 	@DisplayInfo
 	public int bornOnGeneration = 0;
 
-	//The map that the car is in
-	private Map map;
+
 
 	//Used to store the color of the car
-	Color voitureColor = Color.RED;
+	private Color voitureColor = Color.RED;
+
+	//Stores the simulation reference
+	private Simulation simulation;
 
 	/**
 	 * Initialize the car with the map to put him into
 	 * The starting position and orientation is determined by the map
-	 * @param map the map to put the car in
+	 * @param simulation the simulation the car is into
 	 */
-	public Espece(Map map) {
-		//Do the base configuration
-		this();
+	public Espece(Simulation simulation) {
 
-		//Set the map and get the starting parameters from it
-		this.map = map;
-		this.x = map.depart.x;
-		this.y = map.depart.y;
-		this.orientationRad = map.orientation;
+		//Do the base configuration
+		this.simulation = simulation;
+		this.bornOnGeneration = simulation.getGeneration();
+		this.alive = true;
+		setupSensors();
+
+		//Get the starting parameters from the map
+		this.x = simulation.getMap().getDepart().x;
+		this.y = simulation.getMap().getDepart().y;
+		this.orientationRad = 0;
 
 		//Used to calculate the total distance traveled
 		this.lastPointTraveled = new Point((int)x, (int)y);
@@ -101,28 +105,39 @@ public class Espece {
 
 	/**
 	 * Initialize a car with a neural network
-	 * @param map the map to put the car in
+	 * @param simulation the simulation the car is in
 	 * @param neuralNetwork the neural network to copy to the car
 	 */
-	public Espece(Map map, NeuralNetwork neuralNetwork){
-	    this(map);
+	public Espece(Simulation simulation, NeuralNetwork neuralNetwork){
+	    this(simulation);
 	    this.neuralNetwork = neuralNetwork;
 	    this.neuralNetwork.randomize();
     }
 
 	/**
-	 * Initialize the base configuration of the car
+	 * The function used to calculate the fitness of the car
+	 * @return the fitness of the car
 	 */
-	private Espece() {
+	private double fitnessFunction(){
+		double fitness = getMaxDistanceFromStart() + getTotalDistanceTraveled() ;
 
+		//If the car turns in circle at the start
+		if(getMaxDistanceFromStart() < 800){
+			fitness = 0.0;
+		}
+
+		return fitness;
+	}
+
+	/**
+	 * Creates NB_CAPTEUR number of sensors equally distanced from each other
+	 */
+	private void setupSensors(){
 		//Setup the sensors base on the number of sensors
 		//Note that the maximum number of sensors is limited to 180 because of this
-        for(int i = 90 ; i > -90 ; i -= 180 / NB_CAPTEUR){
-        	capteurs.add(new Capteur(this, i, 0, 0));
-        }
-
-        //The car is considered alive at the start of the simulation
-		alive = true;
+		for(int i = 90 ; i > -90 ; i -= 180 / NB_CAPTEUR){
+			capteurs.add(new Capteur(this, i, 0, 0));
+		}
 	}
 
 	//TODO: Doesn't work
@@ -131,7 +146,7 @@ public class Espece {
 	 * The better the fitness, the greener it gets. The worst the fitness is, the more it is red
 	 */
 	private void setColor(){
-		double bestFitness = map.simulation.getBestFitness();
+		double bestFitness = this.simulation.getBestFitness();
 		double percentageFitness = fitness / bestFitness;
 
 		this.voitureColor = new Color(255 - (int)(255 *  percentageFitness), (int)(255 * percentageFitness), 124, 124);
@@ -159,8 +174,7 @@ public class Espece {
 		}
 
 		//Set the fitness to the car
-		map.setFitnessToEspece(this);
-		calculateCarFitnessInformation();
+		this.calculateFitnessScore();
 
 		//Set the color of the car based on its fitness
 		setColor();
@@ -201,7 +215,7 @@ public class Espece {
 		g.setColor(Color.CYAN);
 
 		//TODO: Make the color based on the fitness of the car
-		if(bornOnGeneration != map.simulation.getGeneration()){
+		if(bornOnGeneration != simulation.getGeneration()){
 			g.setColor(new Color(0, 255, 0, 127));
 		}
 		else{
@@ -254,12 +268,13 @@ public class Espece {
 	/**
 	 * Calculate all the variables required to get the fitness of the car
 	 * It calculates the biggest distance it gets from the start and
-	 * the total distance traveled
+	 * the total distance traveled.
+	 * The fitness is then assigned to this car
 	 */
-	private void calculateCarFitnessInformation(){
+	public void calculateFitnessScore(){
 		//Calculate the biggest distance the car gets to from the start
-		if(this.map != null){
-			double currentDistance = distanceFrom(map.depart);
+		if(this.simulation.getMap() != null){
+			double currentDistance = distanceFrom(this.simulation.getMap().getDepart());
 			if(maxDistanceFromStart < currentDistance){
 				maxDistanceFromStart = currentDistance;
 			}
@@ -268,6 +283,8 @@ public class Espece {
 		//Calculate the total distance of the car
 		totalDistanceTraveled += distanceFrom(lastPointTraveled);
 		lastPointTraveled = new Point((int)x, (int)y);
+
+		this.fitness = fitnessFunction();
 	}
 
 	/**
@@ -323,24 +340,22 @@ public class Espece {
 	 *
 	 * De plus, l'acceleration et la vitesse sont mise a z?ro
 	 *
-	 * @param depart
-	 * @param orientation
 	 */
-	public void tpLikeNew(Point depart, int orientation) {
+	public void tpLikeNew() {
 		this.acceleration = 0;
 		this.vitesse = 0;
-		this.x = depart.getX();
-		this.y = depart.getY();
-		this.orientationRad = Math.toRadians(orientation);
+		this.x = this.simulation.getMap().getDepart().x;
+		this.y = this.simulation.getMap().getDepart().y;
+		this.orientationRad = 0;
 		this.alive = true;
 		this.resetCapteur();
 
 	}
 
-	/*******
-	 * ACCESSORS AND MUTATORS
-	 * ACCESSORS AND MUTATORS
-	 ********/
+	//*******===========================================================================
+	// * ACCESSORS AND MUTATORS
+	// * ACCESSORS AND MUTATORS
+	// ********============================================================================/
 
 	/**
 	 * Get the position of the top left of the car based on its position and orientation
@@ -415,10 +430,10 @@ public class Espece {
 	}
 
 
-    public void setFitness(double fitness) {
+    /*public void setFitness(double fitness) {
 		this.fitness = fitness;
 		this.neuralNetwork.setFitness(fitness);
-    }
+    }*/
 
 
 	/**
@@ -428,7 +443,7 @@ public class Espece {
 	public void setSelected(boolean selected) {
 		//Reset la selection des especes a false
 		if(selected == true){
-			map.simulation.resetSelected();
+			this.simulation.resetSelected();
 		}
 		this.selected = selected;
 	}

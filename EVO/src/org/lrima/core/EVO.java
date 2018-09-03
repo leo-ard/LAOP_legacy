@@ -29,8 +29,7 @@ public class EVO {
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    frame = new FrameManager("EVO", simulation);
-                    frame.start();
+                    frame = new FrameManager(simulation);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

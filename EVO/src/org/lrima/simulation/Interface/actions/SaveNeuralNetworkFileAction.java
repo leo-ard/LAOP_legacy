@@ -1,8 +1,7 @@
-package org.lrima.simulation.Interface.Actions;
+package org.lrima.simulation.Interface.actions;
 
 import org.lrima.espece.network.NetworkStructure;
 import org.lrima.espece.network.NeuralNetwork;
-import org.lrima.espece.network.Neuron;
 import org.lrima.simulation.Simulation;
 import org.lrima.simulation.selection.NaturalSelection;
 
@@ -12,13 +11,16 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
 
-public class SaveFileAction extends AbstractAction {
+/**
+ * Saves the best neural network into a file
+ */
+public class SaveNeuralNetworkFileAction extends AbstractAction {
 
-    NeuralNetwork nn;
-    JFrame parent;
-    Simulation simulation;
+    private NeuralNetwork nn;
+    private JFrame parent;
+    private Simulation simulation;
 
-    public SaveFileAction(String name, JFrame parent, Simulation simulation){
+    public SaveNeuralNetworkFileAction(String name, JFrame parent, Simulation simulation){
         super(name);
         this.parent = parent;
         this.simulation = simulation;
@@ -29,8 +31,10 @@ public class SaveFileAction extends AbstractAction {
         //Met en pause la simulation
         this.simulation.setPausing(true);
 
+        //Get the best neural network
         this.nn = NaturalSelection.best.neuralNetwork;
 
+        //Setup the file chooser
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setCurrentDirectory(new File("."));
         fileChooser.setApproveButtonText("Save");
@@ -46,6 +50,10 @@ public class SaveFileAction extends AbstractAction {
         }
     }
 
+    /**
+     * Saves the neural network to a file
+     * @param file the file to save the neural network into
+     */
     private void save(File file){
         try {
             FileOutputStream fos = new FileOutputStream(file);

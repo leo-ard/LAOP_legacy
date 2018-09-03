@@ -3,7 +3,6 @@ package org.lrima.core;
 import java.util.prefs.Preferences;
 
 public class UserPrefs {
-    public static String SRC_VOITURE;
     public static final String SRC_LRIMA = "/images/LRIMA.png";
     public static int NUMBERCARS;
     public static int VITESSE_VOITURE;
@@ -25,7 +24,6 @@ public class UserPrefs {
     public static Preferences preferences;
 
     //Preferences keys
-    final public static String KEY_CAR_IMAGE_URL = "CAR_IMAGE_URL";
     final public static String KEY_NUMBER_OF_CAR = "NUMBER_OF_CAR";
     final public static String KEY_CAR_SPEED = "CAR_SPEED";
     final public static String KEY_TURN_RATE = "TURN_RATE";
@@ -41,7 +39,6 @@ public class UserPrefs {
     final public static String KEY_WINDOW_ESPECE_INFO = "WINDOW_ESPECE_INFO";
 
     //Defaults
-    final public static String DEFAULT_CAR_IMAGE_URL = "/images/voiture.png";
     final public static int DEFAULT_NUMBER_OF_CAR = 200;
     final public static int DEFAULT_CAR_SPEED = 50;
     final public static double DEFAULT_TURN_RATE = 0.5;
@@ -65,7 +62,6 @@ public class UserPrefs {
         NUMBERCARS = preferences.getInt(KEY_NUMBER_OF_CAR, DEFAULT_NUMBER_OF_CAR);
         VITESSE_VOITURE = preferences.getInt(KEY_CAR_SPEED, DEFAULT_CAR_SPEED);
         TURNRATE = preferences.getDouble(KEY_TURN_RATE, DEFAULT_TURN_RATE);
-        SRC_VOITURE = preferences.get(KEY_CAR_IMAGE_URL, DEFAULT_CAR_IMAGE_URL);
 
         TIME_LIMIT = preferences.getInt(KEY_TIME_LIMIT, DEFAULT_TIME_LIMIT);
         USE_BEST = preferences.getBoolean(KEY_USE_LAST_SAVED, DEFAULT_USE_LAST_SAVED);

@@ -1,4 +1,4 @@
-package org.lrima.simulation.Interface.Actions;
+package org.lrima.simulation.Interface.actions;
 
 import org.lrima.espece.network.NetworkStructure;
 import org.lrima.espece.network.NeuralNetwork;
@@ -10,12 +10,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
 
-public class LoadFileAction extends AbstractAction {
+/**
+ * Load a neural network from a file
+ */
+public class LoadNeuralNetworkFileAction extends AbstractAction {
 
-    JFrame parent;
-    Simulation simulation;
+    private JFrame parent;
+    private Simulation simulation;
 
-    public LoadFileAction(String name, JFrame parent, Simulation simulation){
+    public LoadNeuralNetworkFileAction(String name, JFrame parent, Simulation simulation){
         super(name);
         this.parent = parent;
         this.simulation = simulation;
@@ -23,6 +26,7 @@ public class LoadFileAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        //Setup the file chooser
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setCurrentDirectory(new File("."));
         fileChooser.setApproveButtonText("Load");
@@ -34,12 +38,19 @@ public class LoadFileAction extends AbstractAction {
 
             //Restart la simulation
             if(nn != null) {
+                //Change the neural network to the new one
                 simulation.changeNeuralNetwork(nn);
             }
         }
     }
 
+    /**
+     * Loads a neural network from a file
+     * @param file the file to load the neural network from
+     * @return the neural network that was found in the file or null
+     */
     private NeuralNetwork load(File file){
+        //Try to open the file and read the neural network
         try {
             FileInputStream fis = new FileInputStream(file);
             ObjectInputStream ois = new ObjectInputStream(fis);

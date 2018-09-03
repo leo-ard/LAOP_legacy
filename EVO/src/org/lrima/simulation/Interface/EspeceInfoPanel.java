@@ -2,36 +2,30 @@ package org.lrima.simulation.Interface;
 
 import org.lrima.annotations.DisplayInfo;
 import org.lrima.espece.Espece;
-import org.lrima.simulation.Simulation;
 
 import javax.swing.*;
 import java.awt.*;
 import java.lang.reflect.Field;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
+//TODO: Improve the way this class works
 public class EspeceInfoPanel extends JPanel {
 
     public static EspeceInfoPanel instance = null;
-
-    //private static HashMap<String, String> information;
     private static HashMap<String, Box> information;
-    private static Simulation simulation;
 
     private static Box boxLayout;
 
     private static Dimension screenSize;
 
-    public EspeceInfoPanel(Simulation simulation){
+    public EspeceInfoPanel(){
         if(instance == null){
             instance = this;
         }
         else{
             return;
         }
-        this.simulation = simulation;
 
         boxLayout = Box.createVerticalBox();
 

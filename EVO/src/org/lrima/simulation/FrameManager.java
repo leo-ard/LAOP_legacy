@@ -2,236 +2,236 @@ package org.lrima.simulation;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.util.ArrayList;
-
 import javax.swing.*;
-
-//import javafx.scene.input.KeyCode;
 import org.lrima.core.UserPrefs;
 import org.lrima.espece.Espece;
 import org.lrima.espece.network.NetworkPanel;
 import org.lrima.map.MapPanel;
-import org.lrima.simulation.Interface.Actions.*;
+import org.lrima.simulation.Interface.actions.*;
 import org.lrima.simulation.Interface.EspeceInfoPanel;
 import org.lrima.simulation.Interface.GraphicPanel;
-import org.lrima.simulation.Interface.SimulationPanel;
 
-public class FrameManager extends JFrame implements MouseListener, KeyListener {
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+public class FrameManager extends JFrame{
+
+    //All the panels
 	private NetworkPanel networkPanel;
 	private MapPanel mapPanel;
-	
-	public Simulation simulation;
-	public static FrameManager frame;
-	public static GraphicPanel graphicPanel;
-	public static SimulationPanel simulationPanel;
-	public static EspeceInfoPanel especeInfoPanel;
+    private GraphicPanel graphicPanel;
+    private EspeceInfoPanel especeInfoPanel;
 
-    public static SimulationInfos simulationInfos;
+    //the simulation and its information
+	private Simulation simulation;
 
 	//Pour le menu
-    private JCheckBoxMenuItem realtime;
-    private JCheckBoxMenuItem randomMap;
-    private JCheckBoxMenuItem graphique;
-    private JCheckBoxMenuItem neuralNet;
-    private JCheckBoxMenuItem followBest;
-    private JCheckBoxMenuItem especeInfo;
-
-    boolean haveToRestart = false;
+    private JCheckBoxMenuItem checkBoxRealtime;
+    private JCheckBoxMenuItem checkBoxGraphique;
+    private JCheckBoxMenuItem checkBoxNeuralNet;
+    private JCheckBoxMenuItem checkBoxFollowBest;
+    private JCheckBoxMenuItem checkBoxEspeceInfo;
 	
-	public FrameManager(String s, Simulation simulation) {
-		//super(s);
-
-		//Setup pour etre plein ecran
-		setExtendedState(JFrame.MAXIMIZED_BOTH);
+	public FrameManager(Simulation simulation) {
+	    this.setupWindow();
 
         this.simulation = simulation;
-        simulationInfos = new SimulationInfos(simulation);
 
-        //setup les paneaux
-		mapPanel = new MapPanel(simulation.getMap(), getSize().width, getSize().height);
-		networkPanel = new NetworkPanel(simulation.getEspecesOpen().get(0), 1000, 200);
-        graphicPanel = new GraphicPanel(simulationInfos);
-		especeInfoPanel = new EspeceInfoPanel(simulation);
+        //setup the panels
+		mapPanel = new MapPanel(simulation);
+		networkPanel = new NetworkPanel(simulation);
+        graphicPanel = new GraphicPanel(simulation);
+		especeInfoPanel = new EspeceInfoPanel();
 
-		this.add(mapPanel);
-		//this.add(networkPanel, BorderLayout.SOUTH);
-		simulationPanel = new SimulationPanel(simulationInfos);
-		//this.add(simulationPanel, BorderLayout.WEST);
+		//The main panel
+		this.add(mapPanel, BorderLayout.CENTER);
 
-        this.add(graphicPanel, BorderLayout.SOUTH);
-
-		this.addKeyListener(simulation);
-		this.addMouseListener(this);
-		this.addKeyListener(this);
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		//this.pack();
-		this.setAutoRequestFocus(true);
-        this.setVisible(true);
-        //Create menu
+        //Create menu the menu buttons
         createMenu();
+        displaySavedPanel();
 
-		//this.requestFocus();
+        //Start the map panel
+        start();
 	}
 
     /**
-     * Crée un menu
+     * Setup the size of the window, the listeners and basic configuration
+     */
+	private void setupWindow(){
+        //Get the size of the screen
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+
+        //The size if the user disable full screen
+        setSize(screenSize.width / 2, screenSize.height / 2);
+        setResizable(true);
+
+        //Make it full screen
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
+
+        //Key listener
+        this.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                super.keyPressed(e);
+                //Press Q to go to the next generation
+                if(e.getKeyCode() == KeyEvent.VK_Q){
+                    simulation.goToNextGeneration();
+                }
+            }
+        });
+
+        //Mouse listener
+        this.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                //requestFocus();
+            }
+        });
+
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setAutoRequestFocus(true);
+        this.setVisible(true);
+    }
+
+    /**
+     * Create the menu buttons
      */
 	private void createMenu(){
         JMenuBar menuBar = new JMenuBar();
         setJMenuBar(menuBar);
 
-        //Menu file
+        setupFileMenu(menuBar);
+        setupSimulationMenu(menuBar);
+        setupMapMenu(menuBar);
+        setupWindowMenu(menuBar);
+
+        setMenuButtonStates();
+    }
+
+    /**
+     * Add the File menu buttons to the menu bar
+     * @param menuBar the menu bar to add the file menu
+     */
+    private void setupFileMenu(JMenuBar menuBar){
         JMenu file = new JMenu("File");
         menuBar.add(file);
 
-        JMenuItem save = new JMenuItem(new SaveFileAction("Save", this, simulation));
+        //Save button
+        JMenuItem save = new JMenuItem(new SaveNeuralNetworkFileAction("Save", this, simulation));
         save.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK));
         file.add(save);
 
-        JMenuItem load = new JMenuItem(new LoadFileAction("Load", this, simulation));
+        //Load button
+        JMenuItem load = new JMenuItem(new LoadNeuralNetworkFileAction("Load", this, simulation));
         load.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_MASK));
         file.add(load);
+    }
 
-        //Menu simulation
+    /**
+     * Add the simulation buttons on the menu bar
+     * @param menuBar the menu bar to add the simulation menu onto
+     */
+    private void setupSimulationMenu(JMenuBar menuBar){
         JMenu simulationMenu = new JMenu("Simulation");
         menuBar.add(simulationMenu);
 
-        realtime = new JCheckBoxMenuItem(new RealTimeAction("Real time"));
-        simulationMenu.add(realtime);
+        //Real time checkbox
+        checkBoxRealtime = new JCheckBoxMenuItem(new RealTimeAction("Real time"));
+        simulationMenu.add(checkBoxRealtime);
 
-        //randomMap = new JCheckBoxMenuItem(new RandomMapAction("Random Map"));
-        //simulationMenu.add(randomMap);
+        //Follow best checkbox
+        checkBoxFollowBest = new JCheckBoxMenuItem(new FollowBestAction("Follow best"));
+        simulationMenu.add(checkBoxFollowBest);
 
-        followBest = new JCheckBoxMenuItem(new FollowBestAction("Follow best", mapPanel));
-        simulationMenu.add(followBest);
-
+        //Pause button
         JMenuItem pause = new JMenuItem(new PauseAction("Pause", simulation));
         pause.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, InputEvent.CTRL_MASK));
         simulationMenu.add(pause);
 
+        //Options button
         JMenuItem options = new JMenuItem(new MoreOptionsAction("Options", this));
         simulationMenu.add(options);
+    }
 
-        //Menu map
+    /**
+     * Add the map menu buttons to the menu bar
+     * @param menuBar the menu bar to add the map menu onto
+     */
+    private void setupMapMenu(JMenuBar menuBar){
         JMenu map = new JMenu("Map");
         menuBar.add(map);
 
+        //Map editor button
         JMenuItem mapEditor = new JMenuItem(new OpenStudioAction("Open Studio", simulation));
         map.add(mapEditor);
+    }
 
-        //Menu window
+    /**
+     * Add the window menu buttons to the menu bar
+     * @param menuBar the menu bar to add the window menu onto
+     */
+    private void setupWindowMenu(JMenuBar menuBar){
         JMenu window = new JMenu("Window");
         menuBar.add(window);
 
-        graphique = new JCheckBoxMenuItem(new WindowAddPanel("Graphiques", this, simulationPanel, "West", UserPrefs.KEY_WINDOW_GRAPHIQUE));
-        window.add(graphique);
+        //Show graphic panel button
+        checkBoxGraphique = new JCheckBoxMenuItem(new WindowAddPanelAction("Graphiques", this, graphicPanel, "South", UserPrefs.KEY_WINDOW_GRAPHIQUE));
+        window.add(checkBoxGraphique);
 
-        neuralNet = new JCheckBoxMenuItem(new WindowAddPanel("Neural Network", this, networkPanel, "South", UserPrefs.KEY_WINDOW_NEURAL_NET));
-        window.add(neuralNet);
+        //TODO: show the neural network on top of the map and not on the bottom of the window
+        //Show neural network panel button
+        checkBoxNeuralNet = new JCheckBoxMenuItem(new WindowAddPanelAction("Neural Network", this, networkPanel, "South", UserPrefs.KEY_WINDOW_NEURAL_NET));
+        window.add(checkBoxNeuralNet);
 
-        especeInfo = new JCheckBoxMenuItem(new WindowAddPanel("Car info", this, especeInfoPanel, "East", UserPrefs.KEY_WINDOW_ESPECE_INFO));
-        window.add(especeInfo);
-
-        load_pref();
+        //Show car information panel
+        checkBoxEspeceInfo = new JCheckBoxMenuItem(new WindowAddPanelAction("Car info", this, especeInfoPanel, "East", UserPrefs.KEY_WINDOW_ESPECE_INFO));
+        window.add(checkBoxEspeceInfo);
     }
 
-    private void load_pref(){
-        realtime.setState(UserPrefs.REAL_TIME);
-        //randomMap.setState(UserPrefs.RANDOM_MAP);
-        followBest.setState(UserPrefs.FOLLOW_BEST);
+    /**
+     * Set the state of the check boxes in the menu to the state that is saved
+     * in the user preferences
+     */
+    private void setMenuButtonStates(){
+        checkBoxRealtime.setState(UserPrefs.REAL_TIME);
+        checkBoxFollowBest.setState(UserPrefs.FOLLOW_BEST);
+        checkBoxGraphique.setState(UserPrefs.SHOW_WINDOW_GRAPHIQUE);
+        checkBoxNeuralNet.setState(UserPrefs.SHOW_WINDOW_NEURAL_NETWORK);
+        checkBoxEspeceInfo.setState(UserPrefs.SHOW_WINDOW_ESPECE_INFO);
+    }
 
-	    graphique.setState(UserPrefs.SHOW_WINDOW_GRAPHIQUE);
-	    neuralNet.setState(UserPrefs.SHOW_WINDOW_NEURAL_NETWORK);
-	    especeInfo.setState(UserPrefs.SHOW_WINDOW_ESPECE_INFO);
-
-	    if(graphique.getState()){
-            add(simulationPanel, "West");
+    /**
+     * Restore the panels that was open in the last session
+     */
+    private void displaySavedPanel(){
+	    if(checkBoxGraphique.getState()){
+	        add(graphicPanel, "South");
         }
-        if(neuralNet.getState()){
+        if(checkBoxNeuralNet.getState()){
 	        add(networkPanel, "South");
         }
-        if(especeInfo.getState()){
+        if(checkBoxEspeceInfo.getState()){
 	        add(especeInfoPanel, "East");
         }
     }
 
-    public MapPanel getMapPanel() {
-        return mapPanel;
-    }
-
-    public Simulation getSimulation() {
-        return simulation;
-    }
-
+    /**
+     * Make the mapPanel and networkPanel redraw itself regularly
+     */
     public void start() {
 		mapPanel.start();
 		networkPanel.start();
-		
 	}
-	
+
+	//TODO: On a tu vraiment besoin de ça?
 	public void pack() {
 		super.pack();
 		this.setLocationRelativeTo(null);
 		this.setVisible(true);
 	}
 
-    public NetworkPanel getNetworkPanel() {
-        return networkPanel;
-    }
-
+    /**
+     * Change the car that the networkPanel uses
+     * @param e the car
+     */
     public void changeNetworkFocus(Espece e) {
 		networkPanel.setEspece(e);
-		
 	}
-
-	public static void addGeneration(ArrayList<Espece> especes) {
-		//simulationInfos.addGeneration(especes);
-		//simulationPanel.update();
-	}
-	@Override
-	public void mouseClicked(MouseEvent e) {
-	    this.requestFocus();
-	}
-
-	@Override
-	public void mousePressed(MouseEvent e) {
-
-	}
-
-	@Override
-	public void mouseReleased(MouseEvent e) {
-
-	}
-
-	@Override
-	public void mouseEntered(MouseEvent e) {
-
-	}
-
-	@Override
-	public void mouseExited(MouseEvent e) {
-
-	}
-
-    @Override
-    public void keyTyped(KeyEvent e) {
-
-    }
-
-    @Override
-    public void keyPressed(KeyEvent e) {
-        if(e.getKeyCode() == KeyEvent.VK_W){
-            simulation.goToNextGeneration();
-        }
-    }
-
-    @Override
-    public void keyReleased(KeyEvent e) {
-
-    }
 }

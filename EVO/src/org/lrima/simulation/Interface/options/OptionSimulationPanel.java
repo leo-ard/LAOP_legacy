@@ -5,13 +5,16 @@ import org.lrima.core.UserPrefs;
 import javax.swing.*;
 import java.awt.*;
 
-public class SimulationPanel extends JPanel implements OptionPanel {
+public class OptionSimulationPanel extends JPanel implements OptionPanel {
 
-    JLabel timeLimitLabel, loadLastSavedLabel;
-    JTextField timeLimitField;
-    JCheckBox loadLastSavedCheck;
+    private JLabel timeLimitLabel, loadLastSavedLabel;
+    private JTextField timeLimitTextField;
+    private JCheckBox loadLastSavedCheck;
 
-    public SimulationPanel(){
+    /**
+     * Creates a JPanel with all the options for the simulation
+     */
+    public OptionSimulationPanel(){
 
         FlowLayout sectionLayout = new FlowLayout(FlowLayout.LEFT, 15, 5);
         Box box = Box.createVerticalBox();
@@ -20,9 +23,9 @@ public class SimulationPanel extends JPanel implements OptionPanel {
         JPanel timeLimitPanel = new JPanel();
         timeLimitPanel.setLayout(sectionLayout);
         timeLimitLabel = new JLabel("Time limit (seconds) :");
-        timeLimitField = new JTextField(5);
+        timeLimitTextField = new JTextField(5);
         timeLimitPanel.add(timeLimitLabel);
-        timeLimitPanel.add(timeLimitField);
+        timeLimitPanel.add(timeLimitTextField);
         box.add(timeLimitPanel);
 
         JPanel loadBestPanel = new JPanel();
@@ -37,13 +40,16 @@ public class SimulationPanel extends JPanel implements OptionPanel {
 
     }
 
+    /**
+     * Load the options saved in the preferences and puts it into the things
+     */
     private void loadPrefs(){
         UserPrefs.load();
 
         int timeLimit = (int)(UserPrefs.TIME_LIMIT / 1000);
         boolean loadBest = UserPrefs.USE_BEST;
 
-        timeLimitField.setText("" + timeLimit);
+        timeLimitTextField.setText("" + timeLimit);
         loadLastSavedCheck.setSelected(loadBest);
     }
 
@@ -52,12 +58,13 @@ public class SimulationPanel extends JPanel implements OptionPanel {
         int timeLimit;
 
         try{
-            timeLimit = Integer.parseInt(timeLimitField.getText());
+            timeLimit = Integer.parseInt(timeLimitTextField.getText());
         }catch(NumberFormatException e){
             System.out.println("Erreur");
             return false;
         }
 
+        //Put the new value into the preferences
         UserPrefs.preferences.putInt(UserPrefs.KEY_TIME_LIMIT, timeLimit * 1000);
         UserPrefs.preferences.putBoolean(UserPrefs.KEY_USE_LAST_SAVED, loadLastSavedCheck.isSelected());
 

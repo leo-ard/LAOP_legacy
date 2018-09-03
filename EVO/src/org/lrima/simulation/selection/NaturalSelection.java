@@ -15,8 +15,10 @@ import org.lrima.utils.Random;
 public class  NaturalSelection {
 	ArrayList<Espece> especes;
 	public static Espece best = null;
+	private Simulation simulation;
 	
-	public NaturalSelection(ArrayList<Espece> especes) {
+	public NaturalSelection(Simulation simulation, ArrayList<Espece> especes) {
+		this.simulation = simulation;
 		this.especes = especes;
 	}
 	
@@ -32,7 +34,6 @@ public class  NaturalSelection {
 	public ArrayList<Espece> getMutatedList(Map m) {
 		this.sort();
 		this.getBest();
-		FrameManager.addGeneration(especes);
 		this.kill50();
 		//this.mutateBest();
 		this.resetList(m);
@@ -60,8 +61,7 @@ public class  NaturalSelection {
 
 			newNeuralNetwork = new NeuralNetwork(6, 2, true);
 
-			Espece e = new Espece(m, newNeuralNetwork);
-			e.bornOnGeneration = m.simulation.getGeneration();
+			Espece e = new Espece(this.simulation, newNeuralNetwork);
 			especes.add(e);
 		}
 		
@@ -93,7 +93,7 @@ public class  NaturalSelection {
 	 */
 	public void resetList(Map m) {
 		for(Espece e : especes){
-			e.tpLikeNew(m.depart, m.orientation);
+			e.tpLikeNew();
 		}
 	}
 }
