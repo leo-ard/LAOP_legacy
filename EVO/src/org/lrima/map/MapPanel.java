@@ -6,13 +6,12 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.awt.font.FontRenderContext;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -22,19 +21,20 @@ import javax.swing.JPanel;
 import org.lrima.core.EVO;
 import org.lrima.core.UserPrefs;
 import org.lrima.espece.Espece;
+import org.lrima.map.Studio.Drawables.Line;
 import org.lrima.map.Studio.Drawables.Obstacle;
 import org.lrima.simulation.Simulation;
 
 public class MapPanel extends JPanel implements MouseMotionListener, MouseListener, MouseWheelListener{
 
 	//The map to display
-	private Map map;
+	protected Map map;
 
 	//View range
 	//TODO: Trouver noms plus descriptifs
-	private int viewX, viewY;
-	private int offX, offY;
-	private float zoom;
+	protected int viewX, viewY;
+	protected int offX, offY;
+	protected float zoom;
 
 	//Used for the drag motion on the map
 	private int lastMousePositionX, lastMousePositionY;
@@ -56,11 +56,9 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 	private final int FONT_SIZE = 32;
 
 
-
-	public MapPanel(Simulation simulation) {
+	protected MapPanel(Map map){
 		//Setup variables
-		this.simulation = simulation;
-		this.map = simulation.getMap();
+		this.map = map;
 		this.zoom = 0.5f;
 
 		//Try to load te LRIMA logo image
@@ -82,6 +80,12 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 		this.addMouseListener(this);
 	}
 
+	public MapPanel(Simulation simulation) {
+		this(simulation.getMap());
+		//Setup variables
+		this.simulation = simulation;
+	}
+
 	/**
 	 * Used to constantly repaint the map
 	 */
@@ -98,9 +102,47 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 		Graphics2D graphics = (Graphics2D) g;
 		super.paintComponent(graphics);
 
+		doTransforms(graphics);
+		setupRelativeGraphics(graphics);
+
+		//Reset the zoom and translations
+		graphics.setTransform(new AffineTransform());
+		setupStaticGraphics(graphics);
+
+
+	}
+
+	/**
+	 * TODO:
+	 * @param graphics
+	 */
+	protected void setupStaticGraphics(Graphics2D graphics){
+		//Write the informations
+		drawInformation(graphics);
+
+		//Put the LRIMA image on the top left
+		graphics.drawImage(this.LRIMA_image,0, 0,null);
+	}
+
+	/**
+	 * TODO:
+	 * @param graphics
+	 */
+	protected void setupRelativeGraphics(Graphics2D graphics){
+
+		drawBackground(graphics);
+		drawObstacles(graphics);
+		drawCars(graphics);
+
+	}
+
+	/**
+	 * Applies the zoom and translations to graphics
+	 * @param graphics the graphics to modify
+	 */
+	protected void doTransforms(Graphics2D graphics){
 		double translateX, translateY;
 
-		UserPrefs.load();
 		if(UserPrefs.FOLLOW_BEST){
 			Espece bestEspece = simulation.getBest();
 			translateX = (int) -bestEspece.getX() + getWidth() / 2;
@@ -119,26 +161,13 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 		//Zoom based on mouse wheel
 		graphics.scale(zoom, zoom);
 		graphics.translate(translateX, translateY);
-
-		drawBackground(graphics);
-		drawObstacles(graphics);
-		drawCars(graphics);
-
-		//Reset the zoom and translations
-		graphics.setTransform(new AffineTransform());
-
-		//Write the informations
-		drawInformation(graphics);
-
-		//Put the LRIMA image on the top left
-		graphics.drawImage(this.LRIMA_image,0, 0,null);
 	}
 
 	/**
 	 * Draws the background of the map and the lines
 	 * @param graphics the graphics to put a map into
 	 */
-	private void drawBackground(Graphics2D graphics){
+	protected void drawBackground(Graphics2D graphics){
 		//Set the background color
 		graphics.setColor(COLOR_BACKGROUND);
 		graphics.fillRect(0, 0, map.getMapWidth(), map.getMapHeight());
@@ -159,10 +188,12 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 	 * Draws all the obstacles
 	 * @param graphics the graphics to put the obstacles into
 	 */
-	private void drawObstacles(Graphics2D graphics){
-		for(Obstacle o : map.getObstacles()) {
-			graphics.setColor(COLOR_OBSTACLE);
-			o.draw(graphics);
+	protected void drawObstacles(Graphics2D graphics){
+		for(Obstacle o : map.getObstacles()){
+			ArrayList<Line> lines = o.getLines();
+			for(Line line : lines){
+				line.draw(graphics);
+			}
 		}
 	}
 
@@ -170,7 +201,7 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 	 * Draw the cars
 	 * @param graphics the graphics to put the cars into
 	 */
-	private void drawCars(Graphics2D graphics){
+	protected void drawCars(Graphics2D graphics){
 		graphics.setColor(Color.blue);
 		for(Espece e : this.simulation.getAllEspeces()) {
 			e.draw(graphics);
@@ -181,7 +212,7 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 	 * Draw additional information such as the current generation, the time
 	 * @param graphics the graphics to put the information into
 	 */
-	private void drawInformation(Graphics2D graphics){
+	protected void drawInformation(Graphics2D graphics){
 		graphics.setColor(COLOR_TEXT);
 		graphics.setFont(new Font("Helvetica", Font.PLAIN, FONT_SIZE));
 
@@ -218,17 +249,17 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		int ex = (int) ((e.getX()-viewX-offX)*(1.0/(double)zoom));
-		int ey = (int) ((e.getY()-viewY-offY)*(1.0/(double)zoom));
+
+		Point pointClickedOnMap = mapPointFromScreenPoint(e.getPoint());
 
 		Espece selected = this.simulation.getAllEspeces().get(0);
-		int proche = selected.distanceFrom(new Point(ex,ey));
+		int proche = selected.distanceFrom(pointClickedOnMap);
 		for(Espece espece : this.simulation.getAllEspeces()) {
 			//Reset selected
 			espece.selected = false;
 
-			if(proche >= espece.distanceFrom(new Point(ex, ey))) {
-				proche = espece.distanceFrom(new Point(ex, ey));
+			if(proche >= espece.distanceFrom(pointClickedOnMap)) {
+				proche = espece.distanceFrom(pointClickedOnMap);
 				selected = espece;
 			}
 
@@ -237,6 +268,14 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 
 		//TODO: Meilleure facon de faire ca?
 		EVO.frame.changeNetworkFocus(selected);
+	}
+
+	public Point mapPointFromScreenPoint(Point screenPoint){
+		int x = (int) ((screenPoint.getX()-viewX-offX)*(1.0/(double)zoom));
+		int y = (int) ((screenPoint.getY()-viewY-offY)*(1.0/(double)zoom));
+
+
+		return new Point(x, y);
 	}
 
 	@Override
@@ -270,12 +309,16 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 		//Make it looks like it is zooming where the mouse is
 		offX += (int) (-mouseXOnMap * -(zoom - zoomOld));
 		offY += (int) (-mouseYOnMap * -(zoom - zoomOld));
+
+		this.repaint();
 	}
 
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		viewX = (int) (e.getX()-lastMousePositionX);
 		viewY = (int) (e.getY()-lastMousePositionY);
+
+		this.repaint();
 	}
 
 	@Override

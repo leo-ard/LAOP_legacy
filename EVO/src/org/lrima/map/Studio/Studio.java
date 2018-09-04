@@ -1,9 +1,11 @@
 package org.lrima.map.Studio;
 
+import org.lrima.map.Map;
 import org.lrima.map.Studio.Drawables.*;
 import org.lrima.simulation.Simulation;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.ArrayList;
@@ -14,7 +16,7 @@ import java.util.ArrayList;
  */
 public class Studio extends JFrame implements ActionListener {
 
-    Simulation simulation;
+    private Map map;
     DrawingPanel drawingPanel;
 
     JButton startButton;
@@ -26,8 +28,18 @@ public class Studio extends JFrame implements ActionListener {
     JMenuItem load;
     JMenuItem newMap;
 
-    public Studio(Simulation simulation){
-        this.simulation = simulation;
+    /**
+     * Enter directly into the studio
+     */
+    public static void main(String[] args){
+        Studio s = new Studio();
+        s.setVisible(true);
+        s.setDefaultCloseOperation(EXIT_ON_CLOSE);
+    }
+
+    public Studio(){
+        this.map = new Map(10000, 10000);
+        map.setDepart(new Point(0, 0));
 
         setTitle("Map Studio");
         setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -35,22 +47,18 @@ public class Studio extends JFrame implements ActionListener {
         setupMenu();
         setupToolBar();
 
-        drawingPanel = new DrawingPanel(this);
+        drawingPanel = new DrawingPanel(this.map);
         add(drawingPanel);
 
-        //Continue la simulation quand on ferme le Studio
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                super.windowClosing(e);
-                simulation.setPausing(false);
-            }
-        });
+        drawingPanel.requestFocus();
 
         fileChooser = new JFileChooser();
         fileChooser.setCurrentDirectory(new File("."));
     }
 
+    /**
+     * Add all the buttons to the menu
+     */
     private void setupMenu(){
         JMenuBar menuBar = new JMenuBar();
         setJMenuBar(menuBar);
@@ -71,6 +79,9 @@ public class Studio extends JFrame implements ActionListener {
         file.add(load);
     }
 
+    /**
+     * Add buttons on the toolbar to add the starting point and add obstacles
+     */
     private void setupToolBar(){
         JToolBar toolBar = new JToolBar();
 
@@ -85,7 +96,7 @@ public class Studio extends JFrame implements ActionListener {
         toolBar.add(endButton);
 
         lineButton = new JButton();
-        lineButton.setIcon(new ImageIcon(this.getClass().getResource("/images/icons/Map_Studio/line.gif")));
+        lineButton.setIcon(LineObstacle.OBSTACLE_ICON);
         lineButton.addActionListener(this);
         toolBar.add(lineButton);
 
@@ -95,16 +106,13 @@ public class Studio extends JFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         Obstacle obstacle = null;
-        drawingPanel.resetClic();
 
         if(e.getSource() == startButton){
-            obstacle = new Start();
+
         }
-        if(e.getSource() == endButton){
-            obstacle = new End();
-        }
+
         if(e.getSource() == lineButton){
-            obstacle = new Line();
+            this.drawingPanel.setSelectedObstacle(new LineObstacle());
         }
 
         if(obstacle != null) {
@@ -113,7 +121,8 @@ public class Studio extends JFrame implements ActionListener {
 
         //Menu
         if(e.getSource() == newMap){
-            drawingPanel.newMap();
+            this.map = new Map(10000, 10000);
+            this.drawingPanel = new DrawingPanel(map);
         }
         if(e.getSource() == save){
             fileChooser.setApproveButtonText("Save");
@@ -138,12 +147,9 @@ public class Studio extends JFrame implements ActionListener {
             FileOutputStream fis = new FileOutputStream(file, false);
             ObjectOutputStream oos = new ObjectOutputStream(fis);
 
-            System.out.println("Saving: " + drawingPanel.placedObstacles.size());
-
             //Todo: Popup si getStart == null
-            if(drawingPanel.getStart() != null) {
-                oos.writeObject(drawingPanel.getStart());
-                oos.writeObject(drawingPanel.placedObstacles);
+            if(drawingPanel.getMap().getDepart() != null) {
+                oos.writeObject(drawingPanel.getMap());
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -155,9 +161,7 @@ public class Studio extends JFrame implements ActionListener {
             FileInputStream fis = new FileInputStream(file);
             ObjectInputStream oos = new ObjectInputStream(fis);
 
-            System.out.println("Loading: " + drawingPanel.placedObstacles.size());
-
-            drawingPanel.placedObstacles = (ArrayList<Obstacle>)oos.readObject();
+            drawingPanel = new DrawingPanel((Map)oos.readObject());
         }catch(Exception e){
             e.printStackTrace();
         }

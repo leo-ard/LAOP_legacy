@@ -23,7 +23,7 @@ public class OpenStudioAction extends AbstractAction {
         //Set the simulation to pause before displaying the map studio
         simulation.setPausing(true);
 
-        Studio studio = new Studio(simulation);
+        Studio studio = new Studio();
         studio.setVisible(true);
     }
 }
