@@ -41,6 +41,7 @@ public class DrawingPanel extends MapPanel {
         //Draw the icon following the mouse
         if(selectedObstacle != null){
             g.drawImage(LineObstacle.OBSTACLE_ICON.getImage(), mousePosition.x, mousePosition.y, null);
+            selectedObstacle.drawWhileEditing(g, mousePosition);
         }
     }
 

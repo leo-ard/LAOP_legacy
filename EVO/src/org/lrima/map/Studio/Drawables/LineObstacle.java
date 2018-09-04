@@ -29,6 +29,13 @@ public class LineObstacle implements Obstacle, Serializable{
     }
 
     @Override
+    public void drawWhileEditing(Graphics2D graphics2D, Point mousePosition) {
+       if(start != null){
+           graphics2D.drawLine(start.x, start.y, mousePosition.x, mousePosition.y);
+       }
+    }
+
+    @Override
     public void onMouseClick(MouseEvent event, DrawingPanel panel, Point pointOnMap) {
         System.out.println("test");
         if(start == null){
@@ -52,11 +59,6 @@ public class LineObstacle implements Obstacle, Serializable{
 
     public Point getEnd() {
         return end;
-    }
-
-    @Override
-    public boolean isPlaced() {
-        return placed;
     }
 }
 

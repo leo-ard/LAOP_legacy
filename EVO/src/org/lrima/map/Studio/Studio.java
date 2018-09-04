@@ -27,6 +27,7 @@ public class Studio extends JFrame implements ActionListener {
     JMenuItem save;
     JMenuItem load;
     JMenuItem newMap;
+    private JButton multipleLineButton;
 
     /**
      * Enter directly into the studio
@@ -100,6 +101,11 @@ public class Studio extends JFrame implements ActionListener {
         lineButton.addActionListener(this);
         toolBar.add(lineButton);
 
+        multipleLineButton = new JButton();
+        multipleLineButton.setIcon(LineObstacle.OBSTACLE_ICON);
+        multipleLineButton.addActionListener(this);
+        toolBar.add(multipleLineButton);
+
         add(toolBar, "South");
     }
 
@@ -109,6 +115,10 @@ public class Studio extends JFrame implements ActionListener {
 
         if(e.getSource() == startButton){
 
+        }
+
+        if(e.getSource() == multipleLineButton){
+            this.drawingPanel.setSelectedObstacle(new MultipleLineObstacle());
         }
 
         if(e.getSource() == lineButton){

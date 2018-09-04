@@ -108,8 +108,6 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 		//Reset the zoom and translations
 		graphics.setTransform(new AffineTransform());
 		setupStaticGraphics(graphics);
-
-
 	}
 
 	/**
