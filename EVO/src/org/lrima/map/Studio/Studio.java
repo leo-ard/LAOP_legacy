@@ -2,13 +2,11 @@ package org.lrima.map.Studio;
 
 import org.lrima.map.Map;
 import org.lrima.map.Studio.Drawables.*;
-import org.lrima.simulation.Simulation;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
-import java.util.ArrayList;
 
 
 /**
@@ -17,16 +15,16 @@ import java.util.ArrayList;
 public class Studio extends JFrame implements ActionListener {
 
     private Map map;
-    DrawingPanel drawingPanel;
+    private DrawingPanel drawingPanel;
 
-    JButton startButton;
-    JButton endButton;
-    JButton lineButton;
+    private JButton startButton;
+    private JButton endButton;
+    private JButton lineButton;
 
-    JFileChooser fileChooser;
-    JMenuItem save;
-    JMenuItem load;
-    JMenuItem newMap;
+    private JFileChooser fileChooser;
+    private JMenuItem saveMenuItem;
+    private JMenuItem loadMenuItem;
+    private JMenuItem newMapMenuItem;
 
     /**
      * Enter directly into the studio
@@ -38,22 +36,30 @@ public class Studio extends JFrame implements ActionListener {
     }
 
     public Studio(){
-        this.map = new Map(10000, 10000);
-        map.setDepart(new Point(0, 0));
-
         setTitle("Map Studio");
         setExtendedState(JFrame.MAXIMIZED_BOTH);
 
         setupMenu();
         setupToolBar();
 
+        initializeMap(10000, 10000);
+
         drawingPanel = new DrawingPanel(this.map);
         add(drawingPanel);
 
-        drawingPanel.requestFocus();
-
+        //Setup the file chooser for the menu
         fileChooser = new JFileChooser();
         fileChooser.setCurrentDirectory(new File("."));
+    }
+
+    /**
+     * Initialize the map variable with a width and height
+     * @param width the width the map has to be
+     * @param height the height the map has to be
+     */
+    private void initializeMap(int width, int height){
+        this.map = new Map(10000, 10000);
+        map.setDepart(new Point(0, 0));
     }
 
     /**
@@ -63,20 +69,24 @@ public class Studio extends JFrame implements ActionListener {
         JMenuBar menuBar = new JMenuBar();
         setJMenuBar(menuBar);
 
+        //The file menu
         JMenu file = new JMenu("File");
         menuBar.add(file);
 
-        newMap = new JMenuItem("New");
-        newMap.addActionListener(this);
-        file.add(newMap);
+        //Reset the map button
+        newMapMenuItem = new JMenuItem("New");
+        newMapMenuItem.addActionListener(this);
+        file.add(newMapMenuItem);
 
-        save = new JMenuItem("Save");
-        save.addActionListener(this);
-        file.add(save);
+        //Save the map button
+        saveMenuItem = new JMenuItem("Save");
+        saveMenuItem.addActionListener(this);
+        file.add(saveMenuItem);
 
-        load = new JMenuItem("load");
-        load.addActionListener(this);
-        file.add(load);
+        //Load map from file button
+        loadMenuItem = new JMenuItem("load");
+        loadMenuItem.addActionListener(this);
+        file.add(loadMenuItem);
     }
 
     /**
@@ -85,46 +95,35 @@ public class Studio extends JFrame implements ActionListener {
     private void setupToolBar(){
         JToolBar toolBar = new JToolBar();
 
+        //Button to add a start to the map
         startButton = new JButton();
         startButton.setIcon(new ImageIcon(this.getClass().getResource("/images/icons/Map_Studio/start.gif")));
         startButton.addActionListener(this);
         toolBar.add(startButton);
 
-        endButton = new JButton();
-        endButton.setIcon(new ImageIcon(this.getClass().getResource("/images/icons/Map_Studio/finish.gif")));
-        endButton.addActionListener(this);
-        toolBar.add(endButton);
-
+        //Button to add a single line
         lineButton = new JButton();
         lineButton.setIcon(LineObstacle.OBSTACLE_ICON);
         lineButton.addActionListener(this);
         toolBar.add(lineButton);
 
+        //Adds the toolbar to the bottom of the screen
         add(toolBar, "South");
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        Obstacle obstacle = null;
-
-        if(e.getSource() == startButton){
-
-        }
-
+        //When you click on the line button in the tool bar
         if(e.getSource() == lineButton){
             this.drawingPanel.setSelectedObstacle(new LineObstacle());
         }
 
-        if(obstacle != null) {
-            drawingPanel.setSelectedObstacle(obstacle);
-        }
-
-        //Menu
-        if(e.getSource() == newMap){
+        //Menu buttons
+        if(e.getSource() == newMapMenuItem){
             this.map = new Map(10000, 10000);
             this.drawingPanel = new DrawingPanel(map);
         }
-        if(e.getSource() == save){
+        if(e.getSource() == saveMenuItem){
             fileChooser.setApproveButtonText("Save");
 
             int returnVal = fileChooser.showOpenDialog(this);
@@ -132,7 +131,7 @@ public class Studio extends JFrame implements ActionListener {
                 save(fileChooser.getSelectedFile());
             }
         }
-        if(e.getSource() == load){
+        if(e.getSource() == loadMenuItem){
             fileChooser.setApproveButtonText("Load");
             int returnVal = fileChooser.showOpenDialog(this);
 
@@ -142,6 +141,10 @@ public class Studio extends JFrame implements ActionListener {
         }
     }
 
+    /**
+     * Save the map in a file
+     * @param file the file to save the map into
+     */
     public void save(File file){
         try {
             FileOutputStream fis = new FileOutputStream(file, false);
@@ -156,6 +159,12 @@ public class Studio extends JFrame implements ActionListener {
         }
     }
 
+    //TODO: doesn't work
+
+    /**
+     * Load a map from a file
+     * @param file the file to load the map from
+     */
     public void load(File file){
         try{
             FileInputStream fis = new FileInputStream(file);

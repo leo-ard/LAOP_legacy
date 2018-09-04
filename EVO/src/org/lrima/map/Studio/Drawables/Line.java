@@ -15,6 +15,7 @@ public class Line implements Serializable {
     }
 
     public void draw(Graphics2D graphics){
+        graphics.setStroke(new BasicStroke(10));
         graphics.drawLine(start.x, start.y, end.x, end.y);
     }
 

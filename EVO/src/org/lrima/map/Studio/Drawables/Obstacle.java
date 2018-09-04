@@ -15,7 +15,6 @@ import java.util.ArrayList;
 public interface Obstacle{
 
     public ArrayList<Line> getLines();
-    public boolean isPlaced();
 
     public void onMouseClick(MouseEvent event, DrawingPanel drawingPanel, Point pointOnMap);
     public void onMouseMove(MouseEvent event);

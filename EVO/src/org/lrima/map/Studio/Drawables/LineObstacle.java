@@ -15,7 +15,6 @@ public class LineObstacle implements Obstacle, Serializable{
 
     Point start = null, end = null;
     public static ImageIcon OBSTACLE_ICON = new ImageIcon(LineObstacle.class.getResource("/images/icons/Map_Studio/line.gif"));
-    private boolean placed;
 
 
     @Override
@@ -30,7 +29,6 @@ public class LineObstacle implements Obstacle, Serializable{
 
     @Override
     public void onMouseClick(MouseEvent event, DrawingPanel panel, Point pointOnMap) {
-        System.out.println("test");
         if(start == null){
             start = pointOnMap;
         }
@@ -48,15 +46,6 @@ public class LineObstacle implements Obstacle, Serializable{
 
     public Point getStart() {
         return start;
-    }
-
-    public Point getEnd() {
-        return end;
-    }
-
-    @Override
-    public boolean isPlaced() {
-        return placed;
     }
 }
 
