@@ -16,6 +16,14 @@ public interface Obstacle{
 
     public ArrayList<Line> getLines();
 
+    /**
+     * Function called by DrawingPanel to display the obstacle while editing
+     *
+     * @param graphics the graphics to draw to
+     * @param mousePosition the mouse position
+     */
+    public void drawWhileEditing(Graphics2D graphics, Point mousePosition);
+
     public void onMouseClick(MouseEvent event, DrawingPanel drawingPanel, Point pointOnMap);
     public void onMouseMove(MouseEvent event);
 }

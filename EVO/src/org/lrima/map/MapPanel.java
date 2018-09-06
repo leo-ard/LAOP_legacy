@@ -23,6 +23,7 @@ import org.lrima.core.UserPrefs;
 import org.lrima.espece.Espece;
 import org.lrima.map.Studio.Drawables.Line;
 import org.lrima.map.Studio.Drawables.Obstacle;
+import org.lrima.simulation.Interface.EspeceInfoPanel;
 import org.lrima.simulation.Simulation;
 
 public class MapPanel extends JPanel implements MouseMotionListener, MouseListener, MouseWheelListener{
@@ -108,8 +109,6 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 		//Reset the zoom and translations
 		graphics.setTransform(new AffineTransform());
 		setupStaticGraphics(graphics);
-
-
 	}
 
 	/**
@@ -133,7 +132,14 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 		drawBackground(graphics);
 		drawObstacles(graphics);
 		drawCars(graphics);
+		drawPoints(graphics);
 
+	}
+
+	protected void drawPoints(Graphics2D graphics){
+		//Draw the start
+		graphics.setColor(Color.GREEN);
+		graphics.fillOval(map.getDepart().x, map.getDepart().y, 50, 50);
 	}
 
 	/**
@@ -268,6 +274,8 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 
 		//TODO: Meilleure facon de faire ca?
 		EVO.frame.changeNetworkFocus(selected);
+		//Get the information of the car in the EspeceInfoPanel if it is selected
+		EspeceInfoPanel.update(selected);
 	}
 
 	public Point mapPointFromScreenPoint(Point screenPoint){

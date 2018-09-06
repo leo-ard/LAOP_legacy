@@ -2,11 +2,13 @@ package org.lrima.map.Studio;
 
 import org.lrima.map.Map;
 import org.lrima.map.Studio.Drawables.*;
+import org.lrima.simulation.Simulation;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
+import java.util.ArrayList;
 
 
 /**
@@ -15,16 +17,17 @@ import java.io.*;
 public class Studio extends JFrame implements ActionListener {
 
     private Map map;
-    private DrawingPanel drawingPanel;
+    DrawingPanel drawingPanel;
 
-    private JButton startButton;
-    private JButton endButton;
-    private JButton lineButton;
+    JButton startButton;
+    JButton endButton;
+    JButton lineButton;
 
-    private JFileChooser fileChooser;
-    private JMenuItem saveMenuItem;
-    private JMenuItem loadMenuItem;
-    private JMenuItem newMapMenuItem;
+    JFileChooser fileChooser;
+    JMenuItem save;
+    JMenuItem load;
+    JMenuItem newMap;
+    private JButton multipleLineButton;
 
     /**
      * Enter directly into the studio
@@ -36,30 +39,22 @@ public class Studio extends JFrame implements ActionListener {
     }
 
     public Studio(){
+        this.map = new Map(10000, 10000);
+        map.setDepart(new Point(map.getMapWidth() / 2, map.getMapHeight() /2));
+
         setTitle("Map Studio");
         setExtendedState(JFrame.MAXIMIZED_BOTH);
 
         setupMenu();
         setupToolBar();
 
-        initializeMap(10000, 10000);
-
         drawingPanel = new DrawingPanel(this.map);
         add(drawingPanel);
 
-        //Setup the file chooser for the menu
+        drawingPanel.requestFocus();
+
         fileChooser = new JFileChooser();
         fileChooser.setCurrentDirectory(new File("."));
-    }
-
-    /**
-     * Initialize the map variable with a width and height
-     * @param width the width the map has to be
-     * @param height the height the map has to be
-     */
-    private void initializeMap(int width, int height){
-        this.map = new Map(10000, 10000);
-        map.setDepart(new Point(0, 0));
     }
 
     /**
@@ -69,24 +64,20 @@ public class Studio extends JFrame implements ActionListener {
         JMenuBar menuBar = new JMenuBar();
         setJMenuBar(menuBar);
 
-        //The file menu
         JMenu file = new JMenu("File");
         menuBar.add(file);
 
-        //Reset the map button
-        newMapMenuItem = new JMenuItem("New");
-        newMapMenuItem.addActionListener(this);
-        file.add(newMapMenuItem);
+        newMap = new JMenuItem("New");
+        newMap.addActionListener(this);
+        file.add(newMap);
 
-        //Save the map button
-        saveMenuItem = new JMenuItem("Save");
-        saveMenuItem.addActionListener(this);
-        file.add(saveMenuItem);
+        save = new JMenuItem("Save");
+        save.addActionListener(this);
+        file.add(save);
 
-        //Load map from file button
-        loadMenuItem = new JMenuItem("load");
-        loadMenuItem.addActionListener(this);
-        file.add(loadMenuItem);
+        load = new JMenuItem("load");
+        load.addActionListener(this);
+        file.add(load);
     }
 
     /**
@@ -95,35 +86,55 @@ public class Studio extends JFrame implements ActionListener {
     private void setupToolBar(){
         JToolBar toolBar = new JToolBar();
 
-        //Button to add a start to the map
         startButton = new JButton();
         startButton.setIcon(new ImageIcon(this.getClass().getResource("/images/icons/Map_Studio/start.gif")));
         startButton.addActionListener(this);
         toolBar.add(startButton);
 
-        //Button to add a single line
+        endButton = new JButton();
+        endButton.setIcon(new ImageIcon(this.getClass().getResource("/images/icons/Map_Studio/finish.gif")));
+        endButton.addActionListener(this);
+        toolBar.add(endButton);
+
         lineButton = new JButton();
         lineButton.setIcon(LineObstacle.OBSTACLE_ICON);
         lineButton.addActionListener(this);
         toolBar.add(lineButton);
 
-        //Adds the toolbar to the bottom of the screen
+        multipleLineButton = new JButton();
+        multipleLineButton.setIcon(MultipleLineObstacle.OBSTACLE_ICON);
+        multipleLineButton.addActionListener(this);
+        toolBar.add(multipleLineButton);
+
         add(toolBar, "South");
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        //When you click on the line button in the tool bar
+        Obstacle obstacle = null;
+
+        if(e.getSource() == startButton){
+
+        }
+
+        if(e.getSource() == multipleLineButton){
+            this.drawingPanel.setSelectedObstacle(new MultipleLineObstacle());
+        }
+
         if(e.getSource() == lineButton){
             this.drawingPanel.setSelectedObstacle(new LineObstacle());
         }
 
-        //Menu buttons
-        if(e.getSource() == newMapMenuItem){
+        if(obstacle != null) {
+            drawingPanel.setSelectedObstacle(obstacle);
+        }
+
+        //Menu
+        if(e.getSource() == newMap){
             this.map = new Map(10000, 10000);
             this.drawingPanel = new DrawingPanel(map);
         }
-        if(e.getSource() == saveMenuItem){
+        if(e.getSource() == save){
             fileChooser.setApproveButtonText("Save");
 
             int returnVal = fileChooser.showOpenDialog(this);
@@ -131,7 +142,7 @@ public class Studio extends JFrame implements ActionListener {
                 save(fileChooser.getSelectedFile());
             }
         }
-        if(e.getSource() == loadMenuItem){
+        if(e.getSource() == load){
             fileChooser.setApproveButtonText("Load");
             int returnVal = fileChooser.showOpenDialog(this);
 
@@ -141,10 +152,6 @@ public class Studio extends JFrame implements ActionListener {
         }
     }
 
-    /**
-     * Save the map in a file
-     * @param file the file to save the map into
-     */
     public void save(File file){
         try {
             FileOutputStream fis = new FileOutputStream(file, false);
@@ -159,12 +166,6 @@ public class Studio extends JFrame implements ActionListener {
         }
     }
 
-    //TODO: doesn't work
-
-    /**
-     * Load a map from a file
-     * @param file the file to load the map from
-     */
     public void load(File file){
         try{
             FileInputStream fis = new FileInputStream(file);

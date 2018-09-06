@@ -45,7 +45,7 @@ public class Map implements Serializable {
 
             Map map = (Map) ois.readObject();
 
-            map.setDepart(new Point(0, 0));
+            map.setDepart(new Point(map.getMapWidth() / 2, map.getMapHeight() / 2));
 
             return map;
 

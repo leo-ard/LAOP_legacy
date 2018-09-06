@@ -14,7 +14,8 @@ import java.util.ArrayList;
 public class LineObstacle implements Obstacle, Serializable{
 
     Point start = null, end = null;
-    public static ImageIcon OBSTACLE_ICON = new ImageIcon(LineObstacle.class.getResource("/images/icons/Map_Studio/line.gif"));
+    public static ImageIcon OBSTACLE_ICON = new ImageIcon(LineObstacle.class.getResource("/images/icons/Map_Studio/one_line.png"));
+    private boolean placed;
 
 
     @Override
@@ -28,7 +29,15 @@ public class LineObstacle implements Obstacle, Serializable{
     }
 
     @Override
+    public void drawWhileEditing(Graphics2D graphics2D, Point mousePosition) {
+       if(start != null){
+           graphics2D.drawLine(start.x, start.y, mousePosition.x, mousePosition.y);
+       }
+    }
+
+    @Override
     public void onMouseClick(MouseEvent event, DrawingPanel panel, Point pointOnMap) {
+        System.out.println("test");
         if(start == null){
             start = pointOnMap;
         }
@@ -46,6 +55,10 @@ public class LineObstacle implements Obstacle, Serializable{
 
     public Point getStart() {
         return start;
+    }
+
+    public Point getEnd() {
+        return end;
     }
 }
 
