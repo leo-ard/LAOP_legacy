@@ -28,6 +28,10 @@ public class Genome implements NeuralNetwork {
         this.nodes = new ArrayList<>();
     }
 
+    /**
+     * Init the Genome with the inputs and outputs nodes.
+     * It also initializes the Genome with two connections from random inputs
+     */
     @Override
     public void init(ArrayList<? extends NeuralNetworkTransmitter> transmitters, NeuralNetworkReceiver receiver){
         this.transmitters = transmitters;
@@ -101,14 +105,12 @@ public class Genome implements NeuralNetwork {
         return hiddenNodes;
     }
 
-    public void minimalMutation(){
-        for(ConnectionGene connection : this.connections){
-            double oldWeight = connection.getWeight();
-            double delta = Random.getRandomDoubleValue(-0.5, 0.5);
-            connection.setWeight(oldWeight + delta);
-        }
-    }
-
+    /**
+     * Mutate the Genome.
+     * 80% chance to mutate the weights
+     * 10% chance of adding a connection
+     * 10% chance of adding a node between a connection
+     */
     @Override
     public void mutate() {
         int chanceWeightMutation = Random.getRandomIntegerValue(100);
@@ -126,6 +128,23 @@ public class Genome implements NeuralNetwork {
         }
     }
 
+    /**
+     * Goes through all the connections and applies a random modification to the weight
+     * @param delta the absolute value of the maximum you want your weights to be modified by
+     */
+    public void minimalMutation(double delta){
+        for(ConnectionGene connection : this.connections){
+            double oldWeight = connection.getWeight();
+            double modification = Random.getRandomDoubleValue(-delta, delta);
+            connection.setWeight(oldWeight + modification);
+        }
+    }
+
+    /**
+     * Do a mutation that changes the weights. 90% chance of uniformaly modify all weights and 10% chance to reset all weights
+     * to a random value between -1.0 and 1.0
+     * @param delta the absolute value of the maximum you want your weights to be modified by
+     */
     private void changeWeightMutation(double delta){
         int chance = Random.getRandomIntegerValue(100);
 
@@ -148,7 +167,7 @@ public class Genome implements NeuralNetwork {
     /**
      * Add a connection between two random nodes
      */
-    public void addConnectionMutation(){
+    private void addConnectionMutation(){
         NodeGene nodeGene1 = nodes.get(Random.getRandomIntegerValue(nodes.size()));
         NodeGene nodeGene2;
 
@@ -194,7 +213,7 @@ public class Genome implements NeuralNetwork {
      * Take a random connection and put a new node in between.
      * It creates two new connections and the old connection is set to expressed(false)
      */
-    public void addNodeMutation(){
+    private void addNodeMutation(){
         ConnectionGene connection = connections.get(Random.getRandomIntegerValue(connections.size() - 1));
         connection.setExpresed(false);
 
@@ -213,43 +232,57 @@ public class Genome implements NeuralNetwork {
 
     /**
      * Create a child Genome from two parent Genome
-     * @param parent1
-     * @param parent2
-     * @return
+     * @param parent1 the first parent
+     * @param parent2 the second parent
+     * @return a child genome from parent1 and parent2
      */
     public static Genome crossOver(Genome parent1, Genome parent2){
         Genome child = new Genome();
 
         for(NodeGene node : parent1.getNodes()){
-            child.addNode(node.copy());
+            if(parent2.getNodes().contains(node)){
+                NodeGene node2 = parent2.getNodeWithInnovation(node.getInnovation());
+                NodeGene childNode = Random.getRandomBoolean() ? node.copy() : node2.copy();
+                child.addNode(childNode);
+            }
+            else{ //Excess node, copy from the fittest parent
+                child.addNode(node.copy());
+            }
         }
 
         for(ConnectionGene connection : parent1.getConnections()){
-            ConnectionGene childConnection = new ConnectionGene(connection.getInput(), connection.getOutput());
-            child.addConnection(childConnection);
-        }
+            if(parent2.getConnections().contains(connection)){
+                ConnectionGene parent2Connection = parent2.getConnectionWithInnovation(connection.getInnovation());
+                ConnectionGene childConnection = Random.getRandomBoolean() ? connection.copy() : parent2Connection.copy();
+                child.addConnection(childConnection);
+            }
+            else{ //Excess or disjoint
+                //Get connection from fittest parrent
+                NodeGene inputNode = connection.getInput();
+                NodeGene outputNode = connection.getOutput();
 
-        /*for(ConnectionGene connection : parent1.getConnections()){
-            if(parent2.getConnections().contains(connection)){ //Matching gene
-                ConnectionGene randomParentConnection = Random.getRandomBoolean() ? connection.copy() : parent2.getConnectionWithInnovation(connection.getInnovation()).copy();
-                child.addConnection(randomParentConnection);
+                NodeGene childInputNode = child.getNodeWithInnovation(inputNode.getInnovation());
+                NodeGene childOutputNode = child.getNodeWithInnovation(outputNode.getInnovation());
+
+                child.addConnection(new ConnectionGene(childInputNode, childOutputNode));
             }
-            else{ //Disjoint or excess
-                ConnectionGene childConnection = connection;
-                for(ConnectionGene connection2 : parent2.getConnections()) {
-                    childConnection = Random.getRandomBoolean() ? connection : connection2;
-                }
-                child.addConnection(childConnection.copy());
-            }
-        }*/
+        }
 
         return child;
     }
 
+    /**
+     * Used when you create a Genome without knowing in advance the transmitters
+     * @param transmitters the transmitters this Genome should use
+     */
     public void setTransmitters(ArrayList<? extends NeuralNetworkTransmitter> transmitters) {
         this.transmitters = transmitters;
     }
 
+    /**
+     * Used when you create a Genome without knowing in advance the receiver
+     * @param receiver the receiver this Genome should use
+     */
     public void setReceiver(NeuralNetworkReceiver receiver) {
         this.receiver = receiver;
     }
@@ -263,6 +296,7 @@ public class Genome implements NeuralNetwork {
 
     @Override
     public void feedForward() {
+
         //Set the value to the input nodes
         ArrayList<NodeGene> inputNodes = this.getInputNodes();
         for(int i = 0 ; i < inputNodes.size() ; i++){
@@ -275,14 +309,12 @@ public class Genome implements NeuralNetwork {
                 ArrayList<NodeGene> nodesConnectingToIt = this.getInputsIntoNode(node);
                 ArrayList<Double> weightsConnectingToIt = this.getWeightsIntoNode(node);
 
-                if(nodesConnectingToIt.size() > 0){
-                }
-
                 node.calculateWeightedSum(nodesConnectingToIt, weightsConnectingToIt);
             }
         }
 
         ArrayList<NodeGene> outputNodes = this.getOutputNodes();
+
         double[] outputNodesValues = new double[outputNodes.size()];
 
         for(int i = 0 ; i < outputNodes.size() ; i++){
@@ -298,9 +330,9 @@ public class Genome implements NeuralNetwork {
     }
 
     /**
-     * Finds all the nodes going into another node
-     * @param node the nodes to get the inputs from
-     * @return all the nodes connecting to 'node'
+     * Finds all the nodes leading into another node
+     * @param node the node to get the nodes going into
+     * @return all the nodes going into the specified node
      */
     private ArrayList<NodeGene> getInputsIntoNode(NodeGene node){
         ArrayList<NodeGene> inputs = new ArrayList<>();
@@ -313,6 +345,11 @@ public class Genome implements NeuralNetwork {
         return inputs;
     }
 
+    /**
+     * Find all the weights leading to a certain node
+     * @param node the node to get the weights going into
+     * @return an arrayList containing all the weights going in the specified node
+     */
     private ArrayList<Double> getWeightsIntoNode(NodeGene node) {
         ArrayList<Double> weights = new ArrayList<>();
         for (ConnectionGene connection : this.connections) {
@@ -324,7 +361,12 @@ public class Genome implements NeuralNetwork {
         return weights;
     }
 
-    public ConnectionGene getConnectionWithInnovation(int innovation){
+    /**
+     * Goes through all the connections to find the one with a certain innovation number
+     * @param innovation the innovation number
+     * @return the connection with the specified innovation number
+     */
+    private ConnectionGene getConnectionWithInnovation(int innovation){
         for(ConnectionGene connection : this.connections){
             if(connection.getInnovation() == innovation){
                 return connection;
@@ -333,12 +375,26 @@ public class Genome implements NeuralNetwork {
         return null;
     }
 
+    /**
+     * Goes through all the nodes and find the one with the specified innovation number
+     * @param innovation the innovation number
+     * @return the node with the specified innovation number
+     */
+    private NodeGene getNodeWithInnovation(int innovation){
+        for(NodeGene node : this.nodes){
+            if(node.getInnovation() == innovation){
+                return node;
+            }
+        }
+        return null;
+    }
 
-    final int NODE_MARGIN = 75;
-    final int NODE_SIZE = 50;
-    final int INPUT_NODE_POSITION_X = 0;
-    final int OUTPUT_NODE_POSITION_X = (NODE_SIZE + NODE_MARGIN) * 3;
-    final int HIDDEN_NODE_POSITION_X = (INPUT_NODE_POSITION_X + OUTPUT_NODE_POSITION_X) / 2;
+
+    private final int NODE_MARGIN = 75;
+    private final int NODE_SIZE = 50;
+    private final int INPUT_NODE_POSITION_X = 0;
+    private final int OUTPUT_NODE_POSITION_X = (NODE_SIZE + NODE_MARGIN) * 3;
+    private final int HIDDEN_NODE_POSITION_X = (INPUT_NODE_POSITION_X + OUTPUT_NODE_POSITION_X) / 2;
 
     @Override
     public void draw(Graphics2D g) {
@@ -355,6 +411,7 @@ public class Genome implements NeuralNetwork {
             nodePositions.put(node, position);
 
             g.drawOval(position.x, position.y, NODE_SIZE, NODE_SIZE);
+            g.drawString(String.format("%.2f", node.getValue()), position.x, position.y + 25);
         }
 
         for(int i = 0 ; i < hiddenNodes.size(); i++){
@@ -364,6 +421,7 @@ public class Genome implements NeuralNetwork {
             nodePositions.put(node, position);
 
             g.drawOval(position.x, position.y, NODE_SIZE, NODE_SIZE);
+            g.drawString(String.format("%.2f", node.getValue()), position.x, position.y + 25);
         }
 
         for(int i = 0 ; i < outputNodes.size(); i++){
@@ -373,6 +431,7 @@ public class Genome implements NeuralNetwork {
             nodePositions.put(node, position);
 
             g.drawOval(position.x, position.y, NODE_SIZE, NODE_SIZE);
+            g.drawString(String.format("%.2f", node.getValue()), position.x, position.y + 25);
         }
 
         for(ConnectionGene connection : this.connections){
@@ -397,23 +456,23 @@ public class Genome implements NeuralNetwork {
 
     }
 
-    public void addConnection(ConnectionGene connection){
+    private void addConnection(ConnectionGene connection){
         this.connections.add(connection);
     }
 
-    public ArrayList<ConnectionGene> getConnections() {
+    private ArrayList<ConnectionGene> getConnections() {
         return connections;
     }
 
-    public double getFitness() {
+    private double getFitness() {
         return fitness;
     }
 
-    public ArrayList<NodeGene> getNodes() {
+    private ArrayList<NodeGene> getNodes() {
         return nodes;
     }
 
-    public void addNode(NodeGene node){
+    private void addNode(NodeGene node){
         this.nodes.add(node);
     }
 }

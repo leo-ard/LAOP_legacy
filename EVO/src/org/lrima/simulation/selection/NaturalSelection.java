@@ -11,8 +11,8 @@ import org.lrima.simulation.Simulation;
 import org.lrima.utils.Random;
 
 public class  NaturalSelection {
-	ArrayList<Espece> especes;
-	public static Espece best = null;
+	private ArrayList<Espece> especes;
+	private static Espece best = null;
 	private Simulation simulation;
 	private ArrayList<Espece> halfBestEspece = new ArrayList<>();
 	
@@ -29,7 +29,13 @@ public class  NaturalSelection {
 		this.resetList(m);
 		this.repopulate(m);
 
+        for(Espece e : especes){
+            System.out.println(e.getFitness());
+        }
+
 		return especes;
+
+
 
 	}
 
@@ -46,15 +52,13 @@ public class  NaturalSelection {
 		int numberOfCar = UserPrefs.preferences.getInt(UserPrefs.KEY_NUMBER_OF_CAR, UserPrefs.DEFAULT_NUMBER_OF_CAR);
 
 		ArrayList<Espece> newCars = new ArrayList<>();
-		for(Espece e: this.especes){
-			e.getNeuralNetwork().minimalMutation();
-		}
 
 		while(especes.size() + newCars.size() < numberOfCar) {
 			int randomParent1 = Random.getRandomIntegerValue(halfBestEspece.size() - 1);
 			int randomParent2;
 
-			Genome neuralNetworkParent1 = (Genome) halfBestEspece.get(randomParent1).getNeuralNetwork();
+			//Select two parrents
+			Genome neuralNetworkParent1 = (Genome) best.getNeuralNetwork();
 			Genome neuralNetworkParent2;
 			do {
 				randomParent2 = Random.getRandomIntegerValue(halfBestEspece.size() - 1);
@@ -71,6 +75,7 @@ public class  NaturalSelection {
 
 		for(Espece e : this.especes){
 			e.setFitness(0.0);
+			e.getNeuralNetwork().mutate();
 		}
 	}
 
@@ -91,7 +96,7 @@ public class  NaturalSelection {
 	 * Teleport all cars to spawn
 	 * @param m la map
 	 */
-	public void resetList(Map m) {
+	private void resetList(Map m) {
 		for(Espece e : especes){
 			e.tpLikeNew();
 		}

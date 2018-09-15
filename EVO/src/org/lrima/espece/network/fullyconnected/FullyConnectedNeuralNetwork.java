@@ -20,7 +20,7 @@ public class FullyConnectedNeuralNetwork implements Serializable, NeuralNetwork 
 
 	private ArrayList<RealMatrix> layerInputs = new ArrayList<>();
 	private ArrayList<RealMatrix> layerOutputs = new ArrayList<>();
-	private ArrayList<RealMatrix> weigthMatrices = new ArrayList();
+	private ArrayList<RealMatrix> weigthMatrices = new ArrayList<>();
 
 	private boolean hasBeenInitiated = false;
 
@@ -40,7 +40,7 @@ public class FullyConnectedNeuralNetwork implements Serializable, NeuralNetwork 
 		this.init(numberOfInputNodes, numberOfOutputNodes, numberOfHiddenNodes);
 	}
 
-	public FullyConnectedNeuralNetwork(ArrayList<?extends NeuralNetworkTransmitter> transmitters, NeuralNetworkReceiver receiver) {
+	private FullyConnectedNeuralNetwork(ArrayList<?extends NeuralNetworkTransmitter> transmitters, NeuralNetworkReceiver receiver) {
 		this.transmitters = transmitters;
 		this.receiver = receiver;
 		this.init(transmitters.size(), 2, new Integer[]{4, 3});
@@ -50,7 +50,7 @@ public class FullyConnectedNeuralNetwork implements Serializable, NeuralNetwork 
 	 * Initialize the variables of the neural network. It sets the number of input, hidden and output nodes.
 	 * It also sets the value of each neuron randomly
 	 */
-	public void init(int numberOfInputNodes, int numberOfOutputNodes, Integer ... numberOfHiddenNodes){
+	private void init(int numberOfInputNodes, int numberOfOutputNodes, Integer ... numberOfHiddenNodes){
 		//Check that the number of nodes is valid
 		if(numberOfInputNodes <= 0){
 			System.err.println("Initialization failed. " + numberOfInputNodes + " is not valid for the number of input nodes.");
@@ -153,7 +153,7 @@ public class FullyConnectedNeuralNetwork implements Serializable, NeuralNetwork 
 	}
 
 	@Override
-	public void minimalMutation() {
+	public void minimalMutation(double delta) {
 
 	}
 
@@ -161,7 +161,7 @@ public class FullyConnectedNeuralNetwork implements Serializable, NeuralNetwork 
 		this.layers = layers;
 	}
 
-	public ArrayList<Layer> getLayers() {
+	protected ArrayList<Layer> getLayers() {
 		return layers;
 	}
 

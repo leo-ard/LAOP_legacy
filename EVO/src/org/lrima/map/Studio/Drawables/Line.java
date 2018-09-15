@@ -12,7 +12,7 @@ import java.io.Serializable;
  *
  */
 public class Line implements Serializable {
-    Point start = null, end = null;
+    private Point start, end;
 
     /**
      * Create a line between tow points
@@ -63,7 +63,7 @@ public class Line implements Serializable {
      * @param end2 second point
      * @return true if they are colliding, false otherwise
      */
-    public boolean isCollideWith(Point.Double start2, Point.Double end2){
+    private boolean isCollideWith(Point.Double start2, Point.Double end2){
         double denominator = ((end.x - start.x) * (end2.y - start2.y)) - ((end.y - start.y) * (end2.x - start2.x));
         double numerator1 = ((start.y - start2.y) * (end2.x - start2.x)) - ((start.x - start2.x) * (end2.y - start2.y));
         double numerator2 = ((start.y - start2.y) * (end.x - start.x)) - ((start.x - start2.x) * (end.y - start.y));
@@ -86,7 +86,7 @@ public class Line implements Serializable {
      * @param end second point
      * @return true if they are colliding, false otherwise
      */
-    public boolean isCollideWith(Point start, Point end){
+    private boolean isCollideWith(Point start, Point end){
         return this.isCollideWith(new Point.Double(start.x, start.y), new Point.Double(end.x, end.y));
     }
 
@@ -97,7 +97,7 @@ public class Line implements Serializable {
      * @param capteur the capteur to check the collision with
      * @return true if they are colliding, false otherwise
      */
-    public boolean isCollideWith(Capteur capteur){
+    private boolean isCollideWith(Capteur capteur){
         return isCollideWith(capteur.getPoint1(), capteur.getPoint2());
     }
 
@@ -128,6 +128,18 @@ public class Line implements Serializable {
 
             double xCollide = (ordonneeLigne - ordonneeCapteur) / (tauxVariationCapteur - tauxVariationLigne);
             double yCollide = tauxVariationLigne * xCollide + ordonneeLigne;
+
+            //Vertical line
+            if(start.x == end.x){
+                xCollide = start.x;
+                yCollide = tauxVariationCapteur * start.x + ordonneeCapteur;
+            }
+
+            //Horizontal line
+            if(start.y == end.y){
+                xCollide = (start.y - ordonneeCapteur) / tauxVariationCapteur;
+                yCollide = start.y;
+            }
 
             Point.Double pointDeCollision = new Point.Double(xCollide, yCollide);
 
@@ -166,8 +178,10 @@ public class Line implements Serializable {
 
         double dist = Math.abs((y2-y1) * x0 - (x2 - x1) * y0 + x2 * y1 - y2 * x1) / Math.sqrt(Math.pow(y2 - y1, 2) + Math.pow(x2 - x1, 2));
 
-        if(radius >= dist && mouse.x > Math.min(start.x, end.x) - radius && mouse.x < Math.max(start.x, end.x) + radius){
-            return true;
+        if(radius >= dist){
+            if(mouse.x > Math.min(start.x, end.x) - radius && mouse.x < Math.max(start.x, end.x) + radius){
+                return true;
+            }
         }
 
         return false;

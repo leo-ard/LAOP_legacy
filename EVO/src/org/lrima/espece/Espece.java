@@ -21,7 +21,7 @@ import org.lrima.map.Map;
 public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 	
 	//Width has to be bigger than the height
-	public static final int ESPECES_WIDTH = 74, ESPECES_HEIGHT = 50;
+	private static final int ESPECES_WIDTH = 74, ESPECES_HEIGHT = 50;
 
 	//Stores the position of the car
 	@DisplayInfo
@@ -54,11 +54,11 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 	private double fitness;
 
 	//Array to store all the sensors
-	private ArrayList<Capteur> capteurs = new ArrayList<Capteur>();
+	private ArrayList<Capteur> capteurs = new ArrayList<>();
 	private int NB_CAPTEUR = 6; //Maxiumum of 180
 
 	//The neural network of the car
-	public NeuralNetwork neuralNetwork;
+	private NeuralNetwork neuralNetwork;
 
 	//Is the car currently selected ?
 	public boolean selected;
@@ -309,7 +309,7 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 	 * the total distance traveled.
 	 * The fitness is then assigned to this car
 	 */
-	public void calculateFitnessScore(){
+	private void calculateFitnessScore(){
 		//Calculate the biggest distance the car gets to from the start
 		if(this.simulation.getMap() != null){
 			double currentDistance = distanceFrom(this.simulation.getMap().getDepart());
@@ -351,7 +351,7 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 	/**
 	 * Reset all the sensors to a value of 1
 	 */
-	public void resetCapteur() {
+	private void resetCapteur() {
 		for(Capteur c : capteurs) {
 			c.reset();
 		}
@@ -364,17 +364,6 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 	 */
 	public int distanceFrom(Point point) {
 		return (int) ((point.x - this.x)*(point.x - this.x) + (point.y - this.y)*(point.y - this.y));
-	}
-
-	/**
-	 * Mutate the neural network of the car
-	 */
-	public void mutate(boolean minimal) {
-		if(!minimal) {
-			this.neuralNetwork.mutate();
-		}else{
-			this.neuralNetwork.minimalMutation();
-		}
 	}
 
 	//TODO: Is it really necessary?
@@ -438,8 +427,7 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 		double x = this.x;
 		double y = this.y;
 
-		Point topLeft = rotatePoint(new Point((int)x, (int)y));
-		return topLeft;
+		return rotatePoint(new Point((int)x, (int)y));
 	}
 
 	/**
@@ -450,8 +438,7 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 		double x = this.x;
 		double y = this.y;
 
-		Point topRight = rotatePoint(new Point((int)x + Espece.ESPECES_WIDTH, (int)y));
-		return topRight;
+		return rotatePoint(new Point((int)x + Espece.ESPECES_WIDTH, (int)y));
 	}
 
 	/**
@@ -462,8 +449,7 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 		double x = this.x;
 		double y = this.y;
 
-		Point bottomRight = rotatePoint(new Point((int)x + Espece.ESPECES_WIDTH, (int)y + Espece.ESPECES_HEIGHT));
-		return bottomRight;
+		return rotatePoint(new Point((int)x + Espece.ESPECES_WIDTH, (int)y + Espece.ESPECES_HEIGHT));
 	}
 
 	/**
@@ -474,8 +460,7 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 		double x = this.x;
 		double y = this.y;
 
-		Point bottomLeft = rotatePoint(new Point((int)x, (int)y + Espece.ESPECES_HEIGHT));
-		return bottomLeft;
+		return rotatePoint(new Point((int)x, (int)y + Espece.ESPECES_HEIGHT));
 	}
 	
 	public double getOrientation() {
@@ -515,7 +500,7 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 	 */
 	public void setSelected(boolean selected) {
 		//Reset la selection des especes a false
-		if(selected == true){
+		if(selected){
 			this.simulation.resetSelected();
 			EspeceInfoPanel.update(this);
 		}
@@ -526,7 +511,7 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 		return totalSpeed;
 	}
 
-	public double getMaxDistanceFromStart() {
+	private double getMaxDistanceFromStart() {
 		return maxDistanceFromStart;
 	}
 
@@ -536,13 +521,7 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 
 	@Override
 	public int compareTo(Espece o) {
-		if(this.getFitness() > o.getFitness()){
-			return -1;
-		}
-		if(this.getFitness() < o.getFitness()){
-			return 1;
-		}
-		return 0;
+		return Double.compare(this.getFitness(), o.getFitness());
 	}
 
 	@Override

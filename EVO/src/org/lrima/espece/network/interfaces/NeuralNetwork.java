@@ -6,10 +6,10 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public interface NeuralNetwork {
-    public RealMatrix query(double[] inputs);
-    public void feedForward();
-    public void mutate();
-    public void minimalMutation();
-    public void draw(Graphics2D g);
-    public void init(ArrayList<? extends NeuralNetworkTransmitter> transmitters, NeuralNetworkReceiver receiver);
+    RealMatrix query(double[] inputs);
+    void feedForward();
+    void mutate();
+    void minimalMutation(double delta);
+    void draw(Graphics2D g);
+    void init(ArrayList<? extends NeuralNetworkTransmitter> transmitters, NeuralNetworkReceiver receiver);
 }

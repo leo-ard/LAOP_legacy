@@ -18,22 +18,22 @@ public class NodeGene {
     private double value;
     private int innovation;
 
-    public NodeGene(Type type){
+    protected NodeGene(Type type){
         this.type = type;
         this.innovation = NodeGene.currentInnovation;
         NodeGene.currentInnovation = this.innovation + 1;
     }
 
-    public NodeGene(Type type, int innovation){
+    private NodeGene(Type type, int innovation){
         this.type = type;
         this.innovation = innovation;
     }
 
-    public Type getType() {
+    protected Type getType() {
         return type;
     }
 
-    public void calculateWeightedSum(ArrayList<NodeGene> genes, ArrayList<Double> weights){
+    protected void calculateWeightedSum(ArrayList<NodeGene> genes, ArrayList<Double> weights){
         double sum = 0;
 
         for(int i = 0 ; i < genes.size() ; i++){
@@ -47,9 +47,8 @@ public class NodeGene {
     }
 
 
-    public NodeGene copy(){
-        NodeGene gene = new NodeGene(type, this.innovation);
-        return gene;
+    protected NodeGene copy(){
+        return new NodeGene(type, this.innovation);
     }
 
     public double getValue() {
@@ -73,5 +72,9 @@ public class NodeGene {
 
     public void setValue(double value) {
         this.value = value;
+    }
+
+    protected int getInnovation() {
+        return innovation;
     }
 }
