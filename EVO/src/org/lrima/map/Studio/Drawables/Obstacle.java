@@ -1,19 +1,21 @@
 package org.lrima.map.Studio.Drawables;
 
 
-import org.lrima.espece.Espece;
 import org.lrima.map.Studio.DrawingPanel;
-import org.omg.CORBA.Bounds;
+import org.lrima.map.Studio.tools.CreateObstacleTool;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
-import java.io.Serializable;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public interface Obstacle{
 
+    /**
+     * Convert the obstacle into lines
+     *
+     * @return the lines of the obstacle
+     */
     public ArrayList<Line> getLines();
 
     /**
@@ -24,8 +26,23 @@ public interface Obstacle{
      */
     public void drawWhileEditing(Graphics2D graphics, Point mousePosition);
 
-    public void onMouseClick(MouseEvent event, DrawingPanel drawingPanel, Point pointOnMap);
-    public void onMouseMove(MouseEvent event);
+    /**
+     * Function called only when creating the obstacle. Each click while creating is parsed within this function
+     *
+     * @param event the mouse event
+     * @param createObstacleTool the tool that triggered this function
+     * @param pointOnMap the point on the map of the mouse
+     */
+    public void onMouseClickCreate(MouseEvent event, CreateObstacleTool createObstacleTool, Point pointOnMap);
+
+    ImageIcon getIcon();
+
+    /**
+     * Gets the points that define an obstacle. Used primarily by the edit mode to move them around.
+     *
+     * @return the key points
+     */
+    ArrayList<Point> getKeyPoints();
 }
 
 //public abstract class Obstacle implements Drawable, Serializable {

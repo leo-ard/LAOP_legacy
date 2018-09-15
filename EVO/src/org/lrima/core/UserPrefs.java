@@ -4,6 +4,13 @@ import java.util.prefs.Preferences;
 
 public class UserPrefs {
     public static final String SRC_LRIMA = "/images/LRIMA.png";
+
+    public static final String SRC_TOOLS_START = "/images/icons/tools/start.gif";
+    public static final String SRC_TOOLS_MULTIPLE_LINE = "/images/icons/tools/multipleLines.png";
+    public static final String SRC_TOOLS_LINE = "/images/icons/tools/line.png";
+    public static final String SRC_TOOLS_REACTANGLE = "/images/icons/tools/rectangle.png";
+    public static final String SRC_TOOLS_SELECTION = "/images/icons/tools/selection.png";
+
     public static int NUMBERCARS;
     public static int VITESSE_VOITURE;
     public static double TURNRATE;
