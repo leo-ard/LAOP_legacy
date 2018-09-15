@@ -1,43 +1,43 @@
 package org.lrima.map.Studio;
 
+import org.lrima.core.UserPrefs;
 import org.lrima.map.Map;
 import org.lrima.map.Studio.Drawables.*;
-import org.lrima.simulation.Simulation;
+import org.lrima.map.Studio.tools.CreateObstacleTool;
+import org.lrima.map.Studio.tools.CreateStartTool;
+import org.lrima.map.Studio.tools.EditObstacleTool;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
-import java.util.ArrayList;
 
 
 /**
- * Todo: Refaire cette classe, en sauvegardant un Map dans le fichier au lieu d'un arraylist
+ * Class that manage the edition of maps
  */
 public class Studio extends JFrame implements ActionListener {
-
     private Map map;
-    DrawingPanel drawingPanel;
+    private DrawingPanel drawingPanel;
+    private JButton rectangleButton, selectionButton, multipleLineButton, lineButton, startButton;
 
-    JButton startButton;
-    JButton endButton;
-    JButton lineButton;
+    private JFileChooser fileChooser;
+    private JMenuItem save, load, newMap;
 
-    JFileChooser fileChooser;
-    JMenuItem save;
-    JMenuItem load;
-    JMenuItem newMap;
-    private JButton multipleLineButton;
 
     /**
-     * Enter directly into the studio
+     * Entry to launch the studio
      */
     public static void main(String[] args){
         Studio s = new Studio();
         s.setVisible(true);
         s.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        s.setSize(new Dimension(1080, 800));
     }
 
+    /**
+     * Creates the frame that displays everything to edit a map
+     */
     public Studio(){
         this.map = new Map(10000, 10000);
         map.setDepart(new Point(map.getMapWidth() / 2, map.getMapHeight() /2));
@@ -49,6 +49,8 @@ public class Studio extends JFrame implements ActionListener {
         setupToolBar();
 
         drawingPanel = new DrawingPanel(this.map);
+        drawingPanel.setFocusable(true);
+        drawingPanel.requestFocusInWindow();
         add(drawingPanel);
 
         drawingPanel.requestFocus();
@@ -87,14 +89,14 @@ public class Studio extends JFrame implements ActionListener {
         JToolBar toolBar = new JToolBar();
 
         startButton = new JButton();
-        startButton.setIcon(new ImageIcon(this.getClass().getResource("/images/icons/Map_Studio/start.gif")));
+        startButton.setIcon(new ImageIcon(this.getClass().getResource(UserPrefs.SRC_TOOLS_START)));
         startButton.addActionListener(this);
         toolBar.add(startButton);
 
-        endButton = new JButton();
+        /*endButton = new JButton();
         endButton.setIcon(new ImageIcon(this.getClass().getResource("/images/icons/Map_Studio/finish.gif")));
         endButton.addActionListener(this);
-        toolBar.add(endButton);
+        toolBar.add(endButton);*/
 
         lineButton = new JButton();
         lineButton.setIcon(LineObstacle.OBSTACLE_ICON);
@@ -106,6 +108,17 @@ public class Studio extends JFrame implements ActionListener {
         multipleLineButton.addActionListener(this);
         toolBar.add(multipleLineButton);
 
+        rectangleButton = new JButton();
+        rectangleButton.setIcon(RectangleObstacle.OBSTACLE_ICON);
+        rectangleButton.addActionListener(this);
+        toolBar.add(rectangleButton);
+
+        selectionButton = new JButton();
+        selectionButton.setIcon(new ImageIcon(new ImageIcon((this.getClass().getResource(UserPrefs.SRC_TOOLS_SELECTION))).getImage().getScaledInstance(40,40,Image.SCALE_DEFAULT)));
+        selectionButton.addActionListener(this);
+        toolBar.add(selectionButton);
+
+
         add(toolBar, "South");
     }
 
@@ -113,21 +126,24 @@ public class Studio extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         Obstacle obstacle = null;
 
-        if(e.getSource() == startButton){
-
-        }
-
-        if(e.getSource() == multipleLineButton){
-            this.drawingPanel.setSelectedObstacle(new MultipleLineObstacle());
-        }
-
+        //tools
         if(e.getSource() == lineButton){
-            this.drawingPanel.setSelectedObstacle(new LineObstacle());
+            this.drawingPanel.setTool(new CreateObstacleTool(new LineObstacle(), drawingPanel.getMap().getObstacles()));
+        }
+        else if(e.getSource() == multipleLineButton){
+            this.drawingPanel.setTool(new CreateObstacleTool(new MultipleLineObstacle(), drawingPanel.getMap().getObstacles()));
+        }
+        else if(e.getSource() == rectangleButton){
+            this.drawingPanel.setTool(new CreateObstacleTool(new RectangleObstacle(), drawingPanel.getMap().getObstacles()));
+        }
+        if(e.getSource() == selectionButton){
+            this.drawingPanel.setTool(new EditObstacleTool(this.drawingPanel.selectedObstacles));
         }
 
-        if(obstacle != null) {
-            drawingPanel.setSelectedObstacle(obstacle);
+        if(e.getSource() == startButton){
+            this.drawingPanel.setTool(new CreateStartTool());
         }
+
 
         //Menu
         if(e.getSource() == newMap){
@@ -151,6 +167,7 @@ public class Studio extends JFrame implements ActionListener {
             }
         }
     }
+
 
     public void save(File file){
         try {

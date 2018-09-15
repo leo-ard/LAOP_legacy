@@ -1,20 +1,21 @@
 package org.lrima.map.Studio.Drawables;
 
-import org.lrima.espece.Espece;
-import org.lrima.espece.capteur.Capteur;
-import org.lrima.map.Studio.DrawingPanel;
+import org.lrima.core.UserPrefs;
+import org.lrima.map.Studio.tools.CreateObstacleTool;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.io.Serializable;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
+/**
+ * The obstacle of type line
+ */
 public class LineObstacle implements Obstacle, Serializable{
-
     Point start = null, end = null;
-    public static ImageIcon OBSTACLE_ICON = new ImageIcon(LineObstacle.class.getResource("/images/icons/Map_Studio/one_line.png"));
+    public static ImageIcon OBSTACLE_ICON = new ImageIcon(LineObstacle.class.getResource(UserPrefs.SRC_TOOLS_LINE));
+
     private boolean placed;
 
 
@@ -36,21 +37,29 @@ public class LineObstacle implements Obstacle, Serializable{
     }
 
     @Override
-    public void onMouseClick(MouseEvent event, DrawingPanel panel, Point pointOnMap) {
-        System.out.println("test");
+    public void onMouseClickCreate(MouseEvent event, CreateObstacleTool createObstacleTool, Point pointOnMap) {
         if(start == null){
             start = pointOnMap;
         }
         else{
             end = pointOnMap;
-            panel.placeObstacle(this);
-
+            createObstacleTool.createObstacle();
         }
     }
 
     @Override
-    public void onMouseMove(MouseEvent event) {
+    public ImageIcon getIcon() {
+        return LineObstacle.OBSTACLE_ICON;
+    }
 
+    @Override
+    public ArrayList<Point> getKeyPoints() {
+        ArrayList<Point> points = new ArrayList<Point>();
+
+        points.add(start);
+        points.add(end);
+
+        return points;
     }
 
     public Point getStart() {
@@ -61,33 +70,3 @@ public class LineObstacle implements Obstacle, Serializable{
         return end;
     }
 }
-
-//public class Line extends Obstacle implements Serializable {
-//
-//    public Point start;
-//    public Point end;
-//    public int strokeWidth = 10;
-//
-//    public Line(Obstacle obstacle){
-//        super(obstacle);
-//        start = ((Line) obstacle).start;
-//        end = ((Line) obstacle).end;
-//        placingIcon = false;
-//        isSquare = false;
-//    }
-//
-//    public Line() {
-//        super(Obstacle.TYPE_LINE);
-//        placingIcon = false;
-//        icon = new ImageIcon(getClass().getResource("/images/icons/Map_Studio/line.gif"));
-//    }
-//
-//    @Override
-//    public void draw(Graphics2D g) {
-//        super.draw(g);
-//        g.setStroke(new BasicStroke(10));
-//        g.drawLine(start.x, start.y, end.x, end.y);
-//    }
-//
-//
-//}

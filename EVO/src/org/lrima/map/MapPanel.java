@@ -26,6 +26,9 @@ import org.lrima.map.Studio.Drawables.Obstacle;
 import org.lrima.simulation.Interface.EspeceInfoPanel;
 import org.lrima.simulation.Simulation;
 
+/**
+ * Panel that displays a map
+ */
 public class MapPanel extends JPanel implements MouseMotionListener, MouseListener, MouseWheelListener{
 
 	//The map to display
@@ -38,7 +41,7 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 	protected float zoom;
 
 	//Used for the drag motion on the map
-	private int lastMousePositionX, lastMousePositionY;
+	protected Point lastMousePosition;
 
 	//Stores the logo of LRIMA;
 	private BufferedImage LRIMA_image;
@@ -51,12 +54,19 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 	private final Color COLOR_BACKGROUND_LINES = new Color(136, 136, 136);
 	private final Color COLOR_OBSTACLE = new Color(176, 176, 176);
 	private final Color COLOR_TEXT = new Color(0, 0, 0);
+	private final Color COLOR_START = new Color(51,255, 107);
+	private final int START_POINT_SIZE = 50;
 
 	//Used for the text
 	private final int TEXT_MARGIN = 20;
 	private final int FONT_SIZE = 32;
 
 
+	/**
+	 * Creates an panel to display the map in it's current state
+	 *
+	 * @param map the map to be displayed
+	 */
 	protected MapPanel(Map map){
 		//Setup variables
 		this.map = map;
@@ -81,6 +91,11 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 		this.addMouseListener(this);
 	}
 
+	/**
+	 * Creates a panel to display the map's simulation and especes
+	 *
+	 * @param simulation the map's simulation to be displayed
+	 */
 	public MapPanel(Simulation simulation) {
 		this(simulation.getMap());
 		//Setup variables
@@ -112,8 +127,9 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 	}
 
 	/**
-	 * TODO:
-	 * @param graphics
+	 * Draws the graphics that are not moving relative to the map
+	 *
+	 * @param graphics to be drawn on
 	 */
 	protected void setupStaticGraphics(Graphics2D graphics){
 		//Write the informations
@@ -124,13 +140,14 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 	}
 
 	/**
-	 * TODO:
-	 * @param graphics
+	 * Draws the graphics that are moving relative to the map
+	 *
+	 * @param graphics to be drawn on
 	 */
 	protected void setupRelativeGraphics(Graphics2D graphics){
-
 		drawBackground(graphics);
 		drawObstacles(graphics);
+		drawStart(graphics);
 		drawCars(graphics);
 		drawPoints(graphics);
 
@@ -190,11 +207,21 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 		}
 	}
 
+	protected void drawStart(Graphics2D graphics){
+		int x = (int) map.getDepart().getX();
+		int y = (int) map.getDepart().getY();
+
+		graphics.setColor(this.COLOR_START);
+		graphics.fillOval(x-this.START_POINT_SIZE/2, y-this.START_POINT_SIZE/2, this.START_POINT_SIZE, this.START_POINT_SIZE);
+	}
+
 	/**
 	 * Draws all the obstacles
 	 * @param graphics the graphics to put the obstacles into
 	 */
 	protected void drawObstacles(Graphics2D graphics){
+		graphics.setColor(Color.RED);
+		graphics.setStroke(new BasicStroke(3));
 		for(Obstacle o : map.getObstacles()){
 			ArrayList<Line> lines = o.getLines();
 			for(Line line : lines){
@@ -288,8 +315,7 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		lastMousePositionX = e.getX()-viewX;
-		lastMousePositionY = e.getY()-viewY;
+		lastMousePosition = new Point(e.getX()-viewX, e.getY()-viewY);
 	}
 
 	@Override
@@ -323,8 +349,8 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		viewX = (int) (e.getX()-lastMousePositionX);
-		viewY = (int) (e.getY()-lastMousePositionY);
+		viewX = (int) (e.getX()-lastMousePosition.x);
+		viewY = (int) (e.getY()-lastMousePosition.y);
 
 		this.repaint();
 	}
