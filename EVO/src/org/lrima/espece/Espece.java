@@ -85,7 +85,7 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 
 	//Used to know at what generation the car was created (higher number = the car is good)
 	@DisplayInfo
-	public int bornOnGeneration = 0;
+	private int bornOnGeneration = 0;
 
 
 
@@ -521,7 +521,7 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 
 	@Override
 	public int compareTo(Espece o) {
-		return Double.compare(this.getFitness(), o.getFitness());
+		return Double.compare(o.getFitness(), this.getFitness());
 	}
 
 	@Override
