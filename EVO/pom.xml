@@ -9,20 +9,15 @@
     <version>1.0-SNAPSHOT</version>
 
     <dependencies>
-    	<dependency>
-            <groupId>org.knowm.xchart</groupId>
-            <artifactId>xchart-Parent</artifactId>
-            <version>3.5.1</version>
-        </dependency>
         <dependency>
             <groupId>org.knowm.xchart</groupId>
             <artifactId>xchart</artifactId>
-            <version>3.5.1</version>
+            <version>3.5.2</version>
         </dependency>
         <dependency>
-            <groupId>org.knowm.xchart</groupId>
-            <artifactId>xchart-demo</artifactId>
-            <version>3.5.1</version>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-math3</artifactId>
+            <version>3.6.1</version>
         </dependency>
         
 
