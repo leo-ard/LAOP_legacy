@@ -1,14 +1,13 @@
 package org.lrima.espece.network;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.swing.*;
 
 import org.lrima.espece.Espece;
+import org.lrima.espece.network.interfaces.NeuralNetwork;
 import org.lrima.simulation.Simulation;
 import org.lrima.simulation.selection.NaturalSelection;
 
@@ -31,17 +30,6 @@ public class NetworkPanel extends JPanel{
 		this.setPreferredSize(new Dimension(500, 500));
 		this.espece = simulation.getEspecesOpen().get(0);
 		this.network = espece.getNeuralNetwork();
-	}
-
-	/**
-	 * Sauvegarde dans un fichier le meilleur neuralNetwork
-	 */
-	private void saveBest(){
-		Espece espece = NaturalSelection.best;
-
-		if(espece != null) {
-			NetworkStructure.save("best_nn.dat", espece.neuralNetwork);
-		}
 	}
 	
 	public void start() {
@@ -76,8 +64,11 @@ public class NetworkPanel extends JPanel{
 		g.setColor(Color.red);
 		g.setStroke(new BasicStroke(2));
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		
-		int netSize = this.network.getSize();
+
+		//Draw the neural network
+		this.espece.getNeuralNetwork().draw(g);
+
+		/*int netSize = this.network.getSize();
 		int layerSize;
 		for(int i = netSize-1; i >= 0; i--) {
 			layerSize = this.network.getLayer(i).getSize();
@@ -102,10 +93,10 @@ public class NetworkPanel extends JPanel{
 				
 				
 			}
-		}
+		}*/
 	}
 	
-	private void drawNeuronAtPosition(Graphics2D g, Neuron neuron, Point pos) {
+	/*private void drawNeuronAtPosition(Graphics2D g, Neuron neuron, Point pos) {
 		g.setStroke(new BasicStroke(1.0f));
 		g.setColor(Color.white);
 		g.fillOval(pos.x - OVALSIZE/2, pos.y - OVALSIZE/2, OVALSIZE, OVALSIZE);
@@ -116,7 +107,7 @@ public class NetworkPanel extends JPanel{
 		
 		g.setColor(g.getColor().darker().darker());
 		g.drawString(Math.round(neuron.getValue()*100.0)/100.0+"", pos.x-OVALSIZE/2+7, pos.y+OVALSIZE/6);
-	}
+	}*/
 	
 	private void drawConnectionAtPosition(Graphics2D g, Point p1, Point p2, double connectionstrength, double neuronValue1, double neuronValue2) {
 		g.setStroke(new BasicStroke(1+(int)(Math.exp(connectionstrength)*4.0)));

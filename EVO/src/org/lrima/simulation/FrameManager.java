@@ -11,7 +11,7 @@ import org.lrima.simulation.Interface.actions.*;
 import org.lrima.simulation.Interface.EspeceInfoPanel;
 import org.lrima.simulation.Interface.GraphicPanel;
 
-public class FrameManager extends JFrame{
+public class FrameManager extends JFrame implements SimulationListener{
 
     //All the panels
 	private NetworkPanel networkPanel;
@@ -43,12 +43,17 @@ public class FrameManager extends JFrame{
 		//The main panel
 		this.add(mapPanel, BorderLayout.CENTER);
 
+
         //Create menu the menu buttons
         createMenu();
         displaySavedPanel();
 
         //Start the map panel
         start();
+
+        this.mapPanel.add(networkPanel, "South");
+        this.mapPanel.revalidate();
+        revalidate();
 	}
 
     /**
@@ -73,6 +78,9 @@ public class FrameManager extends JFrame{
                 //Press Q to go to the next generation
                 if(e.getKeyCode() == KeyEvent.VK_Q){
                     simulation.goToNextGeneration();
+                }
+                if(e.getKeyCode() == KeyEvent.VK_W){
+                    simulation.getBest().setSelected(true);
                 }
             }
         });
@@ -113,15 +121,6 @@ public class FrameManager extends JFrame{
         JMenu file = new JMenu("File");
         menuBar.add(file);
 
-        //Save button
-        JMenuItem save = new JMenuItem(new SaveNeuralNetworkFileAction("Save", this, simulation));
-        save.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK));
-        file.add(save);
-
-        //Load button
-        JMenuItem load = new JMenuItem(new LoadNeuralNetworkFileAction("Load", this, simulation));
-        load.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_MASK));
-        file.add(load);
     }
 
     /**
@@ -234,4 +233,11 @@ public class FrameManager extends JFrame{
     public void changeNetworkFocus(Espece e) {
 		networkPanel.setEspece(e);
 	}
+
+    @Override
+    public void onNextGeneration() {
+        this.graphicPanel.updateChart(this.simulation);
+        this.getContentPane().repaint();
+        this.networkPanel.repaint();
+    }
 }

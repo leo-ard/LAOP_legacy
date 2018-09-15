@@ -31,9 +31,10 @@ public class EspeceInfoPanel extends JPanel {
 
         screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         setBackground(Color.WHITE);
-        setSize(400, screenSize.height);
+        //setSize(600, screenSize.height);
+        setPreferredSize(new Dimension(screenSize.width / 5, screenSize.height));
 
-        add(boxLayout);
+        add(boxLayout, BorderLayout.NORTH);
 
         load();
     }
@@ -81,9 +82,12 @@ public class EspeceInfoPanel extends JPanel {
                 }
 
                 if(!information.containsKey(fieldName)) {
+
                     //Cree la boite avec les deux informations
                     Box horizontalBox = Box.createHorizontalBox();
-                    horizontalBox.setPreferredSize(new Dimension(screenSize.width / 8, screenSize.height));
+                    //horizontalBox.setPreferredSize(new Dimension(EspeceInfoPanel.instance.getWidth(), 200));
+                    horizontalBox.setPreferredSize(new Dimension(screenSize.width / 5, screenSize.height));
+                    //horizontalBox.setPreferredSize(new Dimension(screenSize.width / 8, screenSize.height));
 
                     JLabel fieldNameLabel = new JLabel(fieldName);
                     JLabel fieldValueLabel = new JLabel(fieldValue);
@@ -91,7 +95,7 @@ public class EspeceInfoPanel extends JPanel {
                     fieldNameLabel.setSize(new Dimension(horizontalBox.getWidth() / 2, 50));
                     fieldValueLabel.setSize(new Dimension(horizontalBox.getWidth() / 2, 50));
 
-                    horizontalBox.add(fieldNameLabel);
+                    horizontalBox.add(new JLabel(fieldNameLabel.getText()));
                     horizontalBox.add(Box.createHorizontalGlue());
                     horizontalBox.add(fieldValueLabel);
 

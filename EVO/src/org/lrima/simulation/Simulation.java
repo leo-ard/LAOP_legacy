@@ -1,19 +1,19 @@
 package org.lrima.simulation;
 
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 
 import org.lrima.core.UserPrefs;
 import org.lrima.espece.Espece;
 import org.lrima.espece.capteur.Capteur;
-import org.lrima.espece.network.NeuralNetwork;
+import org.lrima.espece.network.interfaces.NeuralNetwork;
 import org.lrima.map.Map;
 import org.lrima.map.Studio.Drawables.Line;
-import org.lrima.map.Studio.Drawables.LineObstacle;
 import org.lrima.map.Studio.Drawables.Obstacle;
+import org.lrima.simulation.Interface.GraphicPanel;
 import org.lrima.simulation.selection.NaturalSelection;
 
 public class Simulation extends Thread{
@@ -42,19 +42,22 @@ public class Simulation extends Thread{
     //The neural network that the cars in the next generation will have
     private NeuralNetwork neuralNetworkToUse = null;
 
-    //Stores information about this simulation
-    private SimulationInfos simulationInformation;
+    //Stores information about all the generations
+    private ArrayList<Generation> generations;
 
+    private ArrayList<SimulationListener> simulationListeners = new ArrayList<>();
 
 	/**
 	 * Initialize variables
 	 */
 	public Simulation() {
 		super();
-		running = true;
+
 		Simulation.currentTime = 0;
-		//map = new Map(10000, 10000);
-		map = Map.loadMapFromFile("test.map");
+		this.running = true;
+		this.generations = new ArrayList<>();
+		this.map = Map.loadMapFromFile("test.map");
+
 
 		this.initializeCars(null);
 	}
@@ -77,8 +80,10 @@ public class Simulation extends Thread{
 					Iterator<Espece> iterator = especesOpen.iterator();
 					while (((Iterator) iterator).hasNext()){
 						Espece espece = iterator.next();
+
 						espece.update(msBetweenFrames);
 						this.loopSetCapteur(espece);
+
 
 						//If the car should die, remove it from the espece open
 						if(espece.shouldDie(this.map)){
@@ -137,13 +142,16 @@ public class Simulation extends Thread{
 	 * Used in the main loop to set the value of the sensors
 	 */
 	private void loopSetCapteur(Espece espece){
-		for(Capteur capteur : espece.getCapteursList()){
-			for(Obstacle obstacle : map.getObstacles()){
-				for(Line line : obstacle.getLines()){
-					capteur.setValue(line);
+		for(Capteur capteur : espece.getCapteursList()) {
+			capteur.reset();
+			for (Obstacle obstacle : map.getObstacles()) {
+				for (Line line : obstacle.getLines()) {
+					double capteurValue = line.getCapteurValue(capteur);
+					capteur.setValue(capteurValue);
 				}
 			}
 		}
+
 	}
 
 	/**
@@ -163,6 +171,13 @@ public class Simulation extends Thread{
 	 * Kills all the cars before mutating them
 	 */
 	public void nextGeneration(){
+		//Add the generation to the array of generationInformation
+		this.generations.add(new Generation(this.generation, this.getClonedEspeceSet()));
+
+		for(SimulationListener simulationListener : simulationListeners){
+			simulationListener.onNextGeneration();
+		}
+
 		this.generation++;
 
 	    //Reload les préférences du user
@@ -176,6 +191,10 @@ public class Simulation extends Thread{
             especesClosed.add(espece);
             especesOpen.remove(i);
         }
+
+        for(Espece e : especesClosed){
+        	e.resetEspece();
+		}
 
         //Mutate the cars
         this.mutate();
@@ -199,14 +218,7 @@ public class Simulation extends Thread{
 
 		//Add a new car until you reach the max number of car
 		while(especesOpen.size() < numberOfCar) {
-			//If the neural network to use hasn't been specified
-		    if(neuralNetworkToUse == null) {
-                especesOpen.add(new Espece(this));
-            }
-            else{
-		        //Assign a neural network to the new car
-		        especesOpen.add(new Espece(this, neuralNetworkToUse));
-            }
+			especesOpen.add(new Espece(this));
 		}
 		
 	}
@@ -238,14 +250,8 @@ public class Simulation extends Thread{
 		ArrayList<Espece> allCars = this.getAllEspeces();
 
 		//Sorts the new array by the fitness of the cars
-		allCars.sort(new Comparator<Espece>() {
-			@Override
-			public int compare(Espece e1, Espece e2) {
-				if(e1.getFitness() == e2.getFitness())
-					return 0;
-				return e1.getFitness()>e2.getFitness()?-1:1;
-			}
-		});
+		Collections.sort(allCars);
+
 
 		//Returns the car with the highest fitness (first)
 		return allCars.get(0);
@@ -290,6 +296,21 @@ public class Simulation extends Thread{
 	 */
 	public void addEspeceToClosed(Espece e){
 		especesClosed.add(e);
+	}
+
+	/**
+	 * Clone all the species inside the closed and open set
+	 * @return The list containing the cloned cars
+	 */
+	private ArrayList<Espece> getClonedEspeceSet(){
+		ArrayList<Espece> allSpecies = new ArrayList<>(this.getAllEspeces());
+		ArrayList<Espece> clonedList = new ArrayList<>();
+
+		for(Espece e : allSpecies){
+			clonedList.add(new Espece(e));
+		}
+
+		return clonedList;
 	}
 
 	//*******===========================================================================
@@ -341,7 +362,11 @@ public class Simulation extends Thread{
 		this.pausing = pausing;
 	}
 
-	public SimulationInfos getSimulationInformation() {
-		return simulationInformation;
+	public ArrayList<Generation> getGenerationList(){
+    	return this.generations;
+	}
+
+	public void addSimulationListener(SimulationListener listener){
+    	this.simulationListeners.add(listener);
 	}
 }

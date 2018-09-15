@@ -7,14 +7,18 @@ import org.lrima.annotations.DisplayInfo;
 import org.lrima.core.UserPrefs;
 
 import org.lrima.espece.capteur.Capteur;
-import org.lrima.espece.network.NeuralNetwork;
+import org.lrima.espece.network.fullyconnected.FullyConnectedNeuralNetwork;
+import org.lrima.espece.network.fullyconnected.Layer;
+import org.lrima.espece.network.interfaces.NeuralNetwork;
+import org.lrima.espece.network.interfaces.NeuralNetworkReceiver;
+import org.lrima.espece.network.neat.Genome;
 import org.lrima.map.Studio.Drawables.Line;
 import org.lrima.map.Studio.Drawables.Obstacle;
 import org.lrima.simulation.Interface.EspeceInfoPanel;
 import org.lrima.simulation.Simulation;
 import org.lrima.map.Map;
 
-public class Espece {
+public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 	
 	//Width has to be bigger than the height
 	public static final int ESPECES_WIDTH = 74, ESPECES_HEIGHT = 50;
@@ -23,9 +27,14 @@ public class Espece {
 	@DisplayInfo
 	private double x, y;
 
+	private double rightSpeed, leftSpeed;
+
 	//Is the car still alive?
 	@DisplayInfo
 	private boolean alive;
+
+
+	private double diedAtTime = 0;
 
 	//Orientation of the car in radian
 	@DisplayInfo
@@ -65,6 +74,12 @@ public class Espece {
 	@DisplayInfo
 	private double totalDistanceTraveled;
 
+	//Also used to calculate the fitness
+	@DisplayInfo(textRepresentation = "Right")
+	private float numberOfTimeWentRight = 0;
+	@DisplayInfo(textRepresentation = "Left")
+	private float numberOfTimeWentLeft = 0;
+
 	//Used to calculate the total distance
 	private Point lastPointTraveled;
 
@@ -103,31 +118,51 @@ public class Espece {
 
 		//Setup a base neural network for the car to have
 		//If you want to choose which neural network to use, call Espece(Map, NeuralNetwork)
-		neuralNetwork = new NeuralNetwork(NB_CAPTEUR, 2, true);
+		//neuralNetwork = new NeuralNetwork(NB_CAPTEUR, 2, true);
+		neuralNetwork = new Genome();
+		neuralNetwork.init(this.capteurs, this);
     }
 
 	/**
-	 * Initialize a car with a neural network
-	 * @param simulation the simulation the car is in
-	 * @param neuralNetwork the neural network to copy to the car
+	 * Used to clone a car
+	 * @param e the car to clone
 	 */
-	public Espece(Simulation simulation, NeuralNetwork neuralNetwork){
-	    this(simulation);
-	    this.neuralNetwork = neuralNetwork;
-	    this.neuralNetwork.randomize();
-    }
+	public Espece(Espece e){
+		this.fitness = e.getFitness();
+		this.neuralNetwork = e.getNeuralNetwork();
+	}
 
 	/**
 	 * The function used to calculate the fitness of the car
 	 * @return the fitness of the car
 	 */
 	private double fitnessFunction(){
-		double fitness = getMaxDistanceFromStart() + getTotalDistanceTraveled() ;
+		double fitness;
+		//if(alive) {
+		//fitness = getMaxDistanceFromStart() + getTotalDistanceTraveled();
 
-		//If the car turns in circle at the start
-		if(getMaxDistanceFromStart() < 800){
-			fitness = 0.0;
+		fitness = (getMaxDistanceFromStart()) / 10000 + (diedAtTime / UserPrefs.TIME_LIMIT) * 100;
+
+		/*if(diedAtTime != 0){
+			System.out.println("--------");
+			System.out.println("Max distance from start: " + getMaxDistanceFromStart());
+			System.out.println("Died at time / time limit: " + diedAtTime / UserPrefs.TIME_LIMIT);
+			System.out.println("Fitness: " + fitness);
+		}*/
+
+		//}
+		//else{
+		//	fitness = this.diedAtTime;
+		//}
+
+		/*if(numberOfTimeWentLeft != 0 && numberOfTimeWentRight != 0) {
+			if (numberOfTimeWentRight / numberOfTimeWentLeft < 0.01 || numberOfTimeWentLeft / numberOfTimeWentRight < 0.01) {
+				fitness -= (diedAtTime / UserPrefs.TIME_LIMIT) * 100;
+			}
 		}
+		else if(numberOfTimeWentLeft == 0 || numberOfTimeWentRight == 0){
+			fitness -= (diedAtTime / UserPrefs.TIME_LIMIT) * 100;
+		}*/
 
 		return fitness;
 	}
@@ -152,7 +187,7 @@ public class Espece {
 		double bestFitness = this.simulation.getBestFitness();
 		double percentageFitness = fitness / bestFitness;
 
-		this.voitureColor = new Color(255 - (int)(255 *  percentageFitness), (int)(255 * percentageFitness), 124, 124);
+		//this.voitureColor = new Color(255 - (int)(255 *  percentageFitness), (int)(255 * percentageFitness), 124, 124);
 	}
 
 
@@ -185,11 +220,7 @@ public class Espece {
 
 		//Set the color of the car based on its fitness
 		setColor();
-		
-		//Set the speed of the right and left side of the car from the neural network's output
-		double[] speeds = getSpeedFromNeuralNetwork();
-		double rightSpeed = speeds[0];
-		double leftSpeed = speeds[1];
+		neuralNetwork.feedForward();
 
 		//Get the car speed and turn rate from the settings
         int savedCarSpeed = UserPrefs.preferences.getInt(UserPrefs.KEY_CAR_SPEED, UserPrefs.DEFAULT_CAR_SPEED);
@@ -210,7 +241,6 @@ public class Espece {
 		//To get the average speed
 		totalSpeed += vitesse;
 
-		//TODO: Better way to do this
 		//Get the information of the car in the EspeceInfoPanel if it is selected
 		if(selected){
 			EspeceInfoPanel.update(this);
@@ -221,15 +251,24 @@ public class Espece {
 
 	}
 
+	/**
+	 * Resets the car in case it gets to the next generation
+	 */
+	public void resetEspece(){
+		this.numberOfTimeWentRight = 0;
+		this.numberOfTimeWentLeft = 0;
+	}
+
 	public void draw(Graphics2D g) {
 		g.setColor(Color.CYAN);
 
 		//TODO: Make the color based on the fitness of the car
-		if(bornOnGeneration != simulation.getGeneration()){
-			g.setColor(new Color(0, 255, 0, 127));
+		//g.setColor(voitureColor);
+		if(bornOnGeneration < simulation.getGeneration()){
+			g.setColor(Color.GREEN);
 		}
 		else{
-			g.setColor(new Color(255, 0, 0, 127));
+			g.setColor(Color.RED);
 		}
 
 		//Get all the points of the car and draws it
@@ -244,6 +283,9 @@ public class Espece {
 		if(selected){
 			g.setColor(Color.BLUE);
 		}
+		/*if(simulation.getBest() == this){
+			g.setColor(Color.YELLOW);
+		}*/
 		g.drawPolyline(pointX, pointY, 5);
 
 		//TODO: Make the sensors start in the middle of the car and not on the bottom left
@@ -259,20 +301,6 @@ public class Espece {
 		}
 		//Resets the orientation
 		g.rotate(-orientationRad, x, y);
-	}
-
-	/**
-	 * Get the output of the neural network based on the values that the sensors has
-	 * @return the speed that the left wheel of the car should go [1] and the speed that the
-	 * 			right wheel of the car should go [0]
-	 */
-	private double[] getSpeedFromNeuralNetwork(){
-		double[] capteurArray = capteursToArray();
-		neuralNetwork.update(capteurArray);
-		//The speed that the car has to go left and right
-		double[] speeds = neuralNetwork.getOutputValues();
-
-		return speeds;
 	}
 
 	/**
@@ -317,6 +345,7 @@ public class Espece {
 	 */
 	public void kill() {
 		alive = false;
+		this.diedAtTime = Simulation.currentTime;
 	}
 
 	/**
@@ -340,8 +369,12 @@ public class Espece {
 	/**
 	 * Mutate the neural network of the car
 	 */
-	public void mutate() {
-		this.neuralNetwork.mutate();
+	public void mutate(boolean minimal) {
+		if(!minimal) {
+			this.neuralNetwork.mutate();
+		}else{
+			this.neuralNetwork.minimalMutation();
+		}
 	}
 
 	//TODO: Is it really necessary?
@@ -484,6 +517,7 @@ public class Espece {
 		//Reset la selection des especes a false
 		if(selected == true){
 			this.simulation.resetSelected();
+			EspeceInfoPanel.update(this);
 		}
 		this.selected = selected;
 	}
@@ -498,5 +532,33 @@ public class Espece {
 
 	public double getTotalDistanceTraveled() {
 		return totalDistanceTraveled;
+	}
+
+	@Override
+	public int compareTo(Espece o) {
+		if(this.getFitness() > o.getFitness()){
+			return -1;
+		}
+		if(this.getFitness() < o.getFitness()){
+			return 1;
+		}
+		return 0;
+	}
+
+	@Override
+	public void setNeuralNetworkOutput(double... outputs) {
+		this.rightSpeed = outputs[0];
+		this.leftSpeed = outputs[1];
+
+	}
+
+	public void setNeuralNetwork(Genome genome) {
+		this.neuralNetwork = genome;
+		((Genome) this.neuralNetwork).setTransmitters(this.capteurs);
+		((Genome) this.neuralNetwork).setReceiver(this);
+	}
+
+	public void setFitness(double fitness) {
+		this.fitness = fitness;
 	}
 }

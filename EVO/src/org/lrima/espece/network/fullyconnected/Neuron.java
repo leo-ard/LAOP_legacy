@@ -1,11 +1,28 @@
-package org.lrima.espece.network;
+package org.lrima.espece.network.fullyconnected;
 
 import java.util.ArrayList;
 
 import org.lrima.espece.network.functions.Function;
 import org.lrima.espece.network.functions.IFunction;
+import org.lrima.utils.Random;
 
-public class Neuron {
+public class Neuron{
+    private double value;
+
+    public Neuron(){
+        this.value = Random.getRandomDoubleValue(-1.0, 1.0);
+    }
+
+    public Neuron(double value){
+        this.value = value;
+    }
+
+    public double getValue() {
+        return value;
+    }
+}
+
+/*public class Neuron {
 	private ArrayList<Connection> inputs;
 	private Layer layer;
 	private int index;
@@ -78,4 +95,4 @@ public class Neuron {
 		return index;
 	}
 
-}
+}*/

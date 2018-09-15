@@ -10,4 +10,6 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface DisplayInfo { }
+public @interface DisplayInfo {
+    String textRepresentation() default "";
+}

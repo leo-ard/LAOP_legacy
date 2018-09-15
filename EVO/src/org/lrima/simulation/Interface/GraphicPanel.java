@@ -1,57 +1,107 @@
 package org.lrima.simulation.Interface;
 
 import org.knowm.xchart.*;
+import org.knowm.xchart.style.markers.SeriesMarkers;
 import org.lrima.espece.Espece;
+import org.lrima.simulation.Generation;
 import org.lrima.simulation.Simulation;
-import org.lrima.simulation.SimulationInfos;
+import org.lrima.utils.Random;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Random;
+import java.util.Collections;
 
 //TODO: Finir le graphique
 public class GraphicPanel extends JPanel {
 
-    private SimulationInfos simulationInfos;
+    private ArrayList<Generation> generations;
     private XYChart chart;
     private XChartPanel<XYChart> chartPanel;
     private Dimension screenSize;
 
+    private ArrayList<Integer> xFitnessData = new ArrayList<>();;
+    private ArrayList<Double> yFitnessData = new ArrayList<>();;
+
+    private ArrayList<Integer> xMedianData = new ArrayList<>();;
+    private ArrayList<Integer> yMedianData = new ArrayList<>();;
+
+    private ArrayList<Integer> xMoyenneData = new ArrayList<>();;
+    private ArrayList<Integer> yMoyenneData = new ArrayList<>();;
+
     public GraphicPanel(Simulation simulation){
-        this.simulationInfos = simulation.getSimulationInformation();
+        this.generations = simulation.getGenerationList();
         screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        setBackground(Color.CYAN);
+        setPreferredSize(new Dimension(0, screenSize.height / 4));
+        this.setLayout(new BorderLayout());
 
         createChart();
     }
 
     private void createChart(){
-        Random r = new Random();
 
-        double[] xData = {1, 1, 1, 1, 2, 2, 3};
-        double[] yData = {1, 2, 3, 4, 1, 2, 7};
+        getFitnessData();
 
-        chart = new XYChartBuilder().width(screenSize.width).height(screenSize.height / 5).title("Graphiques").xAxisTitle("Generation").yAxisTitle("Fitness").build();
-        XYSeries series = chart.addSeries("fitness", xData, yData);
+        chart = new XYChartBuilder().title("Fitness en fonction des générations").xAxisTitle("Generation").yAxisTitle("Fitness").build();
+        chart.getStyler().setChartBackgroundColor(new Color(230, 230, 230));
+
+        //Serie for the fitness
+        XYSeries series = chart.addSeries("fitness", new int[]{0}, new int[]{0});
         series.setXYSeriesRenderStyle(XYSeries.XYSeriesRenderStyle.Scatter);
         series.setFillColor(Color.RED);
 
+        //Serie for the median fitness
+        XYSeries medianSeries = chart.addSeries("median", new int[]{0}, new int[]{0});
+        medianSeries.setMarker(SeriesMarkers.NONE);
+
+        //Serie for the average fitness
+        XYSeries moyenneSeries = chart.addSeries("moyenne", new int[]{0}, new int[]{0});
+        moyenneSeries.setMarker(SeriesMarkers.NONE);
+
         chartPanel = new XChartPanel<>(chart);
 
-        this.add(chartPanel);
+        this.add(chartPanel, BorderLayout.CENTER);
+    }
+
+    private void getFitnessData(){
+        xFitnessData = new ArrayList<>();
+        yFitnessData = new ArrayList<>();
+        xMedianData = new ArrayList<>();
+        yMedianData = new ArrayList<>();
+        xMoyenneData = new ArrayList<>();
+        yMoyenneData = new ArrayList<>();
+
+        for(Generation gen : this.generations){
+            ArrayList<Double> allFitnesses = gen.getAllFitnesses();
+            for(double fitness : allFitnesses) {
+                this.xFitnessData.add(gen.getGenerationNumber());
+                this.yFitnessData.add(fitness);
+            }
+
+            double medianFitness = gen.getMedianFitness();
+            this.xMedianData.add(gen.getGenerationNumber());
+            this.yMedianData.add((int)medianFitness);
+
+            double moyenneFitness = gen.getMoyenneFitness();
+            this.xMoyenneData.add(gen.getGenerationNumber());
+            this.yMoyenneData.add((int)moyenneFitness);
+        }
     }
 
     public void updateChart(Simulation simulation){
-        ArrayList<Integer> xData = new ArrayList<>();
-        ArrayList<Double> yData = new ArrayList<>();
 
-        for(Espece e : simulation.getAllEspeces()){
-            xData.add(simulation.getGeneration());
-            yData.add(e.getFitness());
+        //Keep a maximum of 50 generations
+        if(this.generations.size() > 50){
+            //Randomly remove a generation
+            this.generations.remove(0);
         }
 
-        this.chart.updateXYSeries("fitness", xData, yData, null);
-        //chartPanel.
+        getFitnessData();
+
+        this.chart.updateXYSeries("fitness", xFitnessData, yFitnessData, null);
+        this.chart.updateXYSeries("median", xMedianData, yMedianData, null);
+        this.chart.updateXYSeries("moyenne", xMoyenneData, yMoyenneData, null);
     }
 }

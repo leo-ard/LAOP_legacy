@@ -30,6 +30,7 @@ public class EVO {
             public void run() {
                 try {
                     frame = new FrameManager(simulation);
+                    simulation.addSimulationListener(frame);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

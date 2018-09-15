@@ -26,4 +26,9 @@ public class Random {
 		return (double) (Math.random()*(max-min)+min);
 	}
 
+	public static boolean getRandomBoolean(){
+		int random = Random.getRandomIntegerValue(0, 10);
+		return random < 5;
+	}
+
 }

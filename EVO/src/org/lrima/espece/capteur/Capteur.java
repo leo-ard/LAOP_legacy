@@ -3,11 +3,12 @@ package org.lrima.espece.capteur;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import org.lrima.espece.Espece;
+import org.lrima.espece.network.interfaces.NeuralNetworkTransmitter;
 import org.lrima.map.Studio.Drawables.Line;
 import org.lrima.map.Studio.Drawables.Obstacle;
 import org.lrima.simulation.Simulation;
 
-public class Capteur {
+public class Capteur implements NeuralNetworkTransmitter {
 	
 	public static final int CAPTEUR_LENGHT = 1500;
 	
@@ -15,7 +16,7 @@ public class Capteur {
 	private double angle;
 	private double calAngle;
 	private double x, y;
-	private double value;
+	private double value = 1.0;
 
 	public Obstacle lastObstacleCollided;
 	Simulation simulation;
@@ -37,12 +38,11 @@ public class Capteur {
 	
 	/**
 	 * Set la valeur la plus basse, car l'algorith va favoriser les jonctions plus proche du v�hicule que celle plus loins. Aussi a noter que la valeur des capteurs est reset � chaque tick.
-	 * @param obstacle the obstacle that colided with this sensor
+	 * @param capteurValue the value of the sensor
 	 */
-	public void setValue(Line obstacle) {
-		double capteurValue = obstacle.getCapteurValue(this);
+	public void setValue(double capteurValue) {
 		if(capteurValue <= value) {
-			value= capteurValue;
+			value = capteurValue;
 		}
 	}
 	/**
@@ -123,5 +123,8 @@ public class Capteur {
 	}
 
 
-
+	@Override
+	public double getNeuralNetworkInput() {
+		return this.value;
+	}
 }

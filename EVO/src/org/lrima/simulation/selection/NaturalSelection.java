@@ -1,14 +1,12 @@
 package org.lrima.simulation.selection;
 
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Iterator;
+import java.util.Collections;
 
 import org.lrima.core.UserPrefs;
 import org.lrima.espece.Espece;
-import org.lrima.espece.network.NeuralNetwork;
+import org.lrima.espece.network.neat.Genome;
 import org.lrima.map.Map;
-import org.lrima.simulation.FrameManager;
 import org.lrima.simulation.Simulation;
 import org.lrima.utils.Random;
 
@@ -16,26 +14,18 @@ public class  NaturalSelection {
 	ArrayList<Espece> especes;
 	public static Espece best = null;
 	private Simulation simulation;
+	private ArrayList<Espece> halfBestEspece = new ArrayList<>();
 	
 	public NaturalSelection(Simulation simulation, ArrayList<Espece> especes) {
 		this.simulation = simulation;
 		this.especes = especes;
 	}
 	
-	public void sort() {
-		especes.sort(new Comparator<Espece>() {
-			@Override
-			public int compare(Espece e1, Espece e2) {
-				return (int)(e2.getFitness() - e1.getFitness());
-			}
-		});
-	}
-	
 	public ArrayList<Espece> getMutatedList(Map m) {
-		this.sort();
+		Collections.sort(this.especes);
 		this.getBest();
 		this.kill50();
-		//this.mutateBest();
+		//this.mutate();
 		this.resetList(m);
 		this.repopulate(m);
 
@@ -55,24 +45,32 @@ public class  NaturalSelection {
 
 		int numberOfCar = UserPrefs.preferences.getInt(UserPrefs.KEY_NUMBER_OF_CAR, UserPrefs.DEFAULT_NUMBER_OF_CAR);
 
-		while(especes.size() < numberOfCar) {
-			NeuralNetwork newNeuralNetwork = best.getNeuralNetwork();
-			newNeuralNetwork.randomize();
-
-			newNeuralNetwork = new NeuralNetwork(6, 2, true);
-
-			Espece e = new Espece(this.simulation, newNeuralNetwork);
-			especes.add(e);
+		ArrayList<Espece> newCars = new ArrayList<>();
+		for(Espece e: this.especes){
+			e.getNeuralNetwork().minimalMutation();
 		}
-		
-	}
 
-	/**
-	 * Chance to change something on the neural network of the best cars
-	 */
-	private void mutateBest(){
-		for(Espece e : especes){
-			e.mutate();
+		while(especes.size() + newCars.size() < numberOfCar) {
+			int randomParent1 = Random.getRandomIntegerValue(halfBestEspece.size() - 1);
+			int randomParent2;
+
+			Genome neuralNetworkParent1 = (Genome) halfBestEspece.get(randomParent1).getNeuralNetwork();
+			Genome neuralNetworkParent2;
+			do {
+				randomParent2 = Random.getRandomIntegerValue(halfBestEspece.size() - 1);
+				neuralNetworkParent2 = (Genome) halfBestEspece.get(randomParent2).getNeuralNetwork();
+			}while(randomParent1 == randomParent2);
+
+			Espece e = new Espece(this.simulation);
+			Genome childNeuralNetwork = Genome.crossOver(neuralNetworkParent1, neuralNetworkParent2);
+			e.setNeuralNetwork(childNeuralNetwork);
+
+			newCars.add(e);
+		}
+		this.especes.addAll(newCars);
+
+		for(Espece e : this.especes){
+			e.setFitness(0.0);
 		}
 	}
 
@@ -85,6 +83,8 @@ public class  NaturalSelection {
 		while(especes.size() > numberOfCar/2) {
 			especes.remove(especes.size() - 1);
 		}
+
+		this.halfBestEspece = new ArrayList<>(especes);
 	}
 
 	/**
