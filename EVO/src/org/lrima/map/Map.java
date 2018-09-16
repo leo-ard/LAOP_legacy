@@ -34,11 +34,14 @@ public class Map implements Serializable {
 	}
 
     /**
-     * Load the map information and obstacle from a file
-     * @param filePath the path to the map file
+     * Load the map information and obstacle from the preferences of the user
+     * If it is not set in the preferences, the map default.map is used
      */
-    static public Map loadMapFromFile(String filePath){
+    static public Map loadMapFromPreferences(){
         try {
+            UserPrefs.load();
+            String filePath = UserPrefs.MAP_TO_USE_PATH;
+
             //Open the file
             FileInputStream fis = new FileInputStream(filePath);
             ObjectInputStream ois = new ObjectInputStream(fis);
@@ -48,8 +51,26 @@ public class Map implements Serializable {
             return map;
 
         }catch (Exception e){
-            System.out.println("Error while loading the map file");
-            e.printStackTrace();
+            System.err.println("Could not load the file stored in the preferences. Trying to load default.map ...");
+
+            //If the path of the map to use in the preferences doesn't exist, Use default.map instead
+            try {
+                String filePath = UserPrefs.DEFAULT_MAP_TO_USE_PATH;
+
+                //Open the file
+                FileInputStream fis = new FileInputStream(filePath);
+                ObjectInputStream ois = new ObjectInputStream(fis);
+
+                Map map = (Map) ois.readObject();
+
+                UserPrefs.preferences.put(UserPrefs.KEY_MAP_TO_USE, UserPrefs.DEFAULT_MAP_TO_USE_PATH);
+
+                return map;
+
+            }catch (Exception e2){
+                System.err.println("The file 'default.map' doesn't exist !");
+
+            }
         }
 
         return null;

@@ -29,10 +29,6 @@ public class  NaturalSelection {
 		this.resetList(m);
 		this.repopulate(m);
 
-        for(Espece e : especes){
-            System.out.println(e.getFitness());
-        }
-
 		return especes;
 
 

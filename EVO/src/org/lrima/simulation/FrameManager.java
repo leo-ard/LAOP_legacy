@@ -6,6 +6,7 @@ import javax.swing.*;
 import org.lrima.core.UserPrefs;
 import org.lrima.espece.Espece;
 import org.lrima.espece.network.NetworkPanel;
+import org.lrima.map.Map;
 import org.lrima.map.MapPanel;
 import org.lrima.simulation.Interface.actions.*;
 import org.lrima.simulation.Interface.EspeceInfoPanel;
@@ -160,6 +161,9 @@ public class FrameManager extends JFrame implements SimulationListener{
         //Map editor button
         JMenuItem mapEditor = new JMenuItem(new OpenStudioAction("Open Studio", simulation));
         map.add(mapEditor);
+
+        JMenuItem loadMapButton = new JMenuItem(new LoadMapAction("Load Map", this.mapPanel, simulation));
+        map.add(loadMapButton);
     }
 
     /**
@@ -239,5 +243,11 @@ public class FrameManager extends JFrame implements SimulationListener{
         this.graphicPanel.updateChart(this.simulation);
         this.getContentPane().repaint();
         this.networkPanel.repaint();
+    }
+
+    @Override
+    public void simulationRestarted() {
+        Map map = this.mapPanel.getMap();
+        this.simulation.setMap(map);
     }
 }

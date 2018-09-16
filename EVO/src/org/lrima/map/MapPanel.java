@@ -361,4 +361,13 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 	public void mouseEntered(MouseEvent arg0) {}
 	@Override
 	public void mouseExited(MouseEvent arg0) {}
+
+	public void setMap(Map map){
+		this.map = map;
+		this.repaint();
+	}
+
+	public Map getMap() {
+		return map;
+	}
 }

@@ -38,6 +38,7 @@ public class Simulation extends Thread{
 	//Used to trigger an action in the main loop
     private boolean shouldResetAndAddEspece = false;
     private boolean shouldGoToNextGeneration = false;
+    private boolean shouldRestart = false;
 
     //The neural network that the cars in the next generation will have
     private NeuralNetwork neuralNetworkToUse = null;
@@ -56,7 +57,7 @@ public class Simulation extends Thread{
 		Simulation.currentTime = 0;
 		this.running = true;
 		this.generations = new ArrayList<>();
-		this.map = Map.loadMapFromFile("test.map");
+		this.map = Map.loadMapFromPreferences();
 
 
 		this.initializeCars(null);
@@ -70,6 +71,7 @@ public class Simulation extends Thread{
 		long currentTime = System.currentTimeMillis();
 		long timePassed = 0;
 		while(running) {
+
 			if(!pausing) {
 				if(especesOpen.size() != 0 && Simulation.currentTime < UserPrefs.TIME_LIMIT) {
 					//Add the current time to the Simulation.currentTime
@@ -98,25 +100,25 @@ public class Simulation extends Thread{
 					nextGeneration();
 				}
 			}
-			this.waitForRealTime(timePassed, currentTime);
+			if(UserPrefs.REAL_TIME) {
+				try {
+					timePassed = System.currentTimeMillis() - currentTime;
+					Simulation.sleep((long) ((msBetweenFrames - timePassed) > 0 ?msBetweenFrames - timePassed: 0));
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
+			}else{
+				try{
+					//DO NOT REMOVE THIS LINE OR WILL BUG
+					Simulation.sleep(0);
+				}catch (Exception e){
+
+				}
+			}
+
 		}
 	}
 
-	/**
-	 * If the simulation should run in real time, have a constant refresh rate
-	 * @param timePassed the time for calculations
-	 * @param currTime the current time
-	 */
-	private void waitForRealTime(long timePassed, long currTime){
-		if(UserPrefs.REAL_TIME) {
-			try {
-				timePassed = System.currentTimeMillis() - currTime;
-				Simulation.sleep((long) ((msBetweenFrames - timePassed) > 0 ?msBetweenFrames - timePassed: 0));
-			} catch (InterruptedException e1) {
-				e1.printStackTrace();
-			}
-		}
-	}
 
 	//Todo: Avoir un arraylist avec les actions a perform at the end of the loop
 	/**
@@ -135,6 +137,10 @@ public class Simulation extends Thread{
 		if(shouldGoToNextGeneration){
 			nextGeneration();
 			shouldGoToNextGeneration = false;
+		}
+		if(shouldRestart){
+			this.restart();
+			shouldRestart = false;
 		}
 	}
 
@@ -202,6 +208,21 @@ public class Simulation extends Thread{
         //Reset the time of the simulation
         Simulation.currentTime = 0;
     }
+
+    private void restart(){
+		this.especesOpen = new ArrayList<>();
+		this.especesClosed = new ArrayList<>();
+		this.generation = 1;
+		this.generations = new ArrayList<>();
+		Simulation.currentTime = 0;
+
+		for(SimulationListener listener : this.simulationListeners){
+			listener.simulationRestarted();
+		}
+
+		this.initializeCars(null);
+
+	}
 
 	/**
 	 * Destroy all cars and create an array containing new cars the size of the
@@ -313,6 +334,8 @@ public class Simulation extends Thread{
 		return clonedList;
 	}
 
+
+
 	//*******===========================================================================
 	//* ACCESSORS AND MUTATORS
 	//* ACCESSORS AND MUTATORS
@@ -368,5 +391,12 @@ public class Simulation extends Thread{
 
 	public void addSimulationListener(SimulationListener listener){
     	this.simulationListeners.add(listener);
+	}
+	public void setShouldRestart(Boolean shouldRestart){
+    	this.shouldRestart = shouldRestart;
+	}
+
+	public void setMap(Map map) {
+		this.map = map;
 	}
 }

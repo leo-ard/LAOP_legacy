@@ -6,6 +6,7 @@ import org.lrima.map.Studio.Drawables.*;
 import org.lrima.map.Studio.tools.CreateObstacleTool;
 import org.lrima.map.Studio.tools.CreateStartTool;
 import org.lrima.map.Studio.tools.EditObstacleTool;
+import org.lrima.simulation.Simulation;
 
 import javax.swing.*;
 import java.awt.*;
@@ -57,6 +58,7 @@ public class Studio extends JFrame implements ActionListener {
 
         fileChooser = new JFileChooser();
         fileChooser.setCurrentDirectory(new File("."));
+
     }
 
     /**
@@ -188,7 +190,7 @@ public class Studio extends JFrame implements ActionListener {
             FileInputStream fis = new FileInputStream(file);
             ObjectInputStream oos = new ObjectInputStream(fis);
 
-            drawingPanel = new DrawingPanel((Map)oos.readObject());
+            drawingPanel.setMap((Map) oos.readObject());
         }catch(Exception e){
             e.printStackTrace();
         }
