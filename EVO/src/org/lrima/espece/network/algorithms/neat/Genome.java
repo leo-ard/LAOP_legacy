@@ -11,7 +11,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-@MainAlgorithmClass
+@MainAlgorithmClass(name="NEAT Algorithm")
 public class Genome implements NeuralNetwork {
 
     private ArrayList<ConnectionGene> connections;
@@ -58,6 +58,51 @@ public class Genome implements NeuralNetwork {
         this.connections.add(new ConnectionGene(randomNodeInput1,  this.getOutputNodes().get(0)));
         this.connections.add(new ConnectionGene(randomNodeInput2,  this.getOutputNodes().get(1)));
 
+    }
+
+    /**
+     * Create a child Genome from two parent Genome
+     * @param network1 the first parent
+     * @param network2 the second parent
+     * @return a child genome from parent1 and parent2
+     */
+    @Override
+    public NeuralNetwork crossOver(NeuralNetwork network1, NeuralNetwork network2) {
+        Genome child = new Genome();
+
+        Genome parent1 = (Genome) network1;
+        Genome parent2 = (Genome) network2;
+
+        for(NodeGene node : parent1.getNodes()){
+            if(parent2.getNodes().contains(node)){
+                NodeGene node2 = parent2.getNodeWithInnovation(node.getInnovation());
+                NodeGene childNode = Random.getRandomBoolean() ? node.copy() : node2.copy();
+                child.addNode(childNode);
+            }
+            else{ //Excess node, copy from the fittest parent
+                child.addNode(node.copy());
+            }
+        }
+
+        for(ConnectionGene connection : parent1.getConnections()){
+            if(parent2.getConnections().contains(connection)){
+                ConnectionGene parent2Connection = parent2.getConnectionWithInnovation(connection.getInnovation());
+                ConnectionGene childConnection = Random.getRandomBoolean() ? connection.copy() : parent2Connection.copy();
+                child.addConnection(childConnection);
+            }
+            else{ //Excess or disjoint
+                //Get connection from fittest parrent
+                NodeGene inputNode = connection.getInput();
+                NodeGene outputNode = connection.getOutput();
+
+                NodeGene childInputNode = child.getNodeWithInnovation(inputNode.getInnovation());
+                NodeGene childOutputNode = child.getNodeWithInnovation(outputNode.getInnovation());
+
+                child.addConnection(new ConnectionGene(childInputNode, childOutputNode));
+            }
+        }
+
+        return child;
     }
 
     /**
@@ -125,18 +170,6 @@ public class Genome implements NeuralNetwork {
         }
         if(chanceAddNode < 10){
             this.addNodeMutation();
-        }
-    }
-
-    /**
-     * Goes through all the connections and applies a random modification to the weight
-     * @param delta the absolute value of the maximum you want your weights to be modified by
-     */
-    public void minimalMutation(double delta){
-        for(ConnectionGene connection : this.connections){
-            double oldWeight = connection.getWeight();
-            double modification = Random.getRandomDoubleValue(-delta, delta);
-            connection.setWeight(oldWeight + modification);
         }
     }
 
@@ -231,50 +264,10 @@ public class Genome implements NeuralNetwork {
     }
 
     /**
-     * Create a child Genome from two parent Genome
-     * @param parent1 the first parent
-     * @param parent2 the second parent
-     * @return a child genome from parent1 and parent2
-     */
-    public static Genome crossOver(Genome parent1, Genome parent2){
-        Genome child = new Genome();
-
-        for(NodeGene node : parent1.getNodes()){
-            if(parent2.getNodes().contains(node)){
-                NodeGene node2 = parent2.getNodeWithInnovation(node.getInnovation());
-                NodeGene childNode = Random.getRandomBoolean() ? node.copy() : node2.copy();
-                child.addNode(childNode);
-            }
-            else{ //Excess node, copy from the fittest parent
-                child.addNode(node.copy());
-            }
-        }
-
-        for(ConnectionGene connection : parent1.getConnections()){
-            if(parent2.getConnections().contains(connection)){
-                ConnectionGene parent2Connection = parent2.getConnectionWithInnovation(connection.getInnovation());
-                ConnectionGene childConnection = Random.getRandomBoolean() ? connection.copy() : parent2Connection.copy();
-                child.addConnection(childConnection);
-            }
-            else{ //Excess or disjoint
-                //Get connection from fittest parrent
-                NodeGene inputNode = connection.getInput();
-                NodeGene outputNode = connection.getOutput();
-
-                NodeGene childInputNode = child.getNodeWithInnovation(inputNode.getInnovation());
-                NodeGene childOutputNode = child.getNodeWithInnovation(outputNode.getInnovation());
-
-                child.addConnection(new ConnectionGene(childInputNode, childOutputNode));
-            }
-        }
-
-        return child;
-    }
-
-    /**
      * Used when you create a Genome without knowing in advance the transmitters
      * @param transmitters the transmitters this Genome should use
      */
+    @Override
     public void setTransmitters(ArrayList<? extends NeuralNetworkTransmitter> transmitters) {
         this.transmitters = transmitters;
     }
@@ -283,6 +276,7 @@ public class Genome implements NeuralNetwork {
      * Used when you create a Genome without knowing in advance the receiver
      * @param receiver the receiver this Genome should use
      */
+    @Override
     public void setReceiver(NeuralNetworkReceiver receiver) {
         this.receiver = receiver;
     }

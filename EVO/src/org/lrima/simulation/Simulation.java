@@ -39,7 +39,7 @@ public class Simulation extends Thread{
     private boolean shouldRestart = false;
 
     //The neural network that the cars in the next generation will have
-    private NeuralNetwork neuralNetworkToUse = null;
+    private Class<?extends NeuralNetwork> neuralNetworkToUse;
 
     //Stores information about all the generations
     private ArrayList<Generation> generations;
@@ -49,17 +49,17 @@ public class Simulation extends Thread{
 	/**
 	 * Initialize variables
 	 */
-	public Simulation() {
+	public Simulation(Class<?extends NeuralNetwork> neuralNetworkClass) {
 		super();
+		this.neuralNetworkToUse = neuralNetworkClass;
 
 		Simulation.currentTime = 0;
 		this.running = true;
-		this.pausing = true;
 		this.generations = new ArrayList<>();
 		this.map = Map.loadMapFromPreferences();
 
 
-		this.initializeCars(null);
+		this.initializeCars();
 	}
 
 	/**
@@ -125,12 +125,7 @@ public class Simulation extends Thread{
 	 */
 	private void loopEnd(){
 		if(shouldResetAndAddEspece){
-			if(neuralNetworkToUse != null){
-				initializeCars(neuralNetworkToUse);
-			}
-			else{
-				initializeCars(neuralNetworkToUse);
-			}
+			initializeCars();
 			shouldResetAndAddEspece = false;
 		}
 		if(shouldGoToNextGeneration){
@@ -158,17 +153,6 @@ public class Simulation extends Thread{
 		}
 
 	}
-
-	/**
-	 * Called when you try to load a neural network file. It resets all cars and initialize
-	 * them with the new neural network
-	 * @param nn The neural network to change the cars to
-	 */
-	public void changeNeuralNetwork(NeuralNetwork nn){
-	    generation = 0;
-        neuralNetworkToUse = nn;
-        shouldResetAndAddEspece = true;
-    }
 
 	/**
 	 * Goes to the next generation.
@@ -219,16 +203,15 @@ public class Simulation extends Thread{
 			listener.simulationRestarted();
 		}
 
-		this.initializeCars(null);
+		this.initializeCars();
 
 	}
 
 	/**
 	 * Destroy all cars and create an array containing new cars the size of the
 	 * max number of car (set by the user in settings)
-	 * @param neuralNetworkToUse if you want the new cars to replicate a neural network
 	 */
-	private void initializeCars(NeuralNetwork neuralNetworkToUse) {
+	private void initializeCars() {
 		//Reset both car arrays
         especesOpen = new ArrayList<>();
 		especesClosed = new ArrayList<>();
@@ -397,5 +380,9 @@ public class Simulation extends Thread{
 
 	public void setMap(Map map) {
 		this.map = map;
+	}
+
+	public Class<?extends NeuralNetwork> getAlgorithm(){
+    	return this.neuralNetworkToUse;
 	}
 }

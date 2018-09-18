@@ -3,11 +3,11 @@ package org.lrima.core;
 import java.awt.EventQueue;
 
 import org.lrima.Interface.FrameManager;
+import org.lrima.espece.network.algorithms.neat.Genome;
 import org.lrima.simulation.Simulation;
 
 public class EVO {
-	
-	public static Simulation simulation;
+
 	public static FrameManager frame;
 
 	public static void main(String[] args) {
@@ -25,19 +25,15 @@ public class EVO {
     }
 
     private static void start(){
-        simulation = new Simulation();
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    frame = new FrameManager(simulation);
-                    simulation.addSimulationListener(frame);
+                    frame = new FrameManager();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         });
-
-        simulation.start();
     }
 
 }

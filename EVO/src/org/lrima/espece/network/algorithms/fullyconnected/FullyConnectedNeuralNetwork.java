@@ -11,7 +11,7 @@ import org.lrima.espece.network.interfaces.NeuralNetworkReceiver;
 import org.lrima.espece.network.interfaces.NeuralNetworkTransmitter;
 import org.apache.commons.math3.linear.RealMatrix;
 
-@MainAlgorithmClass
+@MainAlgorithmClass(name="Fully Connected")
 public class FullyConnectedNeuralNetwork implements Serializable, NeuralNetwork {
 	//private ArrayList<Layer> layers;
 	private Integer nbInputs = 0;
@@ -32,26 +32,24 @@ public class FullyConnectedNeuralNetwork implements Serializable, NeuralNetwork 
 
 	}
 
-	public FullyConnectedNeuralNetwork(ArrayList<Layer> layers, ArrayList<?extends NeuralNetworkTransmitter> transmitters, NeuralNetworkReceiver receiver){
-		this(transmitters, receiver);
-		this.layers = layers;
+
+	public FullyConnectedNeuralNetwork() {
 	}
 
-	public FullyConnectedNeuralNetwork(int numberOfInputNodes, int numberOfOutputNodes, Integer ... numberOfHiddenNodes) {
-		this.init(numberOfInputNodes, numberOfOutputNodes, numberOfHiddenNodes);
+
+	public void draw(Graphics2D graphics){
+
 	}
 
-	private FullyConnectedNeuralNetwork(ArrayList<?extends NeuralNetworkTransmitter> transmitters, NeuralNetworkReceiver receiver) {
+	@Override
+	public void init(ArrayList<? extends NeuralNetworkTransmitter> transmitters, NeuralNetworkReceiver receiver) {
 		this.transmitters = transmitters;
 		this.receiver = receiver;
-		this.init(transmitters.size(), 2, new Integer[]{4, 3});
-	}
 
-	/**
-	 * Initialize the variables of the neural network. It sets the number of input, hidden and output nodes.
-	 * It also sets the value of each neuron randomly
-	 */
-	private void init(int numberOfInputNodes, int numberOfOutputNodes, Integer ... numberOfHiddenNodes){
+		int numberOfInputNodes = transmitters.size();
+		Integer[] numberOfHiddenNodes = {2};
+		int numberOfOutputNodes = 2;
+
 		//Check that the number of nodes is valid
 		if(numberOfInputNodes <= 0){
 			System.err.println("Initialization failed. " + numberOfInputNodes + " is not valid for the number of input nodes.");
@@ -86,13 +84,19 @@ public class FullyConnectedNeuralNetwork implements Serializable, NeuralNetwork 
 		this.hasBeenInitiated = true;
 	}
 
-	public void draw(Graphics2D graphics){
-
+	@Override
+	public NeuralNetwork crossOver(NeuralNetwork network1, NeuralNetwork network2) {
+		return new FullyConnectedNeuralNetwork();
 	}
 
 	@Override
-	public void init(ArrayList<? extends NeuralNetworkTransmitter> transmitters, NeuralNetworkReceiver receiver) {
+	public void setTransmitters(ArrayList<? extends NeuralNetworkTransmitter> transmitters) {
+		this.transmitters = transmitters;
+	}
 
+	@Override
+	public void setReceiver(NeuralNetworkReceiver receiver) {
+		this.receiver = receiver;
 	}
 
 	public void feedForward(){
@@ -151,11 +155,6 @@ public class FullyConnectedNeuralNetwork implements Serializable, NeuralNetwork 
 		for(Layer layer : this.layers){
 			layer.mutate();
 		}
-	}
-
-	@Override
-	public void minimalMutation(double delta) {
-
 	}
 
 	public void setLayers(ArrayList<Layer> layers) {

@@ -13,6 +13,8 @@ import org.reflections.Reflections;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Set;
@@ -29,18 +31,35 @@ public class AccueilDialog extends JDialog implements ActionListener {
 
     private String[] algorithmsString;
     private Class<?>[] algorithms;
-    private Simulation simulation;
+    private FrameManager frameManager;
 
     private final int FRAME_MARGIN = 20;
     private final int MARGIN_BETWEEN_COMPONENTS = 10;
 
-    public AccueilDialog(Frame owner, Simulation simulation) {
-        super(owner);
-        this.simulation = simulation;
+    /**
+     * A dialog that describe the EVO program and lets the user choose which algorithm to use.
+     * @param frameManager the frame manager
+     */
+    public AccueilDialog(FrameManager frameManager) {
+        super(frameManager);
+        this.frameManager = frameManager;
         initComponents();
+
+        //When the user closes the dialog
+        this.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                super.windowClosing(e);
+                Class<?extends NeuralNetwork> algorithmChosen = (Class<NeuralNetwork>) algorithms[neuralNetworkComboBox.getSelectedIndex()];
+                frameManager.setAlgorithmToUse(algorithmChosen);
+            }
+        });
     }
 
 
+    /**
+     * Inits the components of the dialog and adds them to the panel
+     */
     private void initComponents() {
         JPanel panel = new JPanel();
         this.setResizable(false);
@@ -111,6 +130,8 @@ public class AccueilDialog extends JDialog implements ActionListener {
      * It then add the classes in the JComboBox so that the user can choose which algorithm to use.
      */
     private void loadAlgorithms(){
+
+        //TODO: Fonctionne si on compile dans IDE, mais si on export en jar, le directory n'existe pas !
         File algorithmRoot = new File("EVO/src/org/lrima/espece/network/algorithms");
         File[] algorithms = algorithmRoot.listFiles();
         ArrayList<String> algorithmPackages = new ArrayList<>();
@@ -134,7 +155,7 @@ public class AccueilDialog extends JDialog implements ActionListener {
             if(algorithmClasses.size() == 1) {
                 for(Class<?> algorithmClass : algorithmClasses) {
                     this.algorithms[i] = algorithmClass;
-                    this.algorithmsString[i] = algorithmClass.getSimpleName();
+                    this.algorithmsString[i] = algorithmClass.getAnnotation(MainAlgorithmClass.class).name();
                 }
             }
             else if(algorithmClasses.size() == 0){
@@ -153,9 +174,9 @@ public class AccueilDialog extends JDialog implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource() == this.okButton){
-            Class<NeuralNetwork> algorithmChosen = (Class<NeuralNetwork>) this.algorithms[neuralNetworkComboBox.getSelectedIndex()];
+            Class<?extends NeuralNetwork> algorithmChosen = (Class<NeuralNetwork>) this.algorithms[neuralNetworkComboBox.getSelectedIndex()];
+            this.frameManager.setAlgorithmToUse(algorithmChosen);
             this.dispose();
-            this.simulation.setPausing(false);
         }
     }
 }

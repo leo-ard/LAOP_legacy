@@ -92,6 +92,7 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 
 	//Stores the simulation reference
 	private Simulation simulation;
+	private Class<?extends NeuralNetwork> algorithm;
 
 	/**
 	 * Initialize the car with the map to put him into
@@ -99,6 +100,8 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 	 * @param simulation the simulation the car is into
 	 */
 	public Espece(Simulation simulation) {
+
+		this.algorithm = simulation.getAlgorithm();
 
 		//Do the base configuration
 		this.simulation = simulation;
@@ -117,8 +120,12 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 		//Setup a base neural network for the car to have
 		//If you want to choose which neural network to use, call Espece(Map, NeuralNetwork)
 		//neuralNetwork = new NeuralNetwork(NB_CAPTEUR, 2, true);
-		neuralNetwork = new Genome();
-		neuralNetwork.init(this.capteurs, this);
+		try {
+			neuralNetwork = this.algorithm.getConstructor().newInstance();
+			neuralNetwork.init(this.capteurs, this);
+		}catch (Exception e){
+			e.printStackTrace();
+		}
     }
 
 	/**
@@ -529,10 +536,10 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 
 	}
 
-	public void setNeuralNetwork(Genome genome) {
-		this.neuralNetwork = genome;
-		((Genome) this.neuralNetwork).setTransmitters(this.capteurs);
-		((Genome) this.neuralNetwork).setReceiver(this);
+	public void setNeuralNetwork(NeuralNetwork network) {
+		this.neuralNetwork = network;
+		this.neuralNetwork.setTransmitters(this.capteurs);
+		this.neuralNetwork.setReceiver(this);
 	}
 
 	public void setFitness(double fitness) {

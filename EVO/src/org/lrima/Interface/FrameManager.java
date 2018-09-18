@@ -6,6 +6,7 @@ import javax.swing.*;
 import org.lrima.core.UserPrefs;
 import org.lrima.espece.Espece;
 import org.lrima.espece.network.NetworkPanel;
+import org.lrima.espece.network.interfaces.NeuralNetwork;
 import org.lrima.map.Map;
 import org.lrima.map.MapPanel;
 import org.lrima.Interface.actions.*;
@@ -32,35 +33,36 @@ public class FrameManager extends JFrame implements SimulationListener {
     private JCheckBoxMenuItem checkBoxFollowBest;
     private JCheckBoxMenuItem checkBoxEspeceInfo;
 	
-	public FrameManager(Simulation simulation) {
+	public FrameManager() {
 	    this.setupWindow();
 
-        this.simulation = simulation;
-
-        //setup the panels
-		mapPanel = new MapPanel(simulation);
-		networkPanel = new NetworkPanel(simulation);
-        graphicPanel = new GraphicPanel(simulation);
-		especeInfoPanel = new EspeceInfoPanel();
-
-		//The main panel
-		this.add(mapPanel, BorderLayout.CENTER);
-
-
-        //Create menu the menu buttons
-        createMenu();
-        displaySavedPanel();
-
-        AccueilDialog accueil = new AccueilDialog(this, simulation);
+        AccueilDialog accueil = new AccueilDialog(this);
         accueil.setVisible(true);
 
-        //Start the map panel
-        start();
-
-        this.mapPanel.add(networkPanel, "South");
-        this.mapPanel.revalidate();
-        revalidate();
+        this.especeInfoPanel = new EspeceInfoPanel();
 	}
+
+    /**
+     * Sets the algorithm to use. It creates a new simulation and resets all the panels using the simulation
+     * @param algorithm the algorithm to use
+     */
+    public void setAlgorithmToUse(Class<?extends NeuralNetwork> algorithm){
+	    this.simulation = new Simulation(algorithm);
+
+
+	    this.mapPanel = new MapPanel(simulation);
+	    this.networkPanel = new NetworkPanel(simulation);
+	    this.graphicPanel = new GraphicPanel(simulation);
+
+        createMenu();
+
+	    this.add(mapPanel, BorderLayout.CENTER);
+
+        displaySavedPanel();
+
+	    this.start();
+	    revalidate();
+    }
 
     /**
      * Setup the size of the window, the listeners and basic configuration
@@ -226,6 +228,7 @@ public class FrameManager extends JFrame implements SimulationListener {
     public void start() {
 		mapPanel.start();
 		networkPanel.start();
+        simulation.start();
 	}
 
 	//TODO: On a tu vraiment besoin de ça?

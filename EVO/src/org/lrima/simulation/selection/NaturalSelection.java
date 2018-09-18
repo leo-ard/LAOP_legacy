@@ -6,6 +6,7 @@ import java.util.Collections;
 import org.lrima.core.UserPrefs;
 import org.lrima.espece.Espece;
 import org.lrima.espece.network.algorithms.neat.Genome;
+import org.lrima.espece.network.interfaces.NeuralNetwork;
 import org.lrima.map.Map;
 import org.lrima.simulation.Simulation;
 import org.lrima.utils.Random;
@@ -54,15 +55,15 @@ public class  NaturalSelection {
 			int randomParent2;
 
 			//Select two parrents
-			Genome neuralNetworkParent1 = (Genome) best.getNeuralNetwork();
-			Genome neuralNetworkParent2;
+			NeuralNetwork neuralNetworkParent1 = best.getNeuralNetwork();
+			NeuralNetwork neuralNetworkParent2;
 			do {
 				randomParent2 = Random.getRandomIntegerValue(halfBestEspece.size() - 1);
-				neuralNetworkParent2 = (Genome) halfBestEspece.get(randomParent2).getNeuralNetwork();
+				neuralNetworkParent2 = halfBestEspece.get(randomParent2).getNeuralNetwork();
 			}while(randomParent1 == randomParent2);
 
 			Espece e = new Espece(this.simulation);
-			Genome childNeuralNetwork = Genome.crossOver(neuralNetworkParent1, neuralNetworkParent2);
+			NeuralNetwork childNeuralNetwork = neuralNetworkParent1.crossOver(neuralNetworkParent1, neuralNetworkParent2);
 			e.setNeuralNetwork(childNeuralNetwork);
 
 			newCars.add(e);
