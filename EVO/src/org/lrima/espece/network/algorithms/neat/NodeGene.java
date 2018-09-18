@@ -1,6 +1,5 @@
-package org.lrima.espece.network.neat;
+package org.lrima.espece.network.algorithms.neat;
 
-import javax.xml.soap.Node;
 import java.util.ArrayList;
 
 public class NodeGene {

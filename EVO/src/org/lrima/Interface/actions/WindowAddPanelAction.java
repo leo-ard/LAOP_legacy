@@ -1,7 +1,7 @@
-package org.lrima.simulation.Interface.actions;
+package org.lrima.Interface.actions;
 
 import org.lrima.core.UserPrefs;
-import org.lrima.simulation.FrameManager;
+import org.lrima.Interface.FrameManager;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;

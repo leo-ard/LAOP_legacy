@@ -2,7 +2,7 @@ package org.lrima.core;
 
 import java.awt.EventQueue;
 
-import org.lrima.simulation.FrameManager;
+import org.lrima.Interface.FrameManager;
 import org.lrima.simulation.Simulation;
 
 public class EVO {

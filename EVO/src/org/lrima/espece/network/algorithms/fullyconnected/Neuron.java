@@ -1,9 +1,5 @@
-package org.lrima.espece.network.fullyconnected;
+package org.lrima.espece.network.algorithms.fullyconnected;
 
-import java.util.ArrayList;
-
-import org.lrima.espece.network.functions.Function;
-import org.lrima.espece.network.functions.IFunction;
 import org.lrima.utils.Random;
 
 public class Neuron{

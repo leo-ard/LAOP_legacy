@@ -1,11 +1,10 @@
 package org.lrima.simulation;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 
+import org.lrima.Interface.AccueilDialog;
 import org.lrima.core.UserPrefs;
 import org.lrima.espece.Espece;
 import org.lrima.espece.capteur.Capteur;
@@ -13,7 +12,6 @@ import org.lrima.espece.network.interfaces.NeuralNetwork;
 import org.lrima.map.Map;
 import org.lrima.map.Studio.Drawables.Line;
 import org.lrima.map.Studio.Drawables.Obstacle;
-import org.lrima.simulation.Interface.GraphicPanel;
 import org.lrima.simulation.selection.NaturalSelection;
 
 public class Simulation extends Thread{
@@ -56,6 +54,7 @@ public class Simulation extends Thread{
 
 		Simulation.currentTime = 0;
 		this.running = true;
+		this.pausing = true;
 		this.generations = new ArrayList<>();
 		this.map = Map.loadMapFromPreferences();
 

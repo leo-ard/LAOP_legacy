@@ -1,16 +1,17 @@
-package org.lrima.espece.network.fullyconnected;
+package org.lrima.espece.network.algorithms.fullyconnected;
 
 import java.awt.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 
 import org.apache.commons.math3.linear.MatrixUtils;
-import org.lrima.espece.network.exceptions.NeuralNetworkNotInitiated;
+import org.lrima.espece.network.annotations.MainAlgorithmClass;
 import org.lrima.espece.network.interfaces.NeuralNetwork;
 import org.lrima.espece.network.interfaces.NeuralNetworkReceiver;
 import org.lrima.espece.network.interfaces.NeuralNetworkTransmitter;
 import org.apache.commons.math3.linear.RealMatrix;
 
+@MainAlgorithmClass
 public class FullyConnectedNeuralNetwork implements Serializable, NeuralNetwork {
 	//private ArrayList<Layer> layers;
 	private Integer nbInputs = 0;

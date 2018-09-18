@@ -23,7 +23,7 @@ import org.lrima.core.UserPrefs;
 import org.lrima.espece.Espece;
 import org.lrima.map.Studio.Drawables.Line;
 import org.lrima.map.Studio.Drawables.Obstacle;
-import org.lrima.simulation.Interface.EspeceInfoPanel;
+import org.lrima.Interface.EspeceInfoPanel;
 import org.lrima.simulation.Simulation;
 
 /**

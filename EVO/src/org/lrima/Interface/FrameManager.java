@@ -1,4 +1,4 @@
-package org.lrima.simulation;
+package org.lrima.Interface;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -8,11 +8,13 @@ import org.lrima.espece.Espece;
 import org.lrima.espece.network.NetworkPanel;
 import org.lrima.map.Map;
 import org.lrima.map.MapPanel;
-import org.lrima.simulation.Interface.actions.*;
-import org.lrima.simulation.Interface.EspeceInfoPanel;
-import org.lrima.simulation.Interface.GraphicPanel;
+import org.lrima.Interface.actions.*;
+import org.lrima.Interface.EspeceInfoPanel;
+import org.lrima.Interface.GraphicPanel;
+import org.lrima.simulation.Simulation;
+import org.lrima.simulation.SimulationListener;
 
-public class FrameManager extends JFrame implements SimulationListener{
+public class FrameManager extends JFrame implements SimulationListener {
 
     //All the panels
 	private NetworkPanel networkPanel;
@@ -48,6 +50,9 @@ public class FrameManager extends JFrame implements SimulationListener{
         //Create menu the menu buttons
         createMenu();
         displaySavedPanel();
+
+        AccueilDialog accueil = new AccueilDialog(this, simulation);
+        accueil.setVisible(true);
 
         //Start the map panel
         start();

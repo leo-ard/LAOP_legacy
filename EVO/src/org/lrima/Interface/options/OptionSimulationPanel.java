@@ -1,4 +1,4 @@
-package org.lrima.simulation.Interface.options;
+package org.lrima.Interface.options;
 
 import org.lrima.core.UserPrefs;
 

@@ -1,18 +1,13 @@
-package org.lrima.simulation.Interface;
+package org.lrima.Interface;
 
 import org.knowm.xchart.*;
 import org.knowm.xchart.style.markers.SeriesMarkers;
-import org.lrima.espece.Espece;
 import org.lrima.simulation.Generation;
 import org.lrima.simulation.Simulation;
-import org.lrima.utils.Random;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 import java.awt.*;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Collections;
 
 //TODO: Finir le graphique
 public class GraphicPanel extends JPanel {

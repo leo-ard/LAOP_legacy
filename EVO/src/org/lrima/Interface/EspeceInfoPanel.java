@@ -1,4 +1,4 @@
-package org.lrima.simulation.Interface;
+package org.lrima.Interface;
 
 import org.lrima.annotations.DisplayInfo;
 import org.lrima.espece.Espece;

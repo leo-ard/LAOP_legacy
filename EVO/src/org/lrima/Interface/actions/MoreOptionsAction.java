@@ -1,6 +1,6 @@
-package org.lrima.simulation.Interface.actions;
+package org.lrima.Interface.actions;
 
-import org.lrima.simulation.Interface.options.OptionsDialog;
+import org.lrima.Interface.options.OptionsDialog;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;

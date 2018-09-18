@@ -1,4 +1,4 @@
-package org.lrima.espece.network.fullyconnected;
+package org.lrima.espece.network.algorithms.fullyconnected;
 
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;

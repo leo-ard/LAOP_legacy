@@ -1,17 +1,17 @@
-package org.lrima.espece.network.neat;
+package org.lrima.espece.network.algorithms.neat;
 
-import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
+import org.lrima.espece.network.annotations.MainAlgorithmClass;
 import org.lrima.espece.network.interfaces.NeuralNetwork;
 import org.lrima.espece.network.interfaces.NeuralNetworkReceiver;
 import org.lrima.espece.network.interfaces.NeuralNetworkTransmitter;
 import org.lrima.utils.Random;
 
-import javax.xml.soap.Node;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+@MainAlgorithmClass
 public class Genome implements NeuralNetwork {
 
     private ArrayList<ConnectionGene> connections;
