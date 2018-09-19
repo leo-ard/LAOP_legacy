@@ -11,26 +11,19 @@ import org.lrima.espece.network.interfaces.NeuralNetworkReceiver;
 import org.lrima.espece.network.interfaces.NeuralNetworkTransmitter;
 import org.apache.commons.math3.linear.RealMatrix;
 
-@MainAlgorithmClass(name="Fully Connected")
-public class FullyConnectedNeuralNetwork implements Serializable, NeuralNetwork {
+@MainAlgorithmClass(name="Fully Connected", description = "Fully connected network with one hidden layer containing 2 neurons. All neurons are connected to each neurons in the next layer.")
+public class FullyConnectedNeuralNetwork extends NeuralNetwork implements Serializable {
+
+	private final Integer[] nbHiddenNodes = {2};
+
 	//private ArrayList<Layer> layers;
 	private Integer nbInputs = 0;
-	private Integer[] nbHidden;
 	private Integer nbOutputs = 0;
 	private ArrayList<Layer> layers = new ArrayList<>();
 
 	private ArrayList<RealMatrix> layerInputs = new ArrayList<>();
 	private ArrayList<RealMatrix> layerOutputs = new ArrayList<>();
 	private ArrayList<RealMatrix> weigthMatrices = new ArrayList<>();
-
-	private boolean hasBeenInitiated = false;
-
-	private ArrayList<?extends NeuralNetworkTransmitter> transmitters;
-	private NeuralNetworkReceiver receiver;
-
-	public static void main(String[] args) {
-
-	}
 
 
 	public FullyConnectedNeuralNetwork() {
@@ -47,33 +40,16 @@ public class FullyConnectedNeuralNetwork implements Serializable, NeuralNetwork 
 		this.receiver = receiver;
 
 		int numberOfInputNodes = transmitters.size();
-		Integer[] numberOfHiddenNodes = {2};
 		int numberOfOutputNodes = 2;
 
-		//Check that the number of nodes is valid
-		if(numberOfInputNodes <= 0){
-			System.err.println("Initialization failed. " + numberOfInputNodes + " is not valid for the number of input nodes.");
-			return;
-		}
-		for(int hiddenNodes : numberOfHiddenNodes){
-			if(hiddenNodes <= 0){
-				System.err.println("Initialization failed. " + hiddenNodes + " is not valid for the number of hidden nodes.");
-				return;
-			}
-		}
-		if(numberOfOutputNodes <= 0){
-			System.err.println("Initialization failed. " + numberOfOutputNodes + " is not valid for the number of output nodes.");
-			return;
-		}
 
 		//Setup the number of nodes in each of the layers
 		this.nbInputs = numberOfInputNodes;
-		this.nbHidden = numberOfHiddenNodes;
 		this.nbOutputs = numberOfOutputNodes;
 
 		this.layers.add(new Layer(nbInputs));
-		for(int i = 0 ; i < numberOfHiddenNodes.length ;i++){
-			this.layers.add(new Layer(numberOfHiddenNodes[i]));
+		for(int i = 0 ; i < nbHiddenNodes.length ;i++){
+			this.layers.add(new Layer(nbHiddenNodes[i]));
 		}
 		this.layers.add(new Layer(nbOutputs));
 
@@ -81,22 +57,11 @@ public class FullyConnectedNeuralNetwork implements Serializable, NeuralNetwork 
 			layers.get(i).initWeights(layers.get(i + 1));
 		}
 
-		this.hasBeenInitiated = true;
 	}
 
 	@Override
 	public NeuralNetwork crossOver(NeuralNetwork network1, NeuralNetwork network2) {
 		return new FullyConnectedNeuralNetwork();
-	}
-
-	@Override
-	public void setTransmitters(ArrayList<? extends NeuralNetworkTransmitter> transmitters) {
-		this.transmitters = transmitters;
-	}
-
-	@Override
-	public void setReceiver(NeuralNetworkReceiver receiver) {
-		this.receiver = receiver;
 	}
 
 	public void feedForward(){

@@ -11,15 +11,11 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-@MainAlgorithmClass(name="NEAT Algorithm")
-public class Genome implements NeuralNetwork {
+@MainAlgorithmClass(name="NEAT Algorithm", description = "Neural Network using a modified NEAT algorithm. The network starts with two connections from random inputs that goes into the two outputs. With each generations, the network grows to try to find the best solution.")
+public class Genome extends NeuralNetwork {
 
     private ArrayList<ConnectionGene> connections;
     private ArrayList<NodeGene> nodes;
-    private double fitness;
-
-    private ArrayList<? extends NeuralNetworkTransmitter> transmitters;
-    private NeuralNetworkReceiver receiver;
 
     private final int nbOutput = 2;
 
@@ -261,31 +257,6 @@ public class Genome implements NeuralNetwork {
         this.nodes.add(newNode);
         this.connections.add(startConnection);
         this.connections.add(endConnection);
-    }
-
-    /**
-     * Used when you create a Genome without knowing in advance the transmitters
-     * @param transmitters the transmitters this Genome should use
-     */
-    @Override
-    public void setTransmitters(ArrayList<? extends NeuralNetworkTransmitter> transmitters) {
-        this.transmitters = transmitters;
-    }
-
-    /**
-     * Used when you create a Genome without knowing in advance the receiver
-     * @param receiver the receiver this Genome should use
-     */
-    @Override
-    public void setReceiver(NeuralNetworkReceiver receiver) {
-        this.receiver = receiver;
-    }
-
-    @Override
-    public RealMatrix query(double[] inputs) {
-
-
-        return null;
     }
 
     @Override

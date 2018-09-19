@@ -11,22 +11,23 @@ import org.lrima.simulation.Simulation;
 import org.reflections.Reflections;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Set;
 import javax.swing.*;
 import javax.swing.border.*;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
+import javax.swing.text.EditorKit;
 
 /**
  * @author unknown
  */
-public class AccueilDialog extends JDialog implements ActionListener {
+public class AccueilDialog extends JDialog implements ActionListener, ItemListener {
 
     private JButton okButton = new JButton("Simulate");
+    JTextPane algorithmDescriptionPane;
     private JComboBox<String> neuralNetworkComboBox = new JComboBox<>();
 
     private String[] algorithmsString;
@@ -43,6 +44,7 @@ public class AccueilDialog extends JDialog implements ActionListener {
     public AccueilDialog(FrameManager frameManager) {
         super(frameManager);
         this.frameManager = frameManager;
+        this.setTitle("Welcome to EVO");
         initComponents();
 
         //When the user closes the dialog
@@ -54,6 +56,7 @@ public class AccueilDialog extends JDialog implements ActionListener {
                 frameManager.setAlgorithmToUse(algorithmChosen);
             }
         });
+        this.neuralNetworkComboBox.addItemListener(this);
     }
 
 
@@ -61,9 +64,13 @@ public class AccueilDialog extends JDialog implements ActionListener {
      * Inits the components of the dialog and adds them to the panel
      */
     private void initComponents() {
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        Dimension panelSize = new Dimension((int)(screenSize.width / 2.5), screenSize.height / 2);
+
         JPanel panel = new JPanel();
         this.setResizable(false);
-        this.setPreferredSize(new Dimension(500, 300));
+        this.setPreferredSize(new Dimension(panelSize.width, panelSize.height));
+        this.setBounds(screenSize.width / 2 - panelSize.width / 2, screenSize.height / 2 - panelSize.height / 2, panelSize.width, panelSize.height);
 
         this.okButton.addActionListener(this);
 
@@ -76,13 +83,29 @@ public class AccueilDialog extends JDialog implements ActionListener {
         panel.setLayout(gridBagLayout);
 
         //INTRODUCTION TEXT
-        JTextPane introductionText = new JTextPane();
+        JEditorPane introductionText = new JTextPane();
+        introductionText.addHyperlinkListener(new HyperlinkListener() {
+            @Override
+            public void hyperlinkUpdate(HyperlinkEvent e) {
+                if(e.getEventType() == HyperlinkEvent.EventType.ACTIVATED){
+                    if(Desktop.isDesktopSupported()){
+                        try{
+                            Desktop.getDesktop().browse(e.getURL().toURI());
+                        }catch (Exception error){
+                            error.printStackTrace();
+                        }
+
+                    }
+                }
+            }
+        });
+
+        introductionText.setEditorKit(JEditorPane.createEditorKitForContentType("text/html"));
         String text =   "Welcome to EVO, a program that lets you test different artificial intelligence";
         text +=         " algorithms with the task of making a car learn to drive by itself without driving into obstacles.";
-        text +=         " This program was developed for LRIMa, click here to learn more";
+        text +=         " This program was developed for LRIMa, <a href=\"http://www-etud.iro.umontreal.ca/~rezguiji/lrima.php\">click here to learn more</a>";
         introductionText.setText(text);
         introductionText.setEditable(false);
-        introductionText.setSize(200, 300);
 
         GridBagConstraints textPaneGBC = new GridBagConstraints();
         textPaneGBC.gridx = 0;
@@ -111,10 +134,25 @@ public class AccueilDialog extends JDialog implements ActionListener {
 
         panel.add(this.neuralNetworkComboBox, algorithmToUseComboBoxGBC);
 
+        //Algorithm description
+        algorithmDescriptionPane = new JTextPane();
+        String descriptionText = this.algorithms[neuralNetworkComboBox.getSelectedIndex()].getAnnotation(MainAlgorithmClass.class).description();
+        this.algorithmDescriptionPane.setText(descriptionText);
+        algorithmDescriptionPane.setEditable(false);
+
+        GridBagConstraints algorithmDescriotionGBC = new GridBagConstraints();
+        algorithmDescriotionGBC.gridx = 0;
+        algorithmDescriotionGBC.gridy = 2;
+        algorithmDescriotionGBC.gridwidth = 3;
+        algorithmDescriotionGBC.insets = new Insets(MARGIN_BETWEEN_COMPONENTS, FRAME_MARGIN, MARGIN_BETWEEN_COMPONENTS, FRAME_MARGIN);
+        algorithmDescriotionGBC.fill = GridBagConstraints.BOTH;
+
+        panel.add(algorithmDescriptionPane, algorithmDescriotionGBC);
+
         //SIMULATE BUTTON
         GridBagConstraints okButtonGBC = new GridBagConstraints();
 
-        okButtonGBC.gridy = 2;
+        okButtonGBC.gridy = 3;
         okButtonGBC.gridx = 1;
         okButtonGBC.insets = new Insets(MARGIN_BETWEEN_COMPONENTS, MARGIN_BETWEEN_COMPONENTS, FRAME_MARGIN, FRAME_MARGIN);
 
@@ -177,6 +215,14 @@ public class AccueilDialog extends JDialog implements ActionListener {
             Class<?extends NeuralNetwork> algorithmChosen = (Class<NeuralNetwork>) this.algorithms[neuralNetworkComboBox.getSelectedIndex()];
             this.frameManager.setAlgorithmToUse(algorithmChosen);
             this.dispose();
+        }
+    }
+
+    @Override
+    public void itemStateChanged(ItemEvent e) {
+        if(e.getStateChange() == ItemEvent.SELECTED){
+            String descriptionText = this.algorithms[neuralNetworkComboBox.getSelectedIndex()].getAnnotation(MainAlgorithmClass.class).description();
+            this.algorithmDescriptionPane.setText(descriptionText);
         }
     }
 }
