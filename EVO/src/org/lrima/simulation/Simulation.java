@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 
-import org.lrima.Interface.AccueilDialog;
 import org.lrima.core.UserPrefs;
 import org.lrima.espece.Espece;
 import org.lrima.espece.capteur.Capteur;
@@ -16,7 +15,7 @@ import org.lrima.simulation.selection.NaturalSelection;
 
 public class Simulation extends Thread{
 
-	public static double currentTime = 0.0;
+	public static double simulationTime = 0.0;
 
 	//Stores the map information
 	private Map map;
@@ -53,7 +52,7 @@ public class Simulation extends Thread{
 		super();
 		this.neuralNetworkToUse = neuralNetworkClass;
 
-		Simulation.currentTime = 0;
+		Simulation.simulationTime = 0;
 		this.running = true;
 		this.generations = new ArrayList<>();
 		this.map = Map.loadMapFromPreferences();
@@ -68,14 +67,14 @@ public class Simulation extends Thread{
 	public void run() {
 
 		long currentTime = System.currentTimeMillis();
-		long timePassed = 0;
+		long timePassed = (long)msBetweenFrames;
 		while(running) {
 
 			if(!pausing) {
-				if(especesOpen.size() != 0 && Simulation.currentTime < UserPrefs.TIME_LIMIT) {
-					//Add the current time to the Simulation.currentTime
+				if(especesOpen.size() != 0 && Simulation.simulationTime < UserPrefs.TIME_LIMIT) {
+					//Add the current time to the Simulation.simulationTime
 					currentTime = System.currentTimeMillis();
-					Simulation.currentTime += msBetweenFrames;
+					Simulation.simulationTime += msBetweenFrames;
 
 					//Iterate through all the cars to get the value of the sensors
 					Iterator<Espece> iterator = especesOpen.iterator();
@@ -106,14 +105,16 @@ public class Simulation extends Thread{
 				} catch (InterruptedException e1) {
 					e1.printStackTrace();
 				}
-			}else{
-				try{
-					//DO NOT REMOVE THIS LINE OR WILL BUG
-					Simulation.sleep(0);
-				}catch (Exception e){
-
-				}
 			}
+			else {
+			    try{
+			        Simulation.sleep(0);
+
+                }catch(InterruptedException e){
+
+                }
+            }
+            //System.out.println(simulationTime);
 
 		}
 	}
@@ -189,7 +190,7 @@ public class Simulation extends Thread{
         this.mutate();
 
         //Reset the time of the simulation
-        Simulation.currentTime = 0;
+        Simulation.simulationTime = 0;
     }
 
     private void restart(){
@@ -197,7 +198,7 @@ public class Simulation extends Thread{
 		this.especesClosed = new ArrayList<>();
 		this.generation = 1;
 		this.generations = new ArrayList<>();
-		Simulation.currentTime = 0;
+		Simulation.simulationTime = 0;
 
 		for(SimulationListener listener : this.simulationListeners){
 			listener.simulationRestarted();
