@@ -66,13 +66,15 @@ public class  NaturalSelection {
 			NeuralNetwork childNeuralNetwork = neuralNetworkParent1.crossOver(neuralNetworkParent1, neuralNetworkParent2);
 			e.setNeuralNetwork(childNeuralNetwork);
 
+			e.getNeuralNetwork().mutate();
+
 			newCars.add(e);
 		}
 		this.especes.addAll(newCars);
 
 		for(Espece e : this.especes){
 			e.setFitness(0.0);
-			e.getNeuralNetwork().mutate();
+			//e.getNeuralNetwork().mutate();
 		}
 	}
 

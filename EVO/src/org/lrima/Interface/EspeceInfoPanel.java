@@ -2,8 +2,10 @@ package org.lrima.Interface;
 
 import org.lrima.annotations.DisplayInfo;
 import org.lrima.espece.Espece;
+import org.lrima.espece.network.NetworkPanel;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
 import java.lang.reflect.Field;
 import java.text.DecimalFormat;
@@ -12,20 +14,15 @@ import java.util.HashMap;
 //TODO: Improve the way this class works
 public class EspeceInfoPanel extends JPanel {
 
-    public static EspeceInfoPanel instance = null;
-    private static HashMap<String, Box> information;
+    private Espece espece = null;
+    private HashMap<String, Box> information;
+    private NetworkPanel networkPanel;
 
-    private static Box boxLayout;
+    private Box boxLayout;
 
-    private static Dimension screenSize;
+    private Dimension screenSize;
 
     public EspeceInfoPanel(){
-        if(instance == null){
-            instance = this;
-        }
-        else{
-            return;
-        }
 
         boxLayout = Box.createVerticalBox();
 
@@ -34,33 +31,26 @@ public class EspeceInfoPanel extends JPanel {
         //setSize(600, screenSize.height);
         setPreferredSize(new Dimension(screenSize.width / 5, screenSize.height));
 
-        add(boxLayout, BorderLayout.NORTH);
+        //add(boxLayout, BorderLayout.NORTH);
 
         load();
+
+        networkPanel = new NetworkPanel(null);
+        this.add(networkPanel, BorderLayout.CENTER);
     }
 
-    static private void load(){
+    private void load(){
         information = new HashMap<>();
         try {
-            getEspeceFields(null);
+            getEspeceFields();
         }catch (Exception e){}
         displayEspeceFields();
     }
 
-    static public void update(Espece selected){
-        //EspeceInfoPanel.boxLayout.removeAll();
-
-        try {
-            getEspeceFields(selected);
-        }catch (Exception e){}
-        EspeceInfoPanel.instance.revalidate();
-    }
-
     /**
      * Va chercher toutes les informations de l'espece
-     * @param e l'espece
      */
-    static private void getEspeceFields(Espece e) throws IllegalAccessException{
+    private void getEspeceFields() throws IllegalAccessException{
         Class<?> especeClass = Espece.class;
 
         for(Field field : especeClass.getDeclaredFields()){
@@ -71,11 +61,11 @@ public class EspeceInfoPanel extends JPanel {
                 fieldName = field.getName();
                 field.setAccessible(true);
 
-                if(e != null) {
-                    String value = field.get(e).toString();
+                if(this.espece != null) {
+                    String value = field.get(this.espece).toString();
 
-                    if(field.get(e) instanceof Double || field.get(e) instanceof Float){
-                        value = new DecimalFormat("#.##").format(field.get(e));
+                    if(field.get(this.espece) instanceof Double || field.get(this.espece) instanceof Float){
+                        value = new DecimalFormat("#.##").format(field.get(this.espece));
                     }
 
                     fieldValue = value;
@@ -111,14 +101,25 @@ public class EspeceInfoPanel extends JPanel {
         }
     }
 
-    static private void displayEspeceFields(){
+    private void displayEspeceFields(){
 
         for(String fieldName : information.keySet()){
             Box informationBox = information.get(fieldName);
-            if(informationBox.getParent() != EspeceInfoPanel.boxLayout){
+            if(informationBox.getParent() != this.boxLayout){
                 //L'ajoute a this
                 boxLayout.add(informationBox);
             }
         }
+    }
+
+    public void setEspece(Espece e){
+        this.espece = e;
+        try {
+            getEspeceFields();
+        }catch (Exception error){};
+
+        this.networkPanel.setEspece(espece);
+
+        this.revalidate();
     }
 }

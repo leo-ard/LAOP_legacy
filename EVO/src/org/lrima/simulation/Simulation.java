@@ -181,12 +181,12 @@ public class Simulation extends Thread{
             especesOpen.remove(i);
         }
 
-        for(Espece e : especesClosed){
-        	e.resetEspece();
-		}
-
         //Mutate the cars
         this.mutate();
+
+		for(Espece e : especesOpen){
+			e.resetEspece();
+		}
 
         //Reset the time of the simulation
         Simulation.currentTime = 0;

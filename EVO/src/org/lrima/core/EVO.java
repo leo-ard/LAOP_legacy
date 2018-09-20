@@ -25,7 +25,9 @@ public class EVO {
     }
 
     private static void start(){
-        EventQueue.invokeLater(new Runnable() {
+	    EVO.frame = new FrameManager();
+
+        /*EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
                     frame = new FrameManager();
@@ -33,7 +35,7 @@ public class EVO {
                     e.printStackTrace();
                 }
             }
-        });
+        });*/
     }
 
 }

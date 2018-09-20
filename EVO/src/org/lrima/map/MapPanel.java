@@ -52,9 +52,9 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 	//Colors used on the map
 	private final Color COLOR_BACKGROUND = new Color(238, 238, 238);
 	private final Color COLOR_BACKGROUND_LINES = new Color(136, 136, 136);
-	private final Color COLOR_OBSTACLE = new Color(176, 176, 176);
+	private final Color COLOR_OBSTACLE = new Color(93, 93, 93);
 	private final Color COLOR_TEXT = new Color(0, 0, 0);
-	private final Color COLOR_START = new Color(51,255, 107);
+	private final Color COLOR_START = new Color(51,255, 107,136);
 	private final int START_POINT_SIZE = 50;
 
 	//Used for the text
@@ -147,16 +147,14 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 	protected void setupRelativeGraphics(Graphics2D graphics){
 		drawBackground(graphics);
 		drawObstacles(graphics);
-		drawStart(graphics);
-		drawCars(graphics);
 		drawPoints(graphics);
+		drawCars(graphics);
 
 	}
 
 	protected void drawPoints(Graphics2D graphics){
 		//Draw the start
-		graphics.setColor(Color.GREEN);
-		graphics.fillOval(map.getDepart().x, map.getDepart().y, 50, 50);
+		this.drawStart(graphics);
 	}
 
 	/**
@@ -220,7 +218,7 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 	 * @param graphics the graphics to put the obstacles into
 	 */
 	protected void drawObstacles(Graphics2D graphics){
-		graphics.setColor(Color.RED);
+		graphics.setColor(this.COLOR_OBSTACLE);
 		graphics.setStroke(new BasicStroke(3));
 		for(Obstacle o : map.getObstacles()){
 			ArrayList<Line> lines = o.getLines();
@@ -300,9 +298,7 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 		selected.setSelected(true);
 
 		//TODO: Meilleure facon de faire ca?
-		EVO.frame.changeNetworkFocus(selected);
-		//Get the information of the car in the EspeceInfoPanel if it is selected
-		EspeceInfoPanel.update(selected);
+		EVO.frame.changeCarFocus(selected);
 	}
 
 	public Point mapPointFromScreenPoint(Point screenPoint){

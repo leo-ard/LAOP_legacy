@@ -97,7 +97,7 @@ public class OptionsDialog extends JDialog implements ActionListener {
 
                 //If all the options are valid
                 if(!erreur){
-                    setVisible(false);
+                    dispose();
                     EVO.restart();
                 }
             }

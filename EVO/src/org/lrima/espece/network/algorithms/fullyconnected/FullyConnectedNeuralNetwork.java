@@ -5,13 +5,13 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 import org.apache.commons.math3.linear.MatrixUtils;
-import org.lrima.espece.network.annotations.MainAlgorithmClass;
+import org.lrima.espece.network.annotations.AlgorithmInformation;
 import org.lrima.espece.network.interfaces.NeuralNetwork;
 import org.lrima.espece.network.interfaces.NeuralNetworkReceiver;
 import org.lrima.espece.network.interfaces.NeuralNetworkTransmitter;
 import org.apache.commons.math3.linear.RealMatrix;
 
-@MainAlgorithmClass(name="Fully Connected", description = "Fully connected network with one hidden layer containing 2 neurons. All neurons are connected to each neurons in the next layer.")
+@AlgorithmInformation(name="Fully Connected", description = "Fully connected network with one hidden layer containing 2 neurons. All neurons are connected to each neurons in the next layer.")
 public class FullyConnectedNeuralNetwork extends NeuralNetwork implements Serializable {
 
 	private final Integer[] nbHiddenNodes = {2};

@@ -4,6 +4,7 @@ import java.awt.*;
 import java.util.*;
 
 import org.lrima.annotations.DisplayInfo;
+import org.lrima.core.EVO;
 import org.lrima.core.UserPrefs;
 
 import org.lrima.espece.capteur.Capteur;
@@ -49,7 +50,7 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 	//The fitness of the car.
 	//The fitness is used to classify the car based on how good it did
 	@DisplayInfo
-	private double fitness;
+	private double fitness = 0.0;
 
 	//Array to store all the sensors
 	private ArrayList<Capteur> capteurs = new ArrayList<>();
@@ -146,7 +147,7 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 		//if(alive) {
 		//fitness = getMaxDistanceFromStart() + getTotalDistanceTraveled();
 
-		fitness = (getMaxDistanceFromStart()) / 10000 + (diedAtTime / UserPrefs.TIME_LIMIT) * 100;
+		fitness = (getMaxDistanceFromStart()) / 10000;// + (diedAtTime / UserPrefs.TIME_LIMIT) * 100;
 
 		/*if(diedAtTime != 0){
 			System.out.println("--------");
@@ -192,7 +193,9 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 		double bestFitness = this.simulation.getBestFitness();
 		double percentageFitness = fitness / bestFitness;
 
-		//this.voitureColor = new Color(255 - (int)(255 *  percentageFitness), (int)(255 * percentageFitness), 124, 124);
+		if(fitness <= bestFitness) {
+			this.voitureColor = new Color(255 - (int) (255 * percentageFitness), (int) (255 * percentageFitness), 124, 124);
+		}
 	}
 
 
@@ -223,8 +226,6 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 		//Set the fitness to the car
 		this.calculateFitnessScore();
 
-		//Set the color of the car based on its fitness
-		setColor();
 		neuralNetwork.feedForward();
 
 		//Get the car speed and turn rate from the settings
@@ -246,10 +247,6 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 		//To get the average speed
 		totalSpeed += vitesse;
 
-		//Get the information of the car in the EspeceInfoPanel if it is selected
-		if(selected){
-			EspeceInfoPanel.update(this);
-		}
 
 		//Reset the sensors
 		this.resetCapteur();
@@ -262,19 +259,13 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 	public void resetEspece(){
 		this.numberOfTimeWentRight = 0;
 		this.numberOfTimeWentLeft = 0;
+		this.maxDistanceFromStart = 0;
 	}
 
 	public void draw(Graphics2D g) {
-		g.setColor(Color.CYAN);
-
-		//TODO: Make the color based on the fitness of the car
-		//g.setColor(voitureColor);
-		if(bornOnGeneration < simulation.getGeneration()){
-			g.setColor(Color.GREEN);
-		}
-		else{
-			g.setColor(Color.RED);
-		}
+		//Set the color of the car based on its fitness
+		setColor();
+		g.setColor(voitureColor);
 
 		//Get all the points of the car and draws it
 		int[] pointX = {getTopLeft().x, getTopRight().x, getBottomRight().x, getBottomLeft().x, getTopLeft().x};
@@ -507,7 +498,7 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 		//Reset la selection des especes a false
 		if(selected){
 			this.simulation.resetSelected();
-			EspeceInfoPanel.update(this);
+			EVO.frame.changeCarFocus(this);
 		}
 		this.selected = selected;
 	}

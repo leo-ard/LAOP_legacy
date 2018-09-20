@@ -18,7 +18,7 @@ import org.lrima.simulation.SimulationListener;
 public class FrameManager extends JFrame implements SimulationListener {
 
     //All the panels
-	private NetworkPanel networkPanel;
+	//private NetworkPanel networkPanel;
 	private MapPanel mapPanel;
     private GraphicPanel graphicPanel;
     private EspeceInfoPanel especeInfoPanel;
@@ -29,7 +29,6 @@ public class FrameManager extends JFrame implements SimulationListener {
 	//Pour le menu
     private JCheckBoxMenuItem checkBoxRealtime;
     private JCheckBoxMenuItem checkBoxGraphique;
-    private JCheckBoxMenuItem checkBoxNeuralNet;
     private JCheckBoxMenuItem checkBoxFollowBest;
     private JCheckBoxMenuItem checkBoxEspeceInfo;
 	
@@ -49,9 +48,11 @@ public class FrameManager extends JFrame implements SimulationListener {
     public void setAlgorithmToUse(Class<?extends NeuralNetwork> algorithm){
 	    this.simulation = new Simulation(algorithm);
 
+	    this.simulation.addSimulationListener(this);
+
 
 	    this.mapPanel = new MapPanel(simulation);
-	    this.networkPanel = new NetworkPanel(simulation);
+	    //this.networkPanel = new NetworkPanel(simulation);
 	    this.graphicPanel = new GraphicPanel(simulation);
 
         createMenu();
@@ -185,11 +186,6 @@ public class FrameManager extends JFrame implements SimulationListener {
         checkBoxGraphique = new JCheckBoxMenuItem(new WindowAddPanelAction("Graphiques", this, graphicPanel, "South", UserPrefs.KEY_WINDOW_GRAPHIQUE));
         window.add(checkBoxGraphique);
 
-        //TODO: show the neural network on top of the map and not on the bottom of the window
-        //Show neural network panel button
-        checkBoxNeuralNet = new JCheckBoxMenuItem(new WindowAddPanelAction("Neural Network", this, networkPanel, "South", UserPrefs.KEY_WINDOW_NEURAL_NET));
-        window.add(checkBoxNeuralNet);
-
         //Show car information panel
         checkBoxEspeceInfo = new JCheckBoxMenuItem(new WindowAddPanelAction("Car info", this, especeInfoPanel, "East", UserPrefs.KEY_WINDOW_ESPECE_INFO));
         window.add(checkBoxEspeceInfo);
@@ -203,7 +199,6 @@ public class FrameManager extends JFrame implements SimulationListener {
         checkBoxRealtime.setState(UserPrefs.REAL_TIME);
         checkBoxFollowBest.setState(UserPrefs.FOLLOW_BEST);
         checkBoxGraphique.setState(UserPrefs.SHOW_WINDOW_GRAPHIQUE);
-        checkBoxNeuralNet.setState(UserPrefs.SHOW_WINDOW_NEURAL_NETWORK);
         checkBoxEspeceInfo.setState(UserPrefs.SHOW_WINDOW_ESPECE_INFO);
     }
 
@@ -213,9 +208,6 @@ public class FrameManager extends JFrame implements SimulationListener {
     private void displaySavedPanel(){
 	    if(checkBoxGraphique.getState()){
 	        add(graphicPanel, "South");
-        }
-        if(checkBoxNeuralNet.getState()){
-	        add(networkPanel, "South");
         }
         if(checkBoxEspeceInfo.getState()){
 	        add(especeInfoPanel, "East");
@@ -227,7 +219,6 @@ public class FrameManager extends JFrame implements SimulationListener {
      */
     public void start() {
 		mapPanel.start();
-		networkPanel.start();
         simulation.start();
 	}
 
@@ -242,15 +233,14 @@ public class FrameManager extends JFrame implements SimulationListener {
      * Change the car that the networkPanel uses
      * @param e the car
      */
-    public void changeNetworkFocus(Espece e) {
-		networkPanel.setEspece(e);
+    public void changeCarFocus(Espece e) {
+		especeInfoPanel.setEspece(e);
 	}
 
     @Override
     public void onNextGeneration() {
         this.graphicPanel.updateChart(this.simulation);
         this.getContentPane().repaint();
-        this.networkPanel.repaint();
     }
 
     @Override

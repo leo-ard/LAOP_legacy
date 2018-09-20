@@ -1,7 +1,6 @@
 package org.lrima.espece.network.algorithms.neat;
 
-import org.apache.commons.math3.linear.RealMatrix;
-import org.lrima.espece.network.annotations.MainAlgorithmClass;
+import org.lrima.espece.network.annotations.AlgorithmInformation;
 import org.lrima.espece.network.interfaces.NeuralNetwork;
 import org.lrima.espece.network.interfaces.NeuralNetworkReceiver;
 import org.lrima.espece.network.interfaces.NeuralNetworkTransmitter;
@@ -11,7 +10,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-@MainAlgorithmClass(name="NEAT Algorithm", description = "Neural Network using a modified NEAT algorithm. The network starts with two connections from random inputs that goes into the two outputs. With each generations, the network grows to try to find the best solution.")
+@AlgorithmInformation(name="NEAT Algorithm", description = "Neural Network using a modified NEAT algorithm. The network starts with two connections from random inputs that goes into the two outputs. With each generations, the network grows to try to find the best solution.")
 public class Genome extends NeuralNetwork {
 
     private ArrayList<ConnectionGene> connections;
