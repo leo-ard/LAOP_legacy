@@ -10,7 +10,6 @@ import org.lrima.core.UserPrefs;
 import org.lrima.espece.capteur.Capteur;
 import org.lrima.espece.network.interfaces.NeuralNetwork;
 import org.lrima.espece.network.interfaces.NeuralNetworkReceiver;
-import org.lrima.espece.network.algorithms.neat.Genome;
 import org.lrima.map.Studio.Drawables.Line;
 import org.lrima.map.Studio.Drawables.Obstacle;
 import org.lrima.Interface.EspeceInfoPanel;
@@ -341,7 +340,7 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 	 */
 	public void kill() {
 		alive = false;
-		this.diedAtTime = Simulation.currentTime;
+		this.diedAtTime = Simulation.simulationTime;
 	}
 
 	/**
