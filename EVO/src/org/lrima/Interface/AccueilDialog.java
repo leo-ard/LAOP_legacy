@@ -22,9 +22,10 @@ public class AccueilDialog extends JDialog implements ActionListener, ItemListen
     private JButton okButton = new JButton("Simulate");
     JTextPane algorithmDescriptionPane;
     private JComboBox<String> neuralNetworkComboBox = new JComboBox<>();
+    private JSpinner simulationPerBatchesSpinner;
 
     private String[] algorithmsString;
-    private Class<?>[] algorithms;
+    private Class<?extends NeuralNetwork>[] algorithms;
     private FrameManager frameManager;
 
     private final int FRAME_MARGIN = 20;
@@ -103,7 +104,7 @@ public class AccueilDialog extends JDialog implements ActionListener, ItemListen
         textPaneGBC.gridx = 0;
         textPaneGBC.gridy = 0;
         textPaneGBC.fill = GridBagConstraints.BOTH;
-        textPaneGBC.gridwidth = 3;
+        textPaneGBC.gridwidth = 4;
         textPaneGBC.insets = new Insets(FRAME_MARGIN, FRAME_MARGIN, MARGIN_BETWEEN_COMPONENTS, FRAME_MARGIN);
 
         panel.add(introductionText, textPaneGBC);
@@ -114,17 +115,40 @@ public class AccueilDialog extends JDialog implements ActionListener, ItemListen
         GridBagConstraints algorithmToUseLabelGBC = new GridBagConstraints();
         algorithmToUseLabelGBC.gridx = 0;
         algorithmToUseLabelGBC.gridy = 1;
+        algorithmToUseLabelGBC.gridwidth = 2;
         algorithmToUseLabelGBC.insets = new Insets(MARGIN_BETWEEN_COMPONENTS, FRAME_MARGIN, MARGIN_BETWEEN_COMPONENTS, MARGIN_BETWEEN_COMPONENTS);
 
         panel.add(algorithmToUseLabel, algorithmToUseLabelGBC);
 
         GridBagConstraints algorithmToUseComboBoxGBC = new GridBagConstraints();
-        algorithmToUseComboBoxGBC.gridx = 1;
-        algorithmToUseComboBoxGBC.gridy = 1;
-        algorithmToUseComboBoxGBC.fill = GridBagConstraints.HORIZONTAL;
+        algorithmToUseComboBoxGBC.gridx = 0;
+        algorithmToUseComboBoxGBC.gridwidth = 2;
+        algorithmToUseComboBoxGBC.gridy = 2;
+        //algorithmToUseComboBoxGBC.fill = GridBagConstraints.HORIZONTAL;
         algorithmToUseComboBoxGBC.insets = new Insets(MARGIN_BETWEEN_COMPONENTS, MARGIN_BETWEEN_COMPONENTS, MARGIN_BETWEEN_COMPONENTS, FRAME_MARGIN);
 
         panel.add(this.neuralNetworkComboBox, algorithmToUseComboBoxGBC);
+
+        //NUMBER OF SIMULATION PER BATCH
+        JLabel numberOfSimulationLabel = new JLabel("Simulations per batches: ");
+        numberOfSimulationLabel.setHorizontalTextPosition(JLabel.LEFT);
+        GridBagConstraints numberOfSimulationLabelGBC = new GridBagConstraints();
+        numberOfSimulationLabelGBC.gridx = 1;
+        numberOfSimulationLabelGBC.gridy = 1;
+        numberOfSimulationLabelGBC.gridwidth = 2;
+        numberOfSimulationLabelGBC.gridwidth = 2;
+        numberOfSimulationLabelGBC.insets = new Insets(MARGIN_BETWEEN_COMPONENTS, MARGIN_BETWEEN_COMPONENTS, MARGIN_BETWEEN_COMPONENTS, MARGIN_BETWEEN_COMPONENTS);
+
+        panel.add(numberOfSimulationLabel, numberOfSimulationLabelGBC);
+
+        SpinnerNumberModel numberModel = new SpinnerNumberModel(1, 1, 10, 1);
+        this.simulationPerBatchesSpinner = new JSpinner(numberModel);
+        GridBagConstraints simulationPerBatchesSpinnerGBC = new GridBagConstraints();
+        simulationPerBatchesSpinnerGBC.gridx = 3;
+        simulationPerBatchesSpinnerGBC.gridy = 2;
+        simulationPerBatchesSpinnerGBC.insets = new Insets(MARGIN_BETWEEN_COMPONENTS, MARGIN_BETWEEN_COMPONENTS, MARGIN_BETWEEN_COMPONENTS, FRAME_MARGIN);
+
+        panel.add(simulationPerBatchesSpinner, simulationPerBatchesSpinnerGBC);
 
         //Algorithm description
         algorithmDescriptionPane = new JTextPane();
@@ -134,8 +158,8 @@ public class AccueilDialog extends JDialog implements ActionListener, ItemListen
 
         GridBagConstraints algorithmDescriotionGBC = new GridBagConstraints();
         algorithmDescriotionGBC.gridx = 0;
-        algorithmDescriotionGBC.gridy = 2;
-        algorithmDescriotionGBC.gridwidth = 3;
+        algorithmDescriotionGBC.gridy = 3;
+        algorithmDescriotionGBC.gridwidth = 4;
         algorithmDescriotionGBC.insets = new Insets(MARGIN_BETWEEN_COMPONENTS, FRAME_MARGIN, MARGIN_BETWEEN_COMPONENTS, FRAME_MARGIN);
         algorithmDescriotionGBC.fill = GridBagConstraints.BOTH;
 
@@ -144,8 +168,8 @@ public class AccueilDialog extends JDialog implements ActionListener, ItemListen
         //SIMULATE BUTTON
         GridBagConstraints okButtonGBC = new GridBagConstraints();
 
-        okButtonGBC.gridy = 3;
-        okButtonGBC.gridx = 1;
+        okButtonGBC.gridy = 4;
+        okButtonGBC.gridx = 3;
         okButtonGBC.insets = new Insets(MARGIN_BETWEEN_COMPONENTS, MARGIN_BETWEEN_COMPONENTS, FRAME_MARGIN, FRAME_MARGIN);
 
         panel.add(okButton, okButtonGBC);
@@ -163,7 +187,7 @@ public class AccueilDialog extends JDialog implements ActionListener, ItemListen
         this.algorithms = new Class[AlgorithmManager.algorithms.length];
 
         for(int i = 0 ; i < AlgorithmManager.algorithms.length ; i++){
-            Class<?> algorithmClass = AlgorithmManager.algorithms[i];
+            Class<?extends NeuralNetwork> algorithmClass = AlgorithmManager.algorithms[i];
             algorithms[i] = algorithmClass;
 
             try {
@@ -214,11 +238,34 @@ public class AccueilDialog extends JDialog implements ActionListener, ItemListen
     }
 
     private void loadSelectedAlgorithm(){
+        int simulationPerBatches;
+
+        //If the user did not enter a integer
+        if(this.simulationPerBatchesSpinner.getValue() instanceof Integer) {
+            simulationPerBatches = (int) this.simulationPerBatchesSpinner.getValue();
+        }
+        else{
+            simulationPerBatches = 1;
+        }
+
+        if(simulationPerBatches <= 0){
+            simulationPerBatches = 1;
+        }
+
         //If they don't select "All algorithms" from the combobox
         if(neuralNetworkComboBox.getSelectedIndex() < this.algorithms.length) {
             Class<? extends NeuralNetwork> algorithmChosen = (Class<NeuralNetwork>) this.algorithms[neuralNetworkComboBox.getSelectedIndex()];
-            this.frameManager.setAlgorithmToUse(algorithmChosen);
+            this.frameManager.addBatch(algorithmChosen, simulationPerBatches);
             this.dispose();
         }
+        else{
+            //All algorithms
+            for(Class<?extends NeuralNetwork> algorithm : this.algorithms){
+                this.frameManager.addBatch(algorithm, simulationPerBatches);
+                this.dispose();
+            }
+        }
+
+        this.frameManager.startBatches();
     }
 }

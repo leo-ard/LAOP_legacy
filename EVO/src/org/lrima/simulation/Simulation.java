@@ -22,6 +22,7 @@ public class Simulation extends Thread{
 
 	//Keep track of the current generation
 	private int generation = 1;
+	private int maxGenerations = 5;
 
 	//Stores the cars in the simulation
 	private ArrayList<Espece> especesOpen;
@@ -115,6 +116,11 @@ public class Simulation extends Thread{
                 }
             }
             //System.out.println(simulationTime);
+
+			if(generation >= maxGenerations){
+				this.simulationEnd();
+				this.terminate();
+			}
 
 		}
 	}
@@ -317,7 +323,15 @@ public class Simulation extends Thread{
 		return clonedList;
 	}
 
+	public void terminate(){
+		this.running = false;
+	}
 
+	public void simulationEnd(){
+		for(SimulationListener listener : this.simulationListeners){
+			listener.simulationEnded();
+		}
+	}
 
 	//*******===========================================================================
 	//* ACCESSORS AND MUTATORS
@@ -381,6 +395,10 @@ public class Simulation extends Thread{
 
 	public void setMap(Map map) {
 		this.map = map;
+	}
+
+	public int getMaxGenerations() {
+		return maxGenerations;
 	}
 
 	public Class<?extends NeuralNetwork> getAlgorithm(){

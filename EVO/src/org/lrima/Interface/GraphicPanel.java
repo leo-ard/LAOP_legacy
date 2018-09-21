@@ -39,7 +39,7 @@ public class GraphicPanel extends JPanel {
 
         getFitnessData();
 
-        chart = new XYChartBuilder().title("Fitness en fonction des générations").xAxisTitle("Generation").yAxisTitle("Fitness").build();
+        chart = new XYChartBuilder().title("Fitness over generations").xAxisTitle("Generation").yAxisTitle("Fitness").build();
         chart.getStyler().setChartBackgroundColor(new Color(230, 230, 230));
 
         //Serie for the fitness
@@ -52,7 +52,7 @@ public class GraphicPanel extends JPanel {
         medianSeries.setMarker(SeriesMarkers.NONE);
 
         //Serie for the average fitness
-        XYSeries moyenneSeries = chart.addSeries("moyenne", new int[]{0}, new int[]{0});
+        XYSeries moyenneSeries = chart.addSeries("average", new int[]{0}, new int[]{0});
         moyenneSeries.setMarker(SeriesMarkers.NONE);
 
         chartPanel = new XChartPanel<>(chart);
@@ -97,6 +97,6 @@ public class GraphicPanel extends JPanel {
 
         this.chart.updateXYSeries("fitness", xFitnessData, yFitnessData, null);
         this.chart.updateXYSeries("median", xMedianData, yMedianData, null);
-        this.chart.updateXYSeries("moyenne", xMoyenneData, yMoyenneData, null);
+        this.chart.updateXYSeries("average", xMoyenneData, yMoyenneData, null);
     }
 }

@@ -21,10 +21,12 @@ import javax.swing.JPanel;
 import org.lrima.core.EVO;
 import org.lrima.core.UserPrefs;
 import org.lrima.espece.Espece;
+import org.lrima.espece.network.annotations.AlgorithmInformation;
 import org.lrima.map.Studio.Drawables.Line;
 import org.lrima.map.Studio.Drawables.Obstacle;
 import org.lrima.Interface.EspeceInfoPanel;
 import org.lrima.simulation.Simulation;
+import org.lrima.simulation.SimulationBatch;
 
 /**
  * Panel that displays a map
@@ -60,6 +62,14 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 	//Used for the text
 	private final int TEXT_MARGIN = 20;
 	private final int FONT_SIZE = 32;
+
+	private Timer uploadCheckerTimer;
+
+	private SimulationBatch currentSimulationBatch = null;
+	private int currentBatchNumber = 0;
+	private int maxBatch = 0;
+
+	private double translateX, translateY;
 
 
 	/**
@@ -106,11 +116,15 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 	 * Used to constantly repaint the map
 	 */
 	public void start() {
-		Timer uploadCheckerTimer = new Timer(false);
+		uploadCheckerTimer = new Timer(false);
 		uploadCheckerTimer.scheduleAtFixedRate(
 				new TimerTask() {
 					public void run() { repaint(); }
 				}, 0, 16);
+	}
+
+	public void stop(){
+		uploadCheckerTimer.cancel();
 	}
 
 	@Override
@@ -162,7 +176,7 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 	 * @param graphics the graphics to modify
 	 */
 	protected void doTransforms(Graphics2D graphics){
-		double translateX, translateY;
+
 
 		if(UserPrefs.FOLLOW_BEST){
 			Espece bestEspece = simulation.getBest();
@@ -248,7 +262,11 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 		graphics.setFont(new Font("Helvetica", Font.PLAIN, FONT_SIZE));
 		graphics.drawString((this.simulation.simulationTime / 1000.0 )+ "", 200,200);
 
-		String text = 	"Generation: " + this.simulation.getGeneration();
+		String text = 	"Algorithm: " + this.simulation.getAlgorithm().getAnnotation(AlgorithmInformation.class).name() + " ("+ currentBatchNumber +" / " + maxBatch+")";
+		if(this.currentSimulationBatch != null) {
+			text += "\nSimulation " + (this.currentSimulationBatch.getCurrentSimulationIndex() + 1) + " / " + this.currentSimulationBatch.getSimulations().length;
+		}
+		text += 		"\nGeneration: " + this.simulation.getGeneration() + " / " + this.simulation.getMaxGenerations();
 		text += 		"\nTime: " + Simulation.simulationTime / 1000;
 
 		drawText(graphics,text, new Point(TEXT_MARGIN, getHeight() * 2 - TEXT_MARGIN), "up");
@@ -366,5 +384,17 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 
 	public Map getMap() {
 		return map;
+	}
+
+	public void setCurrentSimulationBatch(SimulationBatch currentSimulationBatch) {
+		this.currentSimulationBatch = currentSimulationBatch;
+	}
+
+	public void setMaxBatch(int maxBatch) {
+		this.maxBatch = maxBatch;
+	}
+
+	public void setCurrentBatchNumber(int currentBatchNumber) {
+		this.currentBatchNumber = currentBatchNumber;
 	}
 }

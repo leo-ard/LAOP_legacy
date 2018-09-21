@@ -2,6 +2,7 @@ package org.lrima.Interface;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
 import javax.swing.*;
 import org.lrima.core.UserPrefs;
 import org.lrima.espece.Espece;
@@ -12,10 +13,12 @@ import org.lrima.map.MapPanel;
 import org.lrima.Interface.actions.*;
 import org.lrima.Interface.EspeceInfoPanel;
 import org.lrima.Interface.GraphicPanel;
+import org.lrima.simulation.BatchListener;
 import org.lrima.simulation.Simulation;
+import org.lrima.simulation.SimulationBatch;
 import org.lrima.simulation.SimulationListener;
 
-public class FrameManager extends JFrame implements SimulationListener {
+public class FrameManager extends JFrame implements SimulationListener, BatchListener {
 
     //All the panels
 	//private NetworkPanel networkPanel;
@@ -24,7 +27,8 @@ public class FrameManager extends JFrame implements SimulationListener {
     private EspeceInfoPanel especeInfoPanel;
 
     //the simulation and its information
-	private Simulation simulation;
+	private ArrayList<SimulationBatch> simulationBatches = new ArrayList<>();
+	private int currentBatch = 0;
 
 	//Pour le menu
     private JCheckBoxMenuItem checkBoxRealtime;
@@ -45,24 +49,49 @@ public class FrameManager extends JFrame implements SimulationListener {
      * Sets the algorithm to use. It creates a new simulation and resets all the panels using the simulation
      * @param algorithm the algorithm to use
      */
-    public void setAlgorithmToUse(Class<?extends NeuralNetwork> algorithm){
-	    this.simulation = new Simulation(algorithm);
+    public void addBatch(Class<?extends NeuralNetwork> algorithm, int numberInBatch){
+        SimulationBatch simulationBatch = new SimulationBatch(algorithm, numberInBatch);
+        this.simulationBatches.add(simulationBatch);
+        simulationBatch.addBatchListener(this);
 
-	    this.simulation.addSimulationListener(this);
+        for(Simulation simulation : simulationBatch.getSimulations()){
+            simulation.addSimulationListener(this);
+        }
 
+    }
 
-	    this.mapPanel = new MapPanel(simulation);
-	    //this.networkPanel = new NetworkPanel(simulation);
-	    this.graphicPanel = new GraphicPanel(simulation);
+    public void startBatches(){
+        simulationBatches.get(currentBatch).startBatch();
+        this.reloadPanels();
+    }
+
+    private void reloadPanels(){
+
+        if(this.mapPanel != null) {
+            mapPanel.stop();
+            this.remove(mapPanel);
+
+        }
+        if(graphicPanel != null){
+            this.remove(graphicPanel);
+        }
+
+        this.mapPanel = new MapPanel(simulationBatches.get(currentBatch).getCurrentSimulation());
+        this.graphicPanel = new GraphicPanel(simulationBatches.get(currentBatch).getCurrentSimulation());
+
+        mapPanel.setCurrentSimulationBatch(simulationBatches.get(currentBatch));
+        mapPanel.setCurrentBatchNumber(currentBatch + 1);
+        mapPanel.setMaxBatch(simulationBatches.size());
+
 
         createMenu();
 
-	    this.add(mapPanel, BorderLayout.CENTER);
+        this.add(mapPanel, BorderLayout.CENTER);
 
         displaySavedPanel();
 
-	    this.start();
-	    revalidate();
+        this.start();
+        revalidate();
     }
 
     /**
@@ -86,10 +115,10 @@ public class FrameManager extends JFrame implements SimulationListener {
                 super.keyPressed(e);
                 //Press Q to go to the next generation
                 if(e.getKeyCode() == KeyEvent.VK_Q){
-                    simulation.goToNextGeneration();
+                    simulationBatches.get(currentBatch).getCurrentSimulation().goToNextGeneration();
                 }
                 if(e.getKeyCode() == KeyEvent.VK_W){
-                    simulation.getBest().setSelected(true);
+                    simulationBatches.get(currentBatch).getCurrentSimulation().getBest().setSelected(true);
                 }
             }
         });
@@ -149,7 +178,7 @@ public class FrameManager extends JFrame implements SimulationListener {
         simulationMenu.add(checkBoxFollowBest);
 
         //Pause button
-        JMenuItem pause = new JMenuItem(new PauseAction("Pause", simulation));
+        JMenuItem pause = new JMenuItem(new PauseAction("Pause", simulationBatches.get(currentBatch).getCurrentSimulation()));
         pause.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, InputEvent.CTRL_MASK));
         simulationMenu.add(pause);
 
@@ -167,10 +196,10 @@ public class FrameManager extends JFrame implements SimulationListener {
         menuBar.add(map);
 
         //Map editor button
-        JMenuItem mapEditor = new JMenuItem(new OpenStudioAction("Open Studio", simulation));
+        JMenuItem mapEditor = new JMenuItem(new OpenStudioAction("Open Studio", simulationBatches.get(currentBatch).getCurrentSimulation()));
         map.add(mapEditor);
 
-        JMenuItem loadMapButton = new JMenuItem(new LoadMapAction("Load Map", this.mapPanel, simulation));
+        JMenuItem loadMapButton = new JMenuItem(new LoadMapAction("Load Map", this.mapPanel, simulationBatches.get(currentBatch).getCurrentSimulation()));
         map.add(loadMapButton);
     }
 
@@ -219,8 +248,11 @@ public class FrameManager extends JFrame implements SimulationListener {
      */
     public void start() {
 		mapPanel.start();
-        simulation.start();
 	}
+
+	public void stop(){
+        mapPanel.stop();
+    }
 
 	//TODO: On a tu vraiment besoin de ça?
 	public void pack() {
@@ -239,13 +271,34 @@ public class FrameManager extends JFrame implements SimulationListener {
 
     @Override
     public void onNextGeneration() {
-        this.graphicPanel.updateChart(this.simulation);
+        this.graphicPanel.updateChart(this.simulationBatches.get(currentBatch).getCurrentSimulation());
         this.getContentPane().repaint();
     }
 
     @Override
     public void simulationRestarted() {
         Map map = this.mapPanel.getMap();
-        this.simulation.setMap(map);
+        this.simulationBatches.get(currentBatch).getCurrentSimulation().setMap(map);
+    }
+
+    @Override
+    public void simulationEnded() {
+        reloadPanels();
+    }
+
+    @Override
+    public void batchFinished() {
+        if(currentBatch + 1 < this.simulationBatches.size()) {
+            this.currentBatch++;
+            //Next batch
+            this.startBatches();
+        }
+        else{
+            this.allBatchFinished();
+        }
+    }
+
+    private void allBatchFinished(){
+        System.out.println("All batches finished");
     }
 }
