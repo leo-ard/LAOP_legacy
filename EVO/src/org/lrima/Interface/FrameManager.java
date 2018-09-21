@@ -6,19 +6,18 @@ import java.util.ArrayList;
 import javax.swing.*;
 import org.lrima.core.UserPrefs;
 import org.lrima.espece.Espece;
-import org.lrima.espece.network.NetworkPanel;
 import org.lrima.espece.network.interfaces.NeuralNetwork;
 import org.lrima.map.Map;
 import org.lrima.map.MapPanel;
 import org.lrima.Interface.actions.*;
-import org.lrima.Interface.EspeceInfoPanel;
-import org.lrima.Interface.GraphicPanel;
 import org.lrima.simulation.BatchListener;
 import org.lrima.simulation.Simulation;
 import org.lrima.simulation.SimulationBatch;
 import org.lrima.simulation.SimulationListener;
 
 public class FrameManager extends JFrame implements SimulationListener, BatchListener {
+
+    public static FrameManager instance;
 
     //All the panels
 	//private NetworkPanel networkPanel;
@@ -37,10 +36,10 @@ public class FrameManager extends JFrame implements SimulationListener, BatchLis
     private JCheckBoxMenuItem checkBoxEspeceInfo;
 	
 	public FrameManager() {
+	    if(instance == null){
+	        FrameManager.instance = this;
+        }
 	    this.setupWindow();
-
-        AccueilDialog accueil = new AccueilDialog(this);
-        accueil.setVisible(true);
 
         this.especeInfoPanel = new EspeceInfoPanel();
 	}

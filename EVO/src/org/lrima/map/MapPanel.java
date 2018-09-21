@@ -18,6 +18,7 @@ import java.util.TimerTask;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
+import org.lrima.Interface.FrameManager;
 import org.lrima.core.EVO;
 import org.lrima.core.UserPrefs;
 import org.lrima.espece.Espece;
@@ -317,7 +318,7 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 		selected.setSelected(true);
 
 		//TODO: Meilleure facon de faire ca?
-		EVO.frame.changeCarFocus(selected);
+		FrameManager.instance.changeCarFocus(selected);
 	}
 
 	public Point mapPointFromScreenPoint(Point screenPoint){

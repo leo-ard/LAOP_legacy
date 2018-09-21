@@ -17,7 +17,7 @@ import javax.swing.event.HyperlinkListener;
 /**
  * @author unknown
  */
-public class AccueilDialog extends JDialog implements ActionListener, ItemListener {
+public class HomeDialog extends JDialog implements ActionListener, ItemListener {
 
     private JButton okButton = new JButton("Simulate");
     JTextPane algorithmDescriptionPane;
@@ -26,18 +26,15 @@ public class AccueilDialog extends JDialog implements ActionListener, ItemListen
 
     private String[] algorithmsString;
     private Class<?extends NeuralNetwork>[] algorithms;
-    private FrameManager frameManager;
 
     private final int FRAME_MARGIN = 20;
     private final int MARGIN_BETWEEN_COMPONENTS = 10;
 
     /**
      * A dialog that describe the EVO program and lets the user choose which algorithm to use.
-     * @param frameManager the frame manager
      */
-    public AccueilDialog(FrameManager frameManager) {
-        super(frameManager);
-        this.frameManager = frameManager;
+    public HomeDialog() {
+        super();
         this.setTitle("Welcome to EVO");
         initComponents();
 
@@ -238,6 +235,8 @@ public class AccueilDialog extends JDialog implements ActionListener, ItemListen
     }
 
     private void loadSelectedAlgorithm(){
+        FrameManager frameManager = new FrameManager();
+
         int simulationPerBatches;
 
         //If the user did not enter a integer
@@ -255,17 +254,17 @@ public class AccueilDialog extends JDialog implements ActionListener, ItemListen
         //If they don't select "All algorithms" from the combobox
         if(neuralNetworkComboBox.getSelectedIndex() < this.algorithms.length) {
             Class<? extends NeuralNetwork> algorithmChosen = (Class<NeuralNetwork>) this.algorithms[neuralNetworkComboBox.getSelectedIndex()];
-            this.frameManager.addBatch(algorithmChosen, simulationPerBatches);
+            frameManager.addBatch(algorithmChosen, simulationPerBatches);
             this.dispose();
         }
         else{
             //All algorithms
             for(Class<?extends NeuralNetwork> algorithm : this.algorithms){
-                this.frameManager.addBatch(algorithm, simulationPerBatches);
+                frameManager.addBatch(algorithm, simulationPerBatches);
                 this.dispose();
             }
         }
 
-        this.frameManager.startBatches();
+        frameManager.startBatches();
     }
 }

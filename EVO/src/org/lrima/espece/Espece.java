@@ -3,6 +3,7 @@ package org.lrima.espece;
 import java.awt.*;
 import java.util.*;
 
+import org.lrima.Interface.FrameManager;
 import org.lrima.annotations.DisplayInfo;
 import org.lrima.core.EVO;
 import org.lrima.core.UserPrefs;
@@ -497,7 +498,7 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 		//Reset la selection des especes a false
 		if(selected){
 			this.simulation.resetSelected();
-			EVO.frame.changeCarFocus(this);
+			FrameManager.instance.changeCarFocus(this);
 		}
 		this.selected = selected;
 	}

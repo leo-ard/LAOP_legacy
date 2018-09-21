@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.prefs.Preferences;
 
 public class UserPrefs {
+    public static Preferences preferences = Preferences.userRoot().node(UserPrefs.class.getName());
+
     public static final String SRC_LRIMA = "/images/LRIMA.png";
 
     public static final String SRC_TOOLS_START = "/images/icons/tools/start.gif";
@@ -30,8 +32,6 @@ public class UserPrefs {
 
     //Si on devrait utiliser le meilleur NN sauvegarde
     public static boolean USE_BEST = false;
-
-    public static Preferences preferences;
 
     //Preferences keys
     final public static String KEY_NUMBER_OF_CAR = "NUMBER_OF_CAR";
@@ -67,10 +67,6 @@ public class UserPrefs {
     final public static boolean DEFAULT_WINDOW_ESPECE_INFO = false;
 
     final public static String DEFAULT_MAP_TO_USE_PATH = "./default.map";
-
-    public UserPrefs(){
-        preferences = Preferences.userRoot().node(this.getClass().getName());
-    }
 
     public static void load(){
         NUMBERCARS = preferences.getInt(KEY_NUMBER_OF_CAR, DEFAULT_NUMBER_OF_CAR);
