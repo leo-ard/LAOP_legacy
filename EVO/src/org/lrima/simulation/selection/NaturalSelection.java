@@ -5,7 +5,6 @@ import java.util.Collections;
 
 import org.lrima.core.UserPrefs;
 import org.lrima.espece.Espece;
-import org.lrima.espece.network.algorithms.neat.Genome;
 import org.lrima.espece.network.interfaces.NeuralNetwork;
 import org.lrima.map.Map;
 import org.lrima.simulation.Simulation;

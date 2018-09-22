@@ -16,16 +16,16 @@ public abstract class NeuralNetwork {
     }
 
     /**
-     * Used when you create a Genome without knowing in advance the transmitters
-     * @param transmitters the transmitters this Genome should use
+     * Used when you create a NeatGenome without knowing in advance the transmitters
+     * @param transmitters the transmitters this NeatGenome should use
      */
     public void setTransmitters(ArrayList<?extends NeuralNetworkTransmitter> transmitters){
         this.transmitters = transmitters;
     }
 
     /**
-     * Used when you create a Genome without knowing in advance the receiver
-     * @param receiver the receiver this Genome should use
+     * Used when you create a NeatGenome without knowing in advance the receiver
+     * @param receiver the receiver this NeatGenome should use
      */
     public void setReceiver(NeuralNetworkReceiver receiver){
         this.receiver = receiver;

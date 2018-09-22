@@ -10,22 +10,22 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-@AlgorithmInformation(name="NEAT Algorithm", description = "Neural Network using a modified NEAT algorithm. The network starts with two connections from random inputs that goes into the two outputs. With each generations, the network grows to try to find the best solution.")
-public class Genome extends NeuralNetwork {
+@AlgorithmInformation(name="NEAT Algorithm", description = "Neural Network using the NEAT algorithm. The network starts with one connections from random inputs that goes into one of the outputs. With each generations, the network grows to try to find the best solution.")
+public class NeatGenome extends NeuralNetwork {
 
     private ArrayList<ConnectionGene> connections;
     private ArrayList<NodeGene> nodes;
 
     private final int nbOutput = 2;
 
-    public Genome(){
+    public NeatGenome(){
         this.connections = new ArrayList<>();
         this.nodes = new ArrayList<>();
     }
 
     /**
-     * Init the Genome with the inputs and outputs nodes.
-     * It also initializes the Genome with two connections from random inputs
+     * Init the NeatGenome with the inputs and outputs nodes.
+     * It also initializes the NeatGenome with two connections from random inputs
      */
     @Override
     public void init(ArrayList<? extends NeuralNetworkTransmitter> transmitters, NeuralNetworkReceiver receiver){
@@ -45,28 +45,24 @@ public class Genome extends NeuralNetwork {
         ArrayList<NodeGene> inputNodes = this.getInputNodes();
         ArrayList<NodeGene> outputNodes = this.getOutputNodes();
         NodeGene randomNodeInput1 = inputNodes.get(Random.getRandomIntegerValue(inputNodes.size()));
-        NodeGene randomNodeInput2;
-        do {
-            randomNodeInput2 = inputNodes.get(Random.getRandomIntegerValue(inputNodes.size()));
-        }while(randomNodeInput2 == randomNodeInput1);
 
         this.connections.add(new ConnectionGene(randomNodeInput1,  this.getOutputNodes().get(0)));
-        this.connections.add(new ConnectionGene(randomNodeInput2,  this.getOutputNodes().get(1)));
+
 
     }
 
     /**
-     * Create a child Genome from two parent Genome
+     * Create a child NeatGenome from two parent NeatGenome
      * @param network1 the first parent
      * @param network2 the second parent
      * @return a child genome from parent1 and parent2
      */
     @Override
     public NeuralNetwork crossOver(NeuralNetwork network1, NeuralNetwork network2) {
-        Genome child = new Genome();
+        NeatGenome child = new NeatGenome();
 
-        Genome parent1 = (Genome) network1;
-        Genome parent2 = (Genome) network2;
+        NeatGenome parent1 = (NeatGenome) network1;
+        NeatGenome parent2 = (NeatGenome) network2;
 
         for(NodeGene node : parent1.getNodes()){
             if(parent2.getNodes().contains(node)){
@@ -146,7 +142,7 @@ public class Genome extends NeuralNetwork {
     }
 
     /**
-     * Mutate the Genome.
+     * Mutate the NeatGenome.
      * 80% chance to mutate the weights
      * 10% chance of adding a connection
      * 10% chance of adding a node between a connection

@@ -39,7 +39,8 @@ public class ChartComponent extends JComponent {
     private void showChart(){
         int chartWidth = (screensize.width / 2) - (ChartPanel.MARGIN_BETWEEN_CHARTS);
         batchChart = new XYChartBuilder().title(algorithm.getAnnotation(AlgorithmInformation.class).name()).xAxisTitle("Generation").yAxisTitle("Fitness").width(chartWidth).height(screensize.height / 3).build();
-
+        batchChart.getStyler().setYAxisMax(100);
+        batchChart.getStyler().setYAxisMin(-100);
         this.getData();
 
         //Lines

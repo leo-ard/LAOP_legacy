@@ -17,7 +17,7 @@ public class ChartPanel extends JPanel {
         this.simulationInformations = simulationInformations;
 
         JPanel graphicPanel = new JPanel();
-        graphicPanel.setLayout(new GridLayout((int)Math.ceil(simulationInformations.keySet().size() / 2), 2, MARGIN_BETWEEN_CHARTS, MARGIN_BETWEEN_CHARTS));
+        graphicPanel.setLayout(new GridLayout((int)Math.ceil((double)simulationInformations.keySet().size() / 2.0), 2, MARGIN_BETWEEN_CHARTS, MARGIN_BETWEEN_CHARTS));
 
         for(Class<?extends NeuralNetwork> algorithm : simulationInformations.keySet()){
             ChartComponent chart = new ChartComponent(algorithm, simulationInformations.get(algorithm));

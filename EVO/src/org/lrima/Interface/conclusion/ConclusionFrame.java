@@ -1,12 +1,11 @@
 package org.lrima.Interface.conclusion;
 
 import org.lrima.espece.network.algorithms.fullyconnected.FullyConnectedNeuralNetwork;
-import org.lrima.espece.network.algorithms.neat.Genome;
+import org.lrima.espece.network.algorithms.neat.NeatGenome;
 import org.lrima.espece.network.interfaces.NeuralNetwork;
 import org.lrima.simulation.SimulationInformation;
 
 import javax.swing.*;
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -16,7 +15,7 @@ public class ConclusionFrame extends JFrame {
 
     public static void main(String[] args) {
         HashMap<Class<?extends NeuralNetwork>, ArrayList<SimulationInformation>> s = new HashMap<>();
-        s.put(Genome.class, new ArrayList<>());
+        s.put(NeatGenome.class, new ArrayList<>());
         s.put(FullyConnectedNeuralNetwork.class, new ArrayList<>());
 
 
