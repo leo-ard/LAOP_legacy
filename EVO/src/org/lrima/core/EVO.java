@@ -7,7 +7,6 @@ public class EVO {
 
 	public static void main(String[] args) {
         UserPrefs.load();
-
 		start();
 
 	}

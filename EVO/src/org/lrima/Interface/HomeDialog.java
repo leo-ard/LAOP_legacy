@@ -17,7 +17,7 @@ import javax.swing.event.HyperlinkListener;
 /**
  * @author unknown
  */
-public class HomeDialog extends JDialog implements ActionListener, ItemListener {
+public class HomeDialog extends JFrame implements ActionListener, ItemListener {
 
     private JButton okButton = new JButton("Simulate");
     JTextPane algorithmDescriptionPane;
@@ -36,16 +36,9 @@ public class HomeDialog extends JDialog implements ActionListener, ItemListener 
     public HomeDialog() {
         super();
         this.setTitle("Welcome to EVO");
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         initComponents();
 
-        //When the user closes the dialog
-        this.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                super.windowClosing(e);
-                loadSelectedAlgorithm();
-            }
-        });
         this.neuralNetworkComboBox.addItemListener(this);
     }
 
@@ -133,7 +126,6 @@ public class HomeDialog extends JDialog implements ActionListener, ItemListener 
         numberOfSimulationLabelGBC.gridx = 1;
         numberOfSimulationLabelGBC.gridy = 1;
         numberOfSimulationLabelGBC.gridwidth = 2;
-        numberOfSimulationLabelGBC.gridwidth = 2;
         numberOfSimulationLabelGBC.insets = new Insets(MARGIN_BETWEEN_COMPONENTS, MARGIN_BETWEEN_COMPONENTS, MARGIN_BETWEEN_COMPONENTS, MARGIN_BETWEEN_COMPONENTS);
 
         panel.add(numberOfSimulationLabel, numberOfSimulationLabelGBC);
@@ -141,8 +133,9 @@ public class HomeDialog extends JDialog implements ActionListener, ItemListener 
         SpinnerNumberModel numberModel = new SpinnerNumberModel(1, 1, 10, 1);
         this.simulationPerBatchesSpinner = new JSpinner(numberModel);
         GridBagConstraints simulationPerBatchesSpinnerGBC = new GridBagConstraints();
-        simulationPerBatchesSpinnerGBC.gridx = 3;
+        simulationPerBatchesSpinnerGBC.gridx = 1;
         simulationPerBatchesSpinnerGBC.gridy = 2;
+        simulationPerBatchesSpinnerGBC.gridwidth = 3;
         simulationPerBatchesSpinnerGBC.insets = new Insets(MARGIN_BETWEEN_COMPONENTS, MARGIN_BETWEEN_COMPONENTS, MARGIN_BETWEEN_COMPONENTS, FRAME_MARGIN);
 
         panel.add(simulationPerBatchesSpinner, simulationPerBatchesSpinnerGBC);

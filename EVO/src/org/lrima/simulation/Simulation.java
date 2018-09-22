@@ -70,6 +70,11 @@ public class Simulation extends Thread{
 		long currentTime = System.currentTimeMillis();
 		long timePassed = (long)msBetweenFrames;
 		while(running) {
+			if(generation > maxGenerations){
+
+				this.simulationEnd();
+				this.terminate();
+			}
 
 			if(!pausing) {
 				if(especesOpen.size() != 0 && Simulation.simulationTime < UserPrefs.TIME_LIMIT) {
@@ -115,12 +120,6 @@ public class Simulation extends Thread{
 
                 }
             }
-            //System.out.println(simulationTime);
-
-			if(generation >= maxGenerations){
-				this.simulationEnd();
-				this.terminate();
-			}
 
 		}
 	}
@@ -403,5 +402,9 @@ public class Simulation extends Thread{
 
 	public Class<?extends NeuralNetwork> getAlgorithm(){
     	return this.neuralNetworkToUse;
+	}
+
+	public ArrayList<Generation> getGenerations() {
+		return generations;
 	}
 }

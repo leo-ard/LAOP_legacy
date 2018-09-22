@@ -3,17 +3,18 @@ package org.lrima.Interface;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import javax.swing.*;
+
+import org.lrima.Interface.conclusion.ConclusionFrame;
 import org.lrima.core.UserPrefs;
 import org.lrima.espece.Espece;
+import org.lrima.espece.network.algorithms.neat.Genome;
 import org.lrima.espece.network.interfaces.NeuralNetwork;
 import org.lrima.map.Map;
 import org.lrima.map.MapPanel;
 import org.lrima.Interface.actions.*;
-import org.lrima.simulation.BatchListener;
-import org.lrima.simulation.Simulation;
-import org.lrima.simulation.SimulationBatch;
-import org.lrima.simulation.SimulationListener;
+import org.lrima.simulation.*;
 
 public class FrameManager extends JFrame implements SimulationListener, BatchListener {
 
@@ -34,6 +35,8 @@ public class FrameManager extends JFrame implements SimulationListener, BatchLis
     private JCheckBoxMenuItem checkBoxGraphique;
     private JCheckBoxMenuItem checkBoxFollowBest;
     private JCheckBoxMenuItem checkBoxEspeceInfo;
+
+
 	
 	public FrameManager() {
 	    if(instance == null){
@@ -298,6 +301,14 @@ public class FrameManager extends JFrame implements SimulationListener, BatchLis
     }
 
     private void allBatchFinished(){
-        System.out.println("All batches finished");
+        HashMap<Class<?extends NeuralNetwork>, ArrayList<SimulationInformation>> informationHashMap = new HashMap<>();
+
+        for(SimulationBatch batch : this.simulationBatches){
+            informationHashMap.put(batch.getAlgorithm(), batch.getSimulationInformations());
+        }
+
+        ConclusionFrame conclusionFrame = new ConclusionFrame(informationHashMap);
+        conclusionFrame.setVisible(true);
+        this.dispose();
     }
 }

@@ -22,6 +22,7 @@ public class EspeceInfoPanel extends JPanel {
 
     private Dimension screenSize;
 
+    //TODO: Mettre les infos dans une table
     public EspeceInfoPanel(){
 
         boxLayout = Box.createVerticalBox();
@@ -31,12 +32,12 @@ public class EspeceInfoPanel extends JPanel {
         //setSize(600, screenSize.height);
         setPreferredSize(new Dimension(screenSize.width / 5, screenSize.height));
 
-        //add(boxLayout, BorderLayout.NORTH);
+        add(boxLayout, BorderLayout.NORTH);
 
         load();
 
         networkPanel = new NetworkPanel(null);
-        this.add(networkPanel, BorderLayout.CENTER);
+        this.add(networkPanel, BorderLayout.SOUTH);
     }
 
     private void load(){

@@ -20,6 +20,9 @@ public class Capteur implements NeuralNetworkTransmitter {
 
 	public Obstacle lastObstacleCollided;
 	Simulation simulation;
+
+	private final Color SENSOR_COLOR = new Color(117, 104, 255);
+	private final Dimension SENSOR_DOT_SIZE = new Dimension(10, 10);
 	
 	public Capteur(/*Simulation simulation, */Espece e, double angle, int x, int y) {
 		this.e = e;
@@ -60,18 +63,9 @@ public class Capteur implements NeuralNetworkTransmitter {
 
 
 
-		g.drawLine(x1,y1,x1+lx,y1-ly);
-		g.setColor(Color.BLACK);
-		g.drawRect(x1+ (int)(lx*value),y1- (int)(ly*value), 1, 1);
+		g.setColor(this.SENSOR_COLOR);
+		g.fillOval(x1+ (int)(lx*value) - SENSOR_DOT_SIZE.width / 2,y1- (int)(ly*value) - SENSOR_DOT_SIZE.height / 2, SENSOR_DOT_SIZE.width, SENSOR_DOT_SIZE.height);
 	}
-
-	/*public double getX1() {
-		return e.getX() + x * Math.cos(e.getOrientation()) - y * Math.sin(e.getOrientation());
-	}
-
-	public double getY1() {
-		return e.getY() + x * Math.sin(e.getOrientation()) + y * Math.cos(e.getOrientation());
-	}*/
 
 	public Point.Double getPoint1(){
 	    return new Point.Double(e.getX(), e.getY());

@@ -1,6 +1,5 @@
 package org.lrima.core;
 
-import java.io.File;
 import java.util.prefs.Preferences;
 
 public class UserPrefs {

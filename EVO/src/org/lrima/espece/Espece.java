@@ -90,10 +90,12 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 
 	//Used to store the color of the car
 	private Color voitureColor = Color.RED;
+	private final Color SELECTED_CAR_BORDER_COLOR = new Color(83, 75, 255, 158);
 
 	//Stores the simulation reference
 	private Simulation simulation;
 	private Class<?extends NeuralNetwork> algorithm;
+
 
 	/**
 	 * Initialize the car with the map to put him into
@@ -277,7 +279,7 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 		g.setStroke(new BasicStroke(5));
 		g.setColor(Color.BLACK);
 		if(selected){
-			g.setColor(Color.BLUE);
+			g.setColor(SELECTED_CAR_BORDER_COLOR);
 		}
 		/*if(simulation.getBest() == this){
 			g.setColor(Color.YELLOW);

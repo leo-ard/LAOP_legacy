@@ -19,6 +19,7 @@ public class NetworkPanel extends JPanel{
 		super();
 		this.setPreferredSize(new Dimension(500, 500));
 		this.espece = espece;
+		this.setBackground(Color.PINK);
 	}
 	
 	public void start() {
@@ -37,9 +38,6 @@ public class NetworkPanel extends JPanel{
 	public void paintComponent(Graphics gra) {
 		super.paintComponent(gra);
 		Graphics2D g = (Graphics2D) gra;
-
-		g.setColor(Color.PINK);
-		g.fillRect(0, 0, this.getWidth(), this.getHeight());
 
 
 		g.setFont(new Font("Arial", 12, 12));
