@@ -1,7 +1,6 @@
 package org.lrima.espece.network.algorithms;
 
 import org.lrima.espece.network.algorithms.fullyconnected.FullyConnectedNeuralNetwork;
-import org.lrima.espece.network.algorithms.improved_neat.ImprovedNeatGenome;
 import org.lrima.espece.network.algorithms.neat.NeatGenome;
 import org.lrima.espece.network.interfaces.NeuralNetwork;
 
@@ -14,8 +13,6 @@ public class AlgorithmManager {
     public static Class<?extends NeuralNetwork>[] algorithms = new Class[]{
             FullyConnectedNeuralNetwork.class,
             NeatGenome.class,
-            ImprovedNeatGenome.class
-
     };
 
 }

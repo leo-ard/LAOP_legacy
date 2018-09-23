@@ -10,6 +10,7 @@ import org.lrima.Interface.conclusion.ConclusionFrame;
 import org.lrima.core.UserPrefs;
 import org.lrima.espece.Espece;
 import org.lrima.espece.network.interfaces.NeuralNetwork;
+import org.lrima.espece.network.interfaces.NeuralNetworkSuperviser;
 import org.lrima.map.Map;
 import org.lrima.map.MapPanel;
 import org.lrima.Interface.actions.*;
@@ -50,13 +51,14 @@ public class FrameManager extends JFrame implements SimulationListener, BatchLis
      * Sets the algorithm to use. It creates a new simulation and resets all the panels using the simulation
      * @param algorithm the algorithm to use
      */
-    public void addBatch(Class<?extends NeuralNetwork> algorithm, int numberInBatch){
+    public void addBatch(Class<?extends NeuralNetwork> algorithm, Class<? extends NeuralNetworkSuperviser> algorithmSupervisor, int numberInBatch){
         SimulationBatch simulationBatch = new SimulationBatch(algorithm, numberInBatch);
         this.simulationBatches.add(simulationBatch);
         simulationBatch.addBatchListener(this);
 
         for(Simulation simulation : simulationBatch.getSimulations()){
             simulation.addSimulationListener(this);
+            simulation.setNeuralNetworkSuperviser(algorithmSupervisor);
         }
 
     }

@@ -191,14 +191,14 @@ public class HomeDialog extends JFrame implements ActionListener, ItemListener {
 
 
         //resets the combo box with the new information
-
-        //Adds a item "All algorithms" to the end of the combo box
         String[] comboBoxItems = new String[this.algorithmsString.length + 1];
+
         for(int z = 0 ; z < this.algorithmsString.length; z++){
             comboBoxItems[z] = algorithmsString[z];
         }
+        //Adds a item "All algorithms" to the end of the combo box
         comboBoxItems[comboBoxItems.length - 1] = "All algorithms";
-        this.neuralNetworkComboBox = new JComboBox<>(comboBoxItems);
+        this.neuralNetworkComboBox = new JComboBox(comboBoxItems);
     }
 
     @Override
@@ -247,13 +247,13 @@ public class HomeDialog extends JFrame implements ActionListener, ItemListener {
         //If they don't select "All algorithms" from the combobox
         if(neuralNetworkComboBox.getSelectedIndex() < this.algorithms.length) {
             Class<? extends NeuralNetwork> algorithmChosen = (Class<NeuralNetwork>) this.algorithms[neuralNetworkComboBox.getSelectedIndex()];
-            frameManager.addBatch(algorithmChosen, simulationPerBatches);
+            frameManager.addBatch(algorithmChosen, algorithmChosen.getAnnotation(AlgorithmInformation.class).supervisor(), simulationPerBatches);
             this.dispose();
         }
         else{
             //All algorithms
             for(Class<?extends NeuralNetwork> algorithm : this.algorithms){
-                frameManager.addBatch(algorithm, simulationPerBatches);
+                frameManager.addBatch(algorithm,  algorithm.getAnnotation(AlgorithmInformation.class).supervisor(),simulationPerBatches);
                 this.dispose();
             }
         }
