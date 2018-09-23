@@ -1,8 +1,6 @@
 package org.lrima.espece.network.algorithms.neat;
 
-import org.lrima.espece.Espece;
 import org.lrima.espece.network.annotations.AlgorithmInformation;
-import org.lrima.espece.network.interfaces.NaturalSelectionSupervisor;
 import org.lrima.espece.network.interfaces.NeuralNetwork;
 import org.lrima.espece.network.interfaces.NeuralNetworkReceiver;
 import org.lrima.espece.network.interfaces.NeuralNetworkTransmitter;
@@ -150,7 +148,7 @@ public class NeatGenome extends NeuralNetwork {
      * 10% chance of adding a node between a connection
      */
     @Override
-    public void generationFinish() {
+    public void mutate() {
         int chanceWeightMutation = Random.getRandomIntegerValue(100);
         int chanceAddConnection = Random.getRandomIntegerValue(100);
         int chanceAddNode = Random.getRandomIntegerValue(100);

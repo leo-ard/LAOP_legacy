@@ -8,10 +8,10 @@ import org.lrima.core.UserPrefs;
 import org.lrima.espece.Espece;
 import org.lrima.espece.capteur.Capteur;
 import org.lrima.espece.network.interfaces.NeuralNetwork;
-import org.lrima.espece.network.interfaces.NeuralNetworkSuperviser;
 import org.lrima.map.Map;
 import org.lrima.map.Studio.Drawables.Line;
 import org.lrima.map.Studio.Drawables.Obstacle;
+import org.lrima.simulation.selection.NaturalSelection;
 
 public class Simulation extends Thread{
 
@@ -41,9 +41,6 @@ public class Simulation extends Thread{
     //The neural network that the cars in the next generation will have
     private Class<?extends NeuralNetwork> neuralNetworkToUse;
 
-    //NeuralNetworkSupervisor
-	private NeuralNetworkSuperviser neuralNetworkSuperviser;
-
     //Stores information about all the generations
     private ArrayList<Generation> generations;
 
@@ -60,6 +57,7 @@ public class Simulation extends Thread{
 		this.running = true;
 		this.generations = new ArrayList<>();
 		this.map = Map.loadMapFromPreferences();
+
 
 		this.initializeCars();
 	}
@@ -168,7 +166,6 @@ public class Simulation extends Thread{
 	 * Kills all the cars before mutating them
 	 */
 	public void nextGeneration(){
-		System.out.println("Go to next generation !");
 		//Add the generation to the array of generationInformation
 		this.generations.add(new Generation(this.generation, this.getClonedEspeceSet()));
 
@@ -190,14 +187,11 @@ public class Simulation extends Thread{
             especesOpen.remove(i);
         }
 
-        //Reset the arrays
-		especesOpen = new ArrayList<Espece>(this.neuralNetworkSuperviser.alterEspeceListAtGenerationFinish(especesClosed, this));
-        especesClosed = new ArrayList<Espece>();
-
+        //Mutate the cars
+        this.mutate();
 
 		for(Espece e : especesOpen){
 			e.resetEspece();
-			e.tpLikeNew();
 		}
 
         //Reset the time of the simulation
@@ -239,6 +233,16 @@ public class Simulation extends Thread{
 	}
 
 	/**
+	 * Start the mutation process by instantiating a NaturalSelection object
+	 * from the especesClosed array and retreive the new array to especesOpen
+	 */
+	public void mutate() {
+		NaturalSelection selection = new NaturalSelection(this, especesClosed);
+		this.especesOpen = selection.getMutatedList(map);
+		this.especesClosed = new ArrayList<Espece>();
+	}
+
+	/**
 	 * Find the best fitness in all the cars
 	 * @return the fitness of the best car
 	 */
@@ -260,10 +264,6 @@ public class Simulation extends Thread{
 
 		//Returns the car with the highest fitness (first)
 		return allCars.get(0);
-	}
-
-	public void addNeuralNetworkSuperviser(){
-
 	}
 
 	/**
@@ -364,14 +364,6 @@ public class Simulation extends Thread{
 	public void setRunning(boolean running) {
 		this.running = running;
 	}
-
-	public void setNeuralNetworkSuperviser(Class<? extends NeuralNetworkSuperviser> nns){
-        try {
-            this.neuralNetworkSuperviser = nns.newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
-    }
 
 	public ArrayList<Espece> getEspecesClosed() {
 		return especesClosed;
