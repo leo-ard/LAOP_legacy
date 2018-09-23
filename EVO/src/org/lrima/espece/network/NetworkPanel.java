@@ -7,9 +7,6 @@ import java.util.TimerTask;
 import javax.swing.*;
 
 import org.lrima.espece.Espece;
-import org.lrima.espece.network.interfaces.NeuralNetwork;
-import org.lrima.simulation.Simulation;
-import org.lrima.simulation.selection.NaturalSelection;
 
 public class NetworkPanel extends JPanel{
 
