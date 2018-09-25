@@ -302,14 +302,13 @@ public class FrameManager extends JFrame implements SimulationListener, BatchLis
     }
 
     private void allBatchFinished(){
-        HashMap<Class<?extends NeuralNetwork>, ArrayList<SimulationInformation>> informationHashMap = new HashMap<>();
-
-        for(SimulationBatch batch : this.simulationBatches){
-            informationHashMap.put(batch.getAlgorithm(), batch.getSimulationInformations());
-        }
-
-        ConclusionFrame conclusionFrame = new ConclusionFrame(informationHashMap);
-        conclusionFrame.setVisible(true);
         this.dispose();
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                ConclusionFrame conclusionFrame = new ConclusionFrame(simulationBatches);
+                conclusionFrame.setVisible(true);
+            }
+        });
     }
 }

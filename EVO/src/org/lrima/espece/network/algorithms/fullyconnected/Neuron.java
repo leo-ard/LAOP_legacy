@@ -3,6 +3,7 @@ package org.lrima.espece.network.algorithms.fullyconnected;
 import org.lrima.utils.Random;
 
 public class Neuron{
+
     private double value;
 
     public Neuron(){

@@ -22,7 +22,7 @@ public class Simulation extends Thread{
 
 	//Keep track of the current generation
 	private int generation = 1;
-	private int maxGenerations = 5;
+	private int maxGenerations = 20;
 
 	//Stores the cars in the simulation
 	private ArrayList<Espece> especesOpen;
@@ -159,7 +159,6 @@ public class Simulation extends Thread{
 				}
 			}
 		}
-
 	}
 
 	/**
@@ -235,7 +234,6 @@ public class Simulation extends Thread{
 		while(especesOpen.size() < numberOfCar) {
 			especesOpen.add(new Espece(this));
 		}
-		
 	}
 
 	/**

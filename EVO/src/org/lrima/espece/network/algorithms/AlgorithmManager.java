@@ -11,7 +11,6 @@ public class AlgorithmManager {
 
     //If you created a new algorithm, add it to this array.
     public static Class<?extends NeuralNetwork>[] algorithms = new Class[]{
-            FullyConnectedNeuralNetwork.class,
             NeatGenome.class,
     };
 

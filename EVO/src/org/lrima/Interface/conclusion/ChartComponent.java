@@ -24,12 +24,15 @@ public class ChartComponent extends JComponent {
     private Class<?extends NeuralNetwork> algorithm;
 
     private Dimension screensize;
+    private double max, min;
 
-    public ChartComponent(Class<?extends NeuralNetwork> algorithm, ArrayList<SimulationInformation> simulations){
+    public ChartComponent(Class<?extends NeuralNetwork> algorithm, ArrayList<SimulationInformation> simulations, double max, double min){
         super();
         this.algorithm = algorithm;
         this.simulations = simulations;
         this.screensize = Toolkit.getDefaultToolkit().getScreenSize();
+        this.min = min;
+        this.max = max;
 
         this.setLayout(new BorderLayout());
 
@@ -39,8 +42,8 @@ public class ChartComponent extends JComponent {
     private void showChart(){
         int chartWidth = (screensize.width / 2) - (ChartPanel.MARGIN_BETWEEN_CHARTS);
         batchChart = new XYChartBuilder().title(algorithm.getAnnotation(AlgorithmInformation.class).name()).xAxisTitle("Generation").yAxisTitle("Fitness").width(chartWidth).height(screensize.height / 3).build();
-        batchChart.getStyler().setYAxisMax((double)100);
-        batchChart.getStyler().setYAxisMin((double)-100);
+        batchChart.getStyler().setYAxisMax(max);
+        batchChart.getStyler().setYAxisMin(min);
         this.getData();
 
         //Lines

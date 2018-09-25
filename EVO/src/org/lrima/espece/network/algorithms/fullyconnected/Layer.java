@@ -9,6 +9,7 @@ import org.lrima.utils.Random;
 
 public class Layer{
     protected RealMatrix weights;
+
     protected ArrayList<Neuron> neurons = new ArrayList<>();
 
     public Layer(int nbNodes){
