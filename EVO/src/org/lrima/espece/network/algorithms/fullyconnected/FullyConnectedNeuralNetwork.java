@@ -116,7 +116,7 @@ public class FullyConnectedNeuralNetwork extends NeuralNetwork implements Serial
 	}
 
 
-	public void mutate(){
+	public void generationFinish(){
 		for(Layer layer : this.layers){
 			layer.mutate();
 		}
