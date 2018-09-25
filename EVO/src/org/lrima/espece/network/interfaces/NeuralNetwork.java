@@ -2,15 +2,20 @@ package org.lrima.espece.network.interfaces;
 
 import org.apache.commons.math3.linear.RealMatrix;
 import org.lrima.espece.Espece;
+import org.lrima.espece.network.interfaces.options.Option;
+import org.lrima.espece.network.interfaces.options.OptionInt;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 
 public abstract class NeuralNetwork {
 
     protected ArrayList<?extends NeuralNetworkTransmitter> transmitters;
     protected NeuralNetworkReceiver receiver;
     protected double fitness;
+    protected HashMap<String, Option> options;
 
     public NeuralNetwork(){
 
@@ -39,4 +44,10 @@ public abstract class NeuralNetwork {
     public abstract void generationFinish();
     public abstract void draw(Graphics2D g);
     public abstract NeuralNetwork crossOver(NeuralNetwork network1, NeuralNetwork network2);
+
+    public HashMap<String, Option> getOptions(){
+        return options;
+    }
+
+
 }
