@@ -130,7 +130,7 @@ public class HomeDialog extends JFrame implements ActionListener, ItemListener {
 
         panel.add(numberOfSimulationLabel, numberOfSimulationLabelGBC);
 
-        SpinnerNumberModel numberModel = new SpinnerNumberModel(1, 1, 10, 1);
+        SpinnerNumberModel numberModel = new SpinnerNumberModel(1, 1, 999, 1);
         this.simulationPerBatchesSpinner = new JSpinner(numberModel);
         GridBagConstraints simulationPerBatchesSpinnerGBC = new GridBagConstraints();
         simulationPerBatchesSpinnerGBC.gridx = 1;

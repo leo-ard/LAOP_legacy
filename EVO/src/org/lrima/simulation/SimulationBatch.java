@@ -30,6 +30,22 @@ public class SimulationBatch implements SimulationListener {
     }
 
 
+    public double[] getAverageFitnessPerGeneration(){
+        double[] fitnesses = new double[this.simulations[0].getGenerationList().size()];
+
+        for(int generation = 0 ; generation < this.simulations[0].getGenerationList().size() ; generation++){
+            int simulationIndex = 0;
+            for(Simulation simulation : this.simulations){
+                fitnesses[generation] = fitnesses[generation] + simulation.getGenerationList().get(generation).getMoyenneFitness();
+                simulationIndex++;
+            }
+            fitnesses[generation] = fitnesses[generation] / (simulationIndex + 1);
+        }
+
+        return fitnesses;
+    }
+
+
     public Simulation[] getSimulations() {
         return simulations;
     }
