@@ -1,12 +1,11 @@
-package org.lrima.espece.network.algorithms.fullyconnected;
+package org.lrima.network.algorithms.fullyconnected;
 
-import org.lrima.espece.network.annotations.AlgorithmInformation;
-import org.lrima.espece.network.interfaces.NeuralNetwork;
-import org.lrima.espece.network.interfaces.NeuralNetworkModel;
-import org.lrima.espece.network.interfaces.options.Option;
+import org.lrima.network.annotations.AlgorithmInformation;
+import org.lrima.network.interfaces.NeuralNetworkModel;
+import org.lrima.network.interfaces.options.Option;
 
 import java.util.HashMap;
-import org.lrima.espece.network.interfaces.options.*;
+import org.lrima.network.interfaces.options.*;
 
 @AlgorithmInformation(name="Fully Connected", description = "Fully connected network with one hidden layer containing 2 neurons. All neurons are connected to each neurons in the next layer.")
 public class FullyConnectedNeuralModel extends NeuralNetworkModel<FullyConnectedNeuralNetwork> {

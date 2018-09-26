@@ -1,4 +1,4 @@
-package org.lrima.espece.network.interfaces;
+package org.lrima.network.interfaces;
 
 import org.lrima.espece.Espece;
 import org.lrima.simulation.Simulation;

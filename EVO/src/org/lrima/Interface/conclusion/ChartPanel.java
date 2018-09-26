@@ -3,7 +3,7 @@ package org.lrima.Interface.conclusion;
 import org.knowm.xchart.XChartPanel;
 import org.knowm.xchart.XYChart;
 import org.knowm.xchart.XYChartBuilder;
-import org.lrima.espece.network.interfaces.NeuralNetworkModel;
+import org.lrima.network.interfaces.NeuralNetworkModel;
 import org.lrima.simulation.SimulationBatch;
 import org.lrima.simulation.SimulationInformation;
 

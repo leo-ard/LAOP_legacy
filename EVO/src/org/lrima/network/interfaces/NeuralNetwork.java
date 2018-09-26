@@ -1,14 +1,10 @@
-package org.lrima.espece.network.interfaces;
+package org.lrima.network.interfaces;
 
-import org.apache.commons.math3.linear.RealMatrix;
-import org.lrima.espece.Espece;
-import org.lrima.espece.network.interfaces.options.Option;
-import org.lrima.espece.network.interfaces.options.OptionInt;
+import org.lrima.network.interfaces.options.Option;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 
 public abstract class NeuralNetwork {
 

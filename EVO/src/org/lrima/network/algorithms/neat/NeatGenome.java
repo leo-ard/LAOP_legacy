@@ -1,9 +1,7 @@
-package org.lrima.espece.network.algorithms.neat;
+package org.lrima.network.algorithms.neat;
 
-import org.lrima.espece.Espece;
-import org.lrima.espece.network.annotations.AlgorithmInformation;
-import org.lrima.espece.network.interfaces.*;
-import org.lrima.espece.network.interfaces.options.Option;
+import org.lrima.network.interfaces.*;
+import org.lrima.network.interfaces.options.Option;
 import org.lrima.utils.Random;
 
 import java.awt.*;

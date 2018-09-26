@@ -8,9 +8,9 @@ import org.lrima.annotations.DisplayInfo;
 import org.lrima.core.UserPrefs;
 
 import org.lrima.espece.capteur.Capteur;
-import org.lrima.espece.network.interfaces.NeuralNetwork;
-import org.lrima.espece.network.interfaces.NeuralNetworkModel;
-import org.lrima.espece.network.interfaces.NeuralNetworkReceiver;
+import org.lrima.network.interfaces.NeuralNetwork;
+import org.lrima.network.interfaces.NeuralNetworkModel;
+import org.lrima.network.interfaces.NeuralNetworkReceiver;
 import org.lrima.map.Studio.Drawables.Line;
 import org.lrima.map.Studio.Drawables.Obstacle;
 import org.lrima.simulation.Simulation;

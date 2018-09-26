@@ -1,10 +1,7 @@
-package org.lrima.espece.network.interfaces;
+package org.lrima.network.interfaces;
 
 import org.lrima.core.UserPrefs;
 import org.lrima.espece.Espece;
-import org.lrima.espece.network.interfaces.NeuralNetwork;
-import org.lrima.espece.network.interfaces.NeuralNetworkSuperviser;
-import org.lrima.map.Map;
 import org.lrima.simulation.Simulation;
 import org.lrima.utils.Random;
 

@@ -8,7 +8,7 @@ import javax.swing.*;
 import org.lrima.Interface.conclusion.ConclusionFrame;
 import org.lrima.core.UserPrefs;
 import org.lrima.espece.Espece;
-import org.lrima.espece.network.interfaces.NeuralNetworkModel;
+import org.lrima.network.interfaces.NeuralNetworkModel;
 import org.lrima.map.Map;
 import org.lrima.map.MapPanel;
 import org.lrima.Interface.actions.*;

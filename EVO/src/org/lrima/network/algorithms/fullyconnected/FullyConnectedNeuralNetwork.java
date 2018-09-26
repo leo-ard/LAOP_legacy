@@ -1,4 +1,4 @@
-package org.lrima.espece.network.algorithms.fullyconnected;
+package org.lrima.network.algorithms.fullyconnected;
 
 import java.awt.*;
 import java.io.Serializable;
@@ -6,13 +6,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.apache.commons.math3.linear.MatrixUtils;
-import org.lrima.espece.network.annotations.AlgorithmInformation;
-import org.lrima.espece.network.interfaces.NeuralNetwork;
-import org.lrima.espece.network.interfaces.NeuralNetworkModel;
-import org.lrima.espece.network.interfaces.NeuralNetworkReceiver;
-import org.lrima.espece.network.interfaces.NeuralNetworkTransmitter;
+import org.lrima.network.interfaces.NeuralNetwork;
+import org.lrima.network.interfaces.NeuralNetworkReceiver;
+import org.lrima.network.interfaces.NeuralNetworkTransmitter;
 import org.apache.commons.math3.linear.RealMatrix;
-import org.lrima.espece.network.interfaces.options.Option;
+import org.lrima.network.interfaces.options.Option;
 
 public class FullyConnectedNeuralNetwork extends NeuralNetwork implements Serializable {
 

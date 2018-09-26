@@ -1,10 +1,9 @@
-package org.lrima.espece.network.algorithms.neat;
+package org.lrima.network.algorithms.neat;
 
-import org.lrima.espece.network.annotations.AlgorithmInformation;
-import org.lrima.espece.network.interfaces.NeuralNetwork;
-import org.lrima.espece.network.interfaces.NeuralNetworkModel;
-import org.lrima.espece.network.interfaces.options.Option;
-import org.lrima.espece.network.interfaces.options.OptionInt;
+import org.lrima.network.annotations.AlgorithmInformation;
+import org.lrima.network.interfaces.NeuralNetworkModel;
+import org.lrima.network.interfaces.options.Option;
+import org.lrima.network.interfaces.options.OptionInt;
 
 import java.util.HashMap;
 

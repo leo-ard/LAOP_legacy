@@ -1,7 +1,6 @@
 package org.lrima.simulation;
 
-import org.lrima.espece.network.interfaces.NeuralNetwork;
-import org.lrima.espece.network.interfaces.NeuralNetworkModel;
+import org.lrima.network.interfaces.NeuralNetworkModel;
 
 import java.util.ArrayList;
 

@@ -1,4 +1,4 @@
-package org.lrima.espece.network.functions;
+package org.lrima.network.functions;
 
 public class Function {
 	public static IFunction SIGMOID = new IFunction() {

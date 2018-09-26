@@ -1,7 +1,7 @@
-package org.lrima.espece.network.annotations;
+package org.lrima.network.annotations;
 
-import org.lrima.espece.network.interfaces.NaturalSelectionSupervisor;
-import org.lrima.espece.network.interfaces.NeuralNetworkSuperviser;
+import org.lrima.network.interfaces.NaturalSelectionSupervisor;
+import org.lrima.network.interfaces.NeuralNetworkSuperviser;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

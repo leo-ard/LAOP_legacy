@@ -3,8 +3,7 @@ package org.lrima.espece.capteur;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import org.lrima.espece.Espece;
-import org.lrima.espece.network.interfaces.NeuralNetworkTransmitter;
-import org.lrima.map.Studio.Drawables.Line;
+import org.lrima.network.interfaces.NeuralNetworkTransmitter;
 import org.lrima.map.Studio.Drawables.Obstacle;
 import org.lrima.simulation.Simulation;
 

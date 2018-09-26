@@ -1,7 +1,6 @@
-package org.lrima.espece.network.interfaces.options;
+package org.lrima.network.interfaces.options;
 
 import javax.swing.*;
-import java.awt.*;
 
 public class OptionInt implements Option<Integer> {
     private JSpinner spinner;

@@ -1,10 +1,10 @@
-package org.lrima.espece.network.interfaces;
+package org.lrima.network.interfaces;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
-import org.lrima.espece.network.annotations.AlgorithmInformation;
-import org.lrima.espece.network.interfaces.options.Option;
+import org.lrima.network.annotations.AlgorithmInformation;
+import org.lrima.network.interfaces.options.Option;
 
 public abstract class NeuralNetworkModel<T extends NeuralNetwork> {
     /**

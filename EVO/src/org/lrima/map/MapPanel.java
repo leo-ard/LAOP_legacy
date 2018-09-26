@@ -21,7 +21,6 @@ import javax.swing.JPanel;
 import org.lrima.Interface.FrameManager;
 import org.lrima.core.UserPrefs;
 import org.lrima.espece.Espece;
-import org.lrima.espece.network.annotations.AlgorithmInformation;
 import org.lrima.map.Studio.Drawables.Line;
 import org.lrima.map.Studio.Drawables.Obstacle;
 import org.lrima.simulation.Simulation;

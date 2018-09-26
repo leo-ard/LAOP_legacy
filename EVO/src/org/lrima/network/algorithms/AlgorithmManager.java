@@ -1,9 +1,9 @@
-package org.lrima.espece.network.algorithms;
+package org.lrima.network.algorithms;
 
-import org.lrima.espece.network.algorithms.fullyconnected.FullyConnectedNeuralModel;
-import org.lrima.espece.network.algorithms.neat.NeatModel;
-import org.lrima.espece.network.annotations.AlgorithmInformation;
-import org.lrima.espece.network.interfaces.NeuralNetworkModel;
+import org.lrima.network.algorithms.fullyconnected.FullyConnectedNeuralModel;
+import org.lrima.network.algorithms.neat.NeatModel;
+import org.lrima.network.annotations.AlgorithmInformation;
+import org.lrima.network.interfaces.NeuralNetworkModel;
 
 import java.util.ArrayList;
 import java.util.Arrays;

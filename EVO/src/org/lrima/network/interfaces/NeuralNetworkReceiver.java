@@ -1,4 +1,4 @@
-package org.lrima.espece.network.interfaces;
+package org.lrima.network.interfaces;
 
 public interface NeuralNetworkReceiver {
     public void setNeuralNetworkOutput(double ... outputs);

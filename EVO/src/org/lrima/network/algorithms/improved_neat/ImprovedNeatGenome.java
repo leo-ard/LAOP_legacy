@@ -1,11 +1,10 @@
-package org.lrima.espece.network.algorithms.improved_neat;
+package org.lrima.network.algorithms.improved_neat;
 
-import org.lrima.espece.network.algorithms.neat.NeatModel;
-import org.lrima.espece.network.annotations.AlgorithmInformation;
-import org.lrima.espece.network.interfaces.NeuralNetwork;
-import org.lrima.espece.network.interfaces.NeuralNetworkReceiver;
-import org.lrima.espece.network.interfaces.NeuralNetworkTransmitter;
-import org.lrima.espece.network.interfaces.options.Option;
+import org.lrima.network.annotations.AlgorithmInformation;
+import org.lrima.network.interfaces.NeuralNetwork;
+import org.lrima.network.interfaces.NeuralNetworkReceiver;
+import org.lrima.network.interfaces.NeuralNetworkTransmitter;
+import org.lrima.network.interfaces.options.Option;
 import org.lrima.utils.Random;
 
 import java.awt.*;

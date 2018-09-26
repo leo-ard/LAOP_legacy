@@ -1,4 +1,4 @@
-package org.lrima.espece.network;
+package org.lrima.network;
 
 import java.awt.*;
 import java.util.Timer;

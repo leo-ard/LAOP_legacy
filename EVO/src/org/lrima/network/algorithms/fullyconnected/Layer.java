@@ -1,10 +1,10 @@
-package org.lrima.espece.network.algorithms.fullyconnected;
+package org.lrima.network.algorithms.fullyconnected;
 
 
 import java.util.ArrayList;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
-import org.lrima.espece.network.functions.Function;
+import org.lrima.network.functions.Function;
 import org.lrima.utils.Random;
 
 public class Layer{

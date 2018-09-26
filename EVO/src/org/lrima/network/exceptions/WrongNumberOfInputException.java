@@ -1,4 +1,4 @@
-package org.lrima.espece.network.exceptions;
+package org.lrima.network.exceptions;
 
 public class WrongNumberOfInputException extends Exception {
 

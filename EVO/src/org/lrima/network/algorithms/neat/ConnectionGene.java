@@ -1,4 +1,4 @@
-package org.lrima.espece.network.algorithms.neat;
+package org.lrima.network.algorithms.neat;
 
 import org.lrima.utils.Random;
 

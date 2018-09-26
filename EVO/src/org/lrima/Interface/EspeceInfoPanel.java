@@ -2,10 +2,9 @@ package org.lrima.Interface;
 
 import org.lrima.annotations.DisplayInfo;
 import org.lrima.espece.Espece;
-import org.lrima.espece.network.NetworkPanel;
+import org.lrima.network.NetworkPanel;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 import java.awt.*;
 import java.lang.reflect.Field;
 import java.text.DecimalFormat;

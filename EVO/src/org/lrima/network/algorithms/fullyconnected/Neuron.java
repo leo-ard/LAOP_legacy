@@ -1,4 +1,4 @@
-package org.lrima.espece.network.algorithms.fullyconnected;
+package org.lrima.network.algorithms.fullyconnected;
 
 import org.lrima.utils.Random;
 
