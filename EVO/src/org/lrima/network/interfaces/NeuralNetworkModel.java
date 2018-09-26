@@ -2,6 +2,7 @@ package org.lrima.network.interfaces;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import org.lrima.network.annotations.AlgorithmInformation;
 import org.lrima.network.interfaces.options.Option;
@@ -18,7 +19,7 @@ public abstract class NeuralNetworkModel<T extends NeuralNetwork> {
      *
      * @return A hashmap populated with default values
      */
-    public abstract HashMap<String, Option> getDefaultOptions();
+    public abstract LinkedHashMap<String, Option> getDefaultOptions();
 
 
     public HashMap<String, Option> getOptions() {
