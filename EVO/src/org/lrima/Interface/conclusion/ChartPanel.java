@@ -3,18 +3,13 @@ package org.lrima.Interface.conclusion;
 import org.knowm.xchart.XChartPanel;
 import org.knowm.xchart.XYChart;
 import org.knowm.xchart.XYChartBuilder;
-import org.lrima.Interface.GraphicPanel;
-import org.lrima.espece.network.annotations.AlgorithmInformation;
-import org.lrima.espece.network.interfaces.NeuralNetwork;
+import org.lrima.espece.network.interfaces.NeuralNetworkModel;
 import org.lrima.simulation.SimulationBatch;
 import org.lrima.simulation.SimulationInformation;
 
 import javax.swing.*;
-import javax.swing.border.BevelBorder;
-import javax.swing.border.Border;
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class ChartPanel extends JPanel {
     //private HashMap<Class<?extends NeuralNetwork>, ArrayList<SimulationInformation>> simulationInformations;
@@ -52,7 +47,7 @@ public class ChartPanel extends JPanel {
         }
 
         for(SimulationBatch batch : this.algorithmBatches){
-            Class<?extends NeuralNetwork> algorithm = batch.getAlgorithm();
+            NeuralNetworkModel algorithm = batch.getAlgorithmModel();
             ArrayList<SimulationInformation> simulationInformations = batch.getSimulationInformations();
 
             ChartComponent chart = new ChartComponent(algorithm, simulationInformations, max, min);
@@ -68,7 +63,7 @@ public class ChartPanel extends JPanel {
         XYChart allAlgorithmChart = new XYChartBuilder().title("Overall fitness over time").xAxisTitle("Generation").yAxisTitle("Fitness").width(chartWidth).height(chartHeight).build();
 
         for(SimulationBatch batch : this.algorithmBatches){
-            allAlgorithmChart.addSeries(batch.getAlgorithm().getAnnotation(AlgorithmInformation.class).name(), this.getGenerationsAsList(batch), batch.getAverageFitnessPerGeneration());
+            allAlgorithmChart.addSeries(batch.getAlgorithmModel().getAlgorithmInformationAnnotation().name(), this.getGenerationsAsList(batch), batch.getAverageFitnessPerGeneration());
         }
 
         XChartPanel<XYChart> chartPanel = new XChartPanel<>(allAlgorithmChart);

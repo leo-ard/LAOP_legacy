@@ -5,15 +5,14 @@ import java.util.*;
 
 import org.lrima.Interface.FrameManager;
 import org.lrima.annotations.DisplayInfo;
-import org.lrima.core.EVO;
 import org.lrima.core.UserPrefs;
 
 import org.lrima.espece.capteur.Capteur;
 import org.lrima.espece.network.interfaces.NeuralNetwork;
+import org.lrima.espece.network.interfaces.NeuralNetworkModel;
 import org.lrima.espece.network.interfaces.NeuralNetworkReceiver;
 import org.lrima.map.Studio.Drawables.Line;
 import org.lrima.map.Studio.Drawables.Obstacle;
-import org.lrima.Interface.EspeceInfoPanel;
 import org.lrima.simulation.Simulation;
 import org.lrima.map.Map;
 
@@ -94,7 +93,7 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 
 	//Stores the simulation reference
 	private Simulation simulation;
-	private Class<?extends NeuralNetwork> algorithm;
+	private NeuralNetworkModel algorithmModel;
 
 
 	/**
@@ -104,7 +103,7 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 	 */
 	public Espece(Simulation simulation) {
 
-		this.algorithm = simulation.getAlgorithm();
+		this.algorithmModel = simulation.getAlgorithm();
 
 		//Do the base configuration
 		this.simulation = simulation;
@@ -123,12 +122,8 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 		//Setup a base neural network for the car to have
 		//If you want to choose which neural network to use, call Espece(Map, NeuralNetwork)
 		//neuralNetwork = new NeuralNetwork(NB_CAPTEUR, 2, true);
-		try {
-			neuralNetwork = this.algorithm.getConstructor().newInstance();
-			neuralNetwork.init(this.capteurs, this);
-		}catch (Exception e){
-			e.printStackTrace();
-		}
+		this.neuralNetwork = this.algorithmModel.getInstance();
+		this.neuralNetwork.init(this.capteurs, this);
     }
 
 	/**

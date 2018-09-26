@@ -7,9 +7,15 @@ package org.lrima.Interface;
 import org.lrima.espece.network.algorithms.AlgorithmManager;
 import org.lrima.espece.network.annotations.AlgorithmInformation;
 import org.lrima.espece.network.interfaces.NeuralNetwork;
+import org.lrima.espece.network.interfaces.NeuralNetworkModel;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.function.Function;
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
@@ -24,8 +30,8 @@ public class HomeDialog extends JFrame implements ActionListener, ItemListener {
     private JComboBox<String> neuralNetworkComboBox = new JComboBox<>();
     private JSpinner simulationPerBatchesSpinner;
 
-    private String[] algorithmsString;
-    private Class<?extends NeuralNetwork>[] algorithms;
+    private ArrayList<String> algorithmsNames;
+
 
     private final int FRAME_MARGIN = 20;
     private final int MARGIN_BETWEEN_COMPONENTS = 10;
@@ -142,7 +148,7 @@ public class HomeDialog extends JFrame implements ActionListener, ItemListener {
 
         //Algorithm description
         algorithmDescriptionPane = new JTextPane();
-        String descriptionText = this.algorithms[neuralNetworkComboBox.getSelectedIndex()].getAnnotation(AlgorithmInformation.class).description();
+        String descriptionText = AlgorithmManager.algorithms.get(neuralNetworkComboBox.getSelectedIndex()).getAnnotation(AlgorithmInformation.class).description();
         this.algorithmDescriptionPane.setText(descriptionText);
         algorithmDescriptionPane.setEditable(false);
 
@@ -173,61 +179,47 @@ public class HomeDialog extends JFrame implements ActionListener, ItemListener {
      * Get all the the algorithms registered in the AlgorithmManager class
      */
     private void loadAlgorithms(){
-        this.algorithmsString = new String[AlgorithmManager.algorithms.length];
-        this.algorithms = new Class[AlgorithmManager.algorithms.length];
-
-        for(int i = 0 ; i < AlgorithmManager.algorithms.length ; i++){
-            Class<?extends NeuralNetwork> algorithmClass = AlgorithmManager.algorithms[i];
-            algorithms[i] = algorithmClass;
-
-            try {
-                algorithmsString[i] = algorithmClass.getAnnotation(AlgorithmInformation.class).name();
-            }catch (NullPointerException e){
-                System.err.println("The class '" + algorithmClass.getName() + "' registered in AlgorithmManager does not have the @AlgorithmInformation annotation");
-                algorithmsString[i] = "Error";
-            }
-
-        }
-
-
         //resets the combo box with the new information
-        String[] comboBoxItems = new String[this.algorithmsString.length + 1];
 
-        for(int z = 0 ; z < this.algorithmsString.length; z++){
-            comboBoxItems[z] = algorithmsString[z];
-        }
         //Adds a item "All algorithms" to the end of the combo box
-        comboBoxItems[comboBoxItems.length - 1] = "All algorithms";
-        this.neuralNetworkComboBox = new JComboBox(comboBoxItems);
+        ArrayList<String> names = AlgorithmManager.algorithmsName;
+        names.add("All algorithms");
+        this.neuralNetworkComboBox = new JComboBox(names.toArray());
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource() == this.okButton){
-            loadSelectedAlgorithm();
+            try {
+                loadSelectedAlgorithm();
+            } catch (InstantiationException e1) {
+                e1.printStackTrace();
+            }
         }
     }
 
     @Override
     public void itemStateChanged(ItemEvent e) {
-        if(e.getStateChange() == ItemEvent.SELECTED){
-            if(neuralNetworkComboBox.getSelectedIndex() < algorithms.length) {
-                try {
-                    String descriptionText = this.algorithms[neuralNetworkComboBox.getSelectedIndex()].getAnnotation(AlgorithmInformation.class).description();
-                    this.algorithmDescriptionPane.setText(descriptionText);
-                }catch (NullPointerException exception){
-                    System.err.println("The class '" + this.algorithms[neuralNetworkComboBox.getSelectedIndex()].getName() + "' registered in AlgorithmManager does not have the @AlgorithmInformation annotation");
-                    this.algorithmDescriptionPane.setText("Error");
-                }
-            }else{
-                //Set the description of the "All Algorithms" combo box item
-                String description = "Simulate all algorithms at the same time. The graphics are disabled and you only see a chart of each algorithms with the fitness over time.";
-                this.algorithmDescriptionPane.setText(description);
+        if(e.getStateChange() != ItemEvent.SELECTED)
+            return;
+
+        if(neuralNetworkComboBox.getSelectedItem().toString().equals("All algorithms")) {
+            try {
+                String descriptionText = AlgorithmManager.algorithms.get(neuralNetworkComboBox.getSelectedIndex()).getAnnotation(AlgorithmInformation.class).description();
+                this.algorithmDescriptionPane.setText(descriptionText);
+            }catch (NullPointerException exception){
+                System.err.println("The class '" + AlgorithmManager.algorithms.get(neuralNetworkComboBox.getSelectedIndex()).getName() + "' registered in AlgorithmManager does not have the @AlgorithmInformation annotation");
+                this.algorithmDescriptionPane.setText("Error");
             }
+        }else{
+            //Set the description of the "All Algorithms" combo box item
+            String description = "Simulate all algorithms at the same time. The graphics are disabled and you only see a chart of each algorithms with the fitness over time.";
+            this.algorithmDescriptionPane.setText(description);
         }
+
     }
 
-    private void loadSelectedAlgorithm(){
+    private void loadSelectedAlgorithm() throws InstantiationException {
         FrameManager frameManager = new FrameManager();
 
         int simulationPerBatches;
@@ -244,16 +236,24 @@ public class HomeDialog extends JFrame implements ActionListener, ItemListener {
             simulationPerBatches = 1;
         }
 
-        //If they don't select "All algorithms" from the combobox
-        if(neuralNetworkComboBox.getSelectedIndex() < this.algorithms.length) {
-            Class<? extends NeuralNetwork> algorithmChosen = (Class<NeuralNetwork>) this.algorithms[neuralNetworkComboBox.getSelectedIndex()];
-            frameManager.addBatch(algorithmChosen, algorithmChosen.getAnnotation(AlgorithmInformation.class).supervisor(), simulationPerBatches);
+        if(!neuralNetworkComboBox.getSelectedItem().toString().equals("All algorithms")) {
+            try {
+                NeuralNetworkModel algorithmChosen = AlgorithmManager.algorithms.get(neuralNetworkComboBox.getSelectedIndex()).getConstructor().newInstance();
+                frameManager.addBatch(algorithmChosen, simulationPerBatches);
+            } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                e.printStackTrace();
+            }
             this.dispose();
         }
         else{
             //All algorithms
-            for(Class<?extends NeuralNetwork> algorithm : this.algorithms){
-                frameManager.addBatch(algorithm,  algorithm.getAnnotation(AlgorithmInformation.class).supervisor(),simulationPerBatches);
+            for(Class<?extends NeuralNetworkModel> algorithm : AlgorithmManager.algorithms){
+                try {
+                    NeuralNetworkModel algorithmInstance = algorithm.getConstructor().newInstance();
+                    frameManager.addBatch(algorithmInstance,simulationPerBatches);
+                } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                    e.printStackTrace();
+                }
                 this.dispose();
             }
         }

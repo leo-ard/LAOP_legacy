@@ -1,9 +1,11 @@
 package org.lrima.espece.network.algorithms.improved_neat;
 
+import org.lrima.espece.network.algorithms.neat.NeatModel;
 import org.lrima.espece.network.annotations.AlgorithmInformation;
 import org.lrima.espece.network.interfaces.NeuralNetwork;
 import org.lrima.espece.network.interfaces.NeuralNetworkReceiver;
 import org.lrima.espece.network.interfaces.NeuralNetworkTransmitter;
+import org.lrima.espece.network.interfaces.options.Option;
 import org.lrima.utils.Random;
 
 import java.awt.*;
@@ -18,7 +20,8 @@ public class ImprovedNeatGenome extends NeuralNetwork {
 
     private final int nbOutput = 2;
 
-    public ImprovedNeatGenome(){
+    public ImprovedNeatGenome(HashMap<String, Option> neuralNetworkModel){
+        super(neuralNetworkModel);
         this.connections = new ArrayList<>();
         this.nodes = new ArrayList<>();
     }
@@ -63,7 +66,7 @@ public class ImprovedNeatGenome extends NeuralNetwork {
      */
     @Override
     public NeuralNetwork crossOver(NeuralNetwork network1, NeuralNetwork network2) {
-        ImprovedNeatGenome child = new ImprovedNeatGenome();
+        ImprovedNeatGenome child = new ImprovedNeatGenome(this.options);
 
         ImprovedNeatGenome parent1 = (ImprovedNeatGenome) network1;
         ImprovedNeatGenome parent2 = (ImprovedNeatGenome) network2;
@@ -151,7 +154,6 @@ public class ImprovedNeatGenome extends NeuralNetwork {
      * 10% chance of adding a connection
      * 10% chance of adding a node between a connection
      */
-    @Override
     public void mutate() {
         int chanceWeightMutation = Random.getRandomIntegerValue(100);
         int chanceAddConnection = Random.getRandomIntegerValue(100);
@@ -291,6 +293,11 @@ public class ImprovedNeatGenome extends NeuralNetwork {
         }
 
         this.receiver.setNeuralNetworkOutput(outputNodesValues);
+    }
+
+    @Override
+    public void generationFinish() {
+        this.mutate();
     }
 
     /**

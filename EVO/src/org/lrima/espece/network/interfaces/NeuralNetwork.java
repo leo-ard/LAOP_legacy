@@ -17,8 +17,8 @@ public abstract class NeuralNetwork {
     protected double fitness;
     protected HashMap<String, Option> options;
 
-    public NeuralNetwork(){
-
+    public NeuralNetwork(HashMap<String, Option> options){
+        this.options = options;
     }
 
     /**
@@ -45,9 +45,6 @@ public abstract class NeuralNetwork {
     public abstract void draw(Graphics2D g);
     public abstract NeuralNetwork crossOver(NeuralNetwork network1, NeuralNetwork network2);
 
-    public HashMap<String, Option> getOptions(){
-        return options;
-    }
 
 
 }

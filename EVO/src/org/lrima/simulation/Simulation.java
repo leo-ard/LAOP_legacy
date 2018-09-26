@@ -8,6 +8,7 @@ import org.lrima.core.UserPrefs;
 import org.lrima.espece.Espece;
 import org.lrima.espece.capteur.Capteur;
 import org.lrima.espece.network.interfaces.NeuralNetwork;
+import org.lrima.espece.network.interfaces.NeuralNetworkModel;
 import org.lrima.espece.network.interfaces.NeuralNetworkSuperviser;
 import org.lrima.map.Map;
 import org.lrima.map.Studio.Drawables.Line;
@@ -39,7 +40,7 @@ public class Simulation extends Thread{
     private boolean shouldRestart = false;
 
     //The neural network that the cars in the next generation will have
-    private Class<?extends NeuralNetwork> neuralNetworkToUse;
+    private NeuralNetworkModel algorithmModel;
 
     //NeuralNetworkSupervisor
 	private NeuralNetworkSuperviser neuralNetworkSuperviser;
@@ -52,9 +53,10 @@ public class Simulation extends Thread{
 	/**
 	 * Initialize variables
 	 */
-	public Simulation(Class<?extends NeuralNetwork> neuralNetworkClass) {
+	public Simulation(NeuralNetworkModel algorithmModel) {
 		super();
-		this.neuralNetworkToUse = neuralNetworkClass;
+		this.algorithmModel = algorithmModel;
+		this.neuralNetworkSuperviser = algorithmModel.getSuperviser();
 
 		Simulation.simulationTime = 0;
 		this.running = true;
@@ -167,7 +169,6 @@ public class Simulation extends Thread{
 	 * Kills all the cars before mutating them
 	 */
 	public void nextGeneration(){
-		System.out.println("Go to next generation !");
 		//Add the generation to the array of generationInformation
 		this.generations.add(new Generation(this.generation, this.getClonedEspeceSet()));
 
@@ -406,8 +407,8 @@ public class Simulation extends Thread{
 		return maxGenerations;
 	}
 
-	public Class<?extends NeuralNetwork> getAlgorithm(){
-    	return this.neuralNetworkToUse;
+	public NeuralNetworkModel getAlgorithm(){
+    	return this.algorithmModel;
 	}
 
 	public ArrayList<Generation> getGenerations() {

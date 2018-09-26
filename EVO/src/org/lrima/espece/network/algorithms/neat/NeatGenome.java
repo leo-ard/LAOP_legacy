@@ -2,17 +2,14 @@ package org.lrima.espece.network.algorithms.neat;
 
 import org.lrima.espece.Espece;
 import org.lrima.espece.network.annotations.AlgorithmInformation;
-import org.lrima.espece.network.interfaces.NaturalSelectionSupervisor;
-import org.lrima.espece.network.interfaces.NeuralNetwork;
-import org.lrima.espece.network.interfaces.NeuralNetworkReceiver;
-import org.lrima.espece.network.interfaces.NeuralNetworkTransmitter;
+import org.lrima.espece.network.interfaces.*;
+import org.lrima.espece.network.interfaces.options.Option;
 import org.lrima.utils.Random;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-@AlgorithmInformation(name="NEAT Algorithm", description = "Neural Network using the NEAT algorithm. The network starts with one connections from random inputs that goes into one of the outputs. With each generations, the network grows to try to find the best solution.")
 public class NeatGenome extends NeuralNetwork {
 
     private ArrayList<ConnectionGene> connections;
@@ -20,10 +17,12 @@ public class NeatGenome extends NeuralNetwork {
 
     private final int nbOutput = 2;
 
-    public NeatGenome(){
+    public NeatGenome(HashMap<String, Option> options) {
+        super(options);
         this.connections = new ArrayList<>();
         this.nodes = new ArrayList<>();
     }
+
 
     /**
      * Init the NeatGenome with the inputs and outputs nodes.
@@ -61,7 +60,7 @@ public class NeatGenome extends NeuralNetwork {
      */
     @Override
     public NeuralNetwork crossOver(NeuralNetwork network1, NeuralNetwork network2) {
-        NeatGenome child = new NeatGenome();
+        NeatGenome child = new NeatGenome(this.options);
 
         NeatGenome parent1 = (NeatGenome) network1;
         NeatGenome parent2 = (NeatGenome) network2;

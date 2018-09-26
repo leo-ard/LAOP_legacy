@@ -23,7 +23,6 @@ public class NaturalSelectionSupervisor implements NeuralNetworkSuperviser {
         this.kill50(especes);
         this.repopulate(especes, simulation);
 
-        System.out.println(especes.size());
         return especes;
     }
 
