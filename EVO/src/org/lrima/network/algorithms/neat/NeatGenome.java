@@ -7,6 +7,7 @@ import org.lrima.utils.Random;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public class NeatGenome extends NeuralNetwork {
 
@@ -15,7 +16,7 @@ public class NeatGenome extends NeuralNetwork {
 
     private final int nbOutput = 2;
 
-    public NeatGenome(HashMap<String, Option> options) {
+    public NeatGenome(LinkedHashMap<String, Option> options) {
         super(options);
         this.connections = new ArrayList<>();
         this.nodes = new ArrayList<>();

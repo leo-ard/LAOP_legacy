@@ -5,6 +5,8 @@ import org.lrima.network.interfaces.NeuralNetworkModel;
 import org.lrima.network.interfaces.options.Option;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+
 import org.lrima.network.interfaces.options.*;
 
 @AlgorithmInformation(name="Fully Connected", description = "Fully connected network with one hidden layer containing 2 neurons. All neurons are connected to each neurons in the next layer.")
@@ -12,7 +14,7 @@ public class FullyConnectedNeuralModel extends NeuralNetworkModel<FullyConnected
 
 
     @Override
-    public HashMap<String, Option> getDefaultOptions() {
+    public LinkedHashMap<String, Option> getDefaultOptions() {
         this.options.put("Nombre de lien", new OptionInt(10));
 
         return this.options;

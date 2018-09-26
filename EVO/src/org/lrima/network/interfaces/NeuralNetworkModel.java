@@ -11,7 +11,7 @@ public abstract class NeuralNetworkModel<T extends NeuralNetwork> {
     /**
      * Characteristics of the algorithm. See {@link #getDefaultOptions} to know witch variable is available.
      */
-    protected HashMap<String, Option> options;
+    protected LinkedHashMap<String, Option> options;
     protected NeuralNetworkSuperviser superviser = new NaturalSelectionSupervisor();
 
     /**
@@ -22,7 +22,7 @@ public abstract class NeuralNetworkModel<T extends NeuralNetwork> {
     public abstract LinkedHashMap<String, Option> getDefaultOptions();
 
 
-    public HashMap<String, Option> getOptions() {
+    public LinkedHashMap<String, Option> getOptions() {
         if(options == null)
             return getDefaultOptions();
         return options;

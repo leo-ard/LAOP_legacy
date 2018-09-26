@@ -7,12 +7,10 @@ import java.util.*;
 import org.lrima.Interface.options.OptionPanel;
 
 public class AlgorithmOptionPanel extends JPanel implements OptionPanel{
-    public HashMap<String, Option> options;
-    private JTextField textField;
-    
+
     public static void main(String args[]) {
     	JFrame frame = new JFrame("juste a name");
-    	HashMap<String, Option> options = new LinkedHashMap<>();
+    	LinkedHashMap<String, Option> options = new LinkedHashMap<>();
     	options.put("test1", new OptionInt(10));
         options.put("test2", new OptionDouble(10.0));
         options.put("test3", new OptionBoolean(true));
@@ -24,9 +22,8 @@ public class AlgorithmOptionPanel extends JPanel implements OptionPanel{
 
     }
 
-    public AlgorithmOptionPanel(HashMap<String, Option> options){
+    public AlgorithmOptionPanel(LinkedHashMap<String, Option> options){
         super();
-        this.options = options;
         setLayout(new BorderLayout(0, 0));
 
         JPanel modificationPanel = new JPanel();

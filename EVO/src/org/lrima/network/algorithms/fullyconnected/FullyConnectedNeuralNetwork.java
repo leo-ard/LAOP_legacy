@@ -4,6 +4,7 @@ import java.awt.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.lrima.network.interfaces.NeuralNetwork;
@@ -26,7 +27,7 @@ public class FullyConnectedNeuralNetwork extends NeuralNetwork implements Serial
 	private ArrayList<RealMatrix> layerOutputs = new ArrayList<>();
 	private ArrayList<RealMatrix> weigthMatrices = new ArrayList<>();
 
-	public FullyConnectedNeuralNetwork(HashMap<String, Option> options) {
+	public FullyConnectedNeuralNetwork(LinkedHashMap<String, Option> options) {
 		super(options);
 		AlgorithmOptionPanel optionPanel = new AlgorithmOptionPanel(this.options);
 	}

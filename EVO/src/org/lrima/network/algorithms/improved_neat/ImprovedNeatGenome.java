@@ -10,6 +10,7 @@ import org.lrima.utils.Random;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 @AlgorithmInformation(name="Improved NEAT", description = "Neural Network using a modified NEAT algorithm. The network starts with two connections from random inputs that goes into the two outputs. With each generations, the network grows to try to find the best solution.")
 public class ImprovedNeatGenome extends NeuralNetwork {
@@ -19,7 +20,7 @@ public class ImprovedNeatGenome extends NeuralNetwork {
 
     private final int nbOutput = 2;
 
-    public ImprovedNeatGenome(HashMap<String, Option> neuralNetworkModel){
+    public ImprovedNeatGenome(LinkedHashMap<String, Option> neuralNetworkModel){
         super(neuralNetworkModel);
         this.connections = new ArrayList<>();
         this.nodes = new ArrayList<>();
