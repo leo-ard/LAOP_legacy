@@ -2,8 +2,9 @@
  * Created by JFormDesigner on Sun Sep 16 19:44:39 EDT 2018
  */
 
-package org.lrima.Interface;
+package org.lrima.Interface.home;
 
+import org.lrima.Interface.FrameManager;
 import org.lrima.espece.network.algorithms.AlgorithmManager;
 import org.lrima.espece.network.annotations.AlgorithmInformation;
 import org.lrima.espece.network.interfaces.NeuralNetwork;
@@ -17,7 +18,7 @@ import javax.swing.event.HyperlinkListener;
 /**
  * @author unknown
  */
-public class HomeDialog extends JFrame implements ActionListener, ItemListener {
+public class HomeFrame extends JFrame implements ActionListener, ItemListener {
 
     private JButton okButton = new JButton("Simulate");
     JTextPane algorithmDescriptionPane;
@@ -33,7 +34,7 @@ public class HomeDialog extends JFrame implements ActionListener, ItemListener {
     /**
      * A dialog that describe the EVO program and lets the user choose which algorithm to use.
      */
-    public HomeDialog() {
+    public HomeFrame() {
         super();
         this.setTitle("Welcome to EVO");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

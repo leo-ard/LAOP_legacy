@@ -151,7 +151,6 @@ public class ImprovedNeatGenome extends NeuralNetwork {
      * 10% chance of adding a connection
      * 10% chance of adding a node between a connection
      */
-    @Override
     public void mutate() {
         int chanceWeightMutation = Random.getRandomIntegerValue(100);
         int chanceAddConnection = Random.getRandomIntegerValue(100);
@@ -291,6 +290,11 @@ public class ImprovedNeatGenome extends NeuralNetwork {
         }
 
         this.receiver.setNeuralNetworkOutput(outputNodesValues);
+    }
+
+    @Override
+    public void generationFinish() {
+        this.mutate();
     }
 
     /**

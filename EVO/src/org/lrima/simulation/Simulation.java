@@ -38,7 +38,6 @@ public class Simulation extends Thread{
     private boolean shouldGoToNextGeneration = false;
     private boolean shouldRestart = false;
 
-    //The neural network that the cars in the next generation will have
     private Class<?extends NeuralNetwork> neuralNetworkToUse;
 
     //NeuralNetworkSupervisor

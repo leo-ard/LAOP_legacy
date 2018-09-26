@@ -1,7 +1,6 @@
 package org.lrima.core;
 
-import org.lrima.Interface.HomeDialog;
-import org.lrima.Interface.FrameManager;
+import org.lrima.Interface.home.HomeFrame;
 
 public class EVO {
 
@@ -17,8 +16,8 @@ public class EVO {
     }
 
     private static void start(){
-        HomeDialog homeDialog = new HomeDialog();
-        homeDialog.setVisible(true);
+        HomeFrame homeFrame = new HomeFrame();
+        homeFrame.setVisible(true);
 
         /*EventQueue.invokeLater(new Runnable() {
             public void run() {
