@@ -81,25 +81,22 @@ public class OptionsDialog extends JDialog implements ActionListener {
         else if(e.getSource() == saveButton){
             //Notify the user that the simulation will restart
             boolean erreur = false;
-            int warningResponse = JOptionPane.showConfirmDialog(this, "La simulation va reloader. Continuer ?", "Warning", JOptionPane.WARNING_MESSAGE);
 
-            if (warningResponse == JOptionPane.YES_OPTION) {
-                //There was an error in the values of the options in the car tab
-                if (!optionVoiturePanel.save()) {
-                    JOptionPane.showMessageDialog(this, "Veuillez verifier les informations pour les voitures", "Erreur", JOptionPane.ERROR_MESSAGE);
-                    erreur = true;
-                }
-                //There was an error in the values of the simulation tab
-                if (!optionSimulationPanel.save()) {
-                    JOptionPane.showMessageDialog(this, "Veuillez verifier les informations pour la simulation", "Erreur", JOptionPane.ERROR_MESSAGE);
-                    erreur = true;
-                }
+            //There was an error in the values of the options in the car tab
+            if (!optionVoiturePanel.save()) {
+                JOptionPane.showMessageDialog(this, "Veuillez verifier les informations pour les voitures", "Erreur", JOptionPane.ERROR_MESSAGE);
+                erreur = true;
+            }
+            //There was an error in the values of the simulation tab
+            if (!optionSimulationPanel.save()) {
+                JOptionPane.showMessageDialog(this, "Veuillez verifier les informations pour la simulation", "Erreur", JOptionPane.ERROR_MESSAGE);
+                erreur = true;
+            }
 
-                //If all the options are valid
-                if(!erreur){
-                    dispose();
-                    EVO.restart();
-                }
+            //If all the options are valid
+            if(!erreur){
+                dispose();
+                //EVO.restart();
             }
         }
     }

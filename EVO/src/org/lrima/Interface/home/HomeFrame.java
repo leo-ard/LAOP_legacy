@@ -1,23 +1,31 @@
 package org.lrima.Interface.home;
 
+import org.lrima.Interface.utils.ImagePanel;
+
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.LayoutStyle.ComponentPlacement;
 
 public class HomeFrame extends JFrame {
 
-    private final Dimension screenDimension = Toolkit.getDefaultToolkit().getScreenSize();
-    private JPanel content;
-    private JEditorPane descriptionEVO;
 
-    private final int FRAME_WIDTH = screenDimension.width / 3;
-    private final int FRAME_HEIGHT = (int)(screenDimension.height / 1.5);
+    private JPanel content;
+
+    private JEditorPane descriptionEVO;
+    private ImagePanel lrimaImagePanel;
+    private JButton configureButton;
+    private JButton runLastButton;
+
+
 
     public HomeFrame(){
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setBounds(screenDimension.width / 2 - FRAME_WIDTH / 2, screenDimension.height / 2 - FRAME_HEIGHT / 2, FRAME_WIDTH, FRAME_HEIGHT);
-
+        this.setBounds(Constant.bounds);
         this.content = new JPanel();
         this.setContentPane(content);
 
@@ -27,18 +35,33 @@ public class HomeFrame extends JFrame {
 
 
         layout.setHorizontalGroup(
-                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                layout.createParallelGroup(Alignment.TRAILING)
                         .addGroup(layout.createSequentialGroup()
                                 .addContainerGap()
-                                .addComponent(descriptionEVO, GroupLayout.DEFAULT_SIZE, 422, Short.MAX_VALUE)
+                                .addGroup(layout.createParallelGroup(Alignment.LEADING)
+                                        .addComponent(descriptionEVO, GroupLayout.DEFAULT_SIZE, 422, Short.MAX_VALUE)
+                                        .addGroup(Alignment.TRAILING, layout.createSequentialGroup()
+                                                .addComponent(runLastButton)
+                                                .addPreferredGap(ComponentPlacement.RELATED, 88, Short.MAX_VALUE)
+                                                .addComponent(configureButton)))
                                 .addContainerGap())
+                        .addGroup(layout.createSequentialGroup()
+                                .addGap(126)
+                                .addComponent(lrimaImagePanel, GroupLayout.DEFAULT_SIZE, 222, Short.MAX_VALUE)
+                                .addGap(116))
         );
         layout.setVerticalGroup(
-                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                layout.createParallelGroup(Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
-                                .addGap(134)
-                                .addComponent(descriptionEVO, GroupLayout.DEFAULT_SIZE, 110, Short.MAX_VALUE)
-                                .addGap(175))
+                                .addGap(15)
+                                .addComponent(lrimaImagePanel, GroupLayout.DEFAULT_SIZE, 101, Short.MAX_VALUE)
+                                .addGap(18)
+                                .addComponent(descriptionEVO, GroupLayout.DEFAULT_SIZE, 92, Short.MAX_VALUE)
+                                .addGap(137)
+                                .addGroup(layout.createParallelGroup(Alignment.TRAILING, false)
+                                        .addComponent(runLastButton, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(configureButton, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addContainerGap())
         );
 
         this.setLayout(layout);
@@ -46,6 +69,8 @@ public class HomeFrame extends JFrame {
 
     private void setupComponents(){
         this.setupDescription();
+        this.setupLrimaImage();
+        this.setupButtons();
     }
 
     private void setupDescription(){
@@ -71,6 +96,24 @@ public class HomeFrame extends JFrame {
         text +=         " This program was developed for LRIMa, <a href=\"http://www-etud.iro.umontreal.ca/~rezguiji/lrima.php\">click here to learn more</a>";
         descriptionEVO.setText(text);
         descriptionEVO.setEditable(false);
+    }
+
+    private void setupLrimaImage(){
+        this.lrimaImagePanel = new ImagePanel("/images/LRIMA.png");
+    }
+
+    private void setupButtons(){
+        this.configureButton = new JButton("Configure");
+        configureButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setVisible(false);
+                ConfigureSimulationFrame configureSimulationFrame = new ConfigureSimulationFrame(HomeFrame.this);
+                configureSimulationFrame.setVisible(true);
+            }
+        });
+
+        this.runLastButton = new JButton("Run last simulation");
     }
 }
 
