@@ -1,9 +1,5 @@
 package org.lrima.espece.network.interfaces.options;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
-import javafx.scene.control.CheckBox;
-import org.graalvm.compiler.nodes.calc.IntegerDivRemNode;
-
 import javax.swing.*;
 
 public class OptionBoolean implements Option<Boolean>{

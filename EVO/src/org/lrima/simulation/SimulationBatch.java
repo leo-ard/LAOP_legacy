@@ -1,26 +1,26 @@
 package org.lrima.simulation;
 
 import org.lrima.espece.network.interfaces.NeuralNetwork;
+import org.lrima.espece.network.interfaces.NeuralNetworkModel;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class SimulationBatch implements SimulationListener {
     private Simulation[] simulations;
     private int currentSimulation = 0;
     private int numberInBatch;
-    private Class<?extends NeuralNetwork> algorithm;
+    private NeuralNetworkModel algorithmModel;
     private ArrayList<SimulationInformation> simulationInformations = new ArrayList<>();
 
     private ArrayList<BatchListener> batchListeners = new ArrayList<>();
 
-    public SimulationBatch(Class<?extends NeuralNetwork> algorithm, int numberInBatch){
+    public SimulationBatch(NeuralNetworkModel algorithmModel, int numberInBatch){
         this.simulations = new Simulation[numberInBatch];
         this.numberInBatch = numberInBatch;
-        this.algorithm = algorithm;
+        this.algorithmModel = algorithmModel;
 
         for(int i = 0 ; i < simulations.length ; i++){
-            simulations[i] = new Simulation(algorithm);
+            simulations[i] = new Simulation(algorithmModel);
             simulations[i].addSimulationListener(this);
         }
     }
@@ -76,7 +76,6 @@ public class SimulationBatch implements SimulationListener {
     }
 
     private void addSimulationInformation(){
-        Class<?extends NeuralNetwork> algorithm = this.getAlgorithm();
 
         SimulationInformation information = new SimulationInformation(this.getCurrentSimulation().getGenerations());
         this.simulationInformations.add(information);
@@ -102,8 +101,8 @@ public class SimulationBatch implements SimulationListener {
         this.batchListeners.add(listener);
     }
 
-    public Class<? extends NeuralNetwork> getAlgorithm() {
-        return algorithm;
+    public NeuralNetworkModel getAlgorithmModel() {
+        return algorithmModel;
     }
 
     public ArrayList<SimulationInformation> getSimulationInformations() {

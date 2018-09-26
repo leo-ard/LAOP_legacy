@@ -1,26 +1,27 @@
-package org.lrima.espece.network.algorithms.neat;
+package org.lrima.espece.network.algorithms.improved_neat;
 
-import org.lrima.espece.Espece;
+import org.lrima.espece.network.algorithms.neat.NeatModel;
 import org.lrima.espece.network.annotations.AlgorithmInformation;
-import org.lrima.espece.network.interfaces.NaturalSelectionSupervisor;
 import org.lrima.espece.network.interfaces.NeuralNetwork;
 import org.lrima.espece.network.interfaces.NeuralNetworkReceiver;
 import org.lrima.espece.network.interfaces.NeuralNetworkTransmitter;
+import org.lrima.espece.network.interfaces.options.Option;
 import org.lrima.utils.Random;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-@AlgorithmInformation(name="NEAT Algorithm", description = "Neural Network using the NEAT algorithm. The network starts with one connections from random inputs that goes into one of the outputs. With each generations, the network grows to try to find the best solution.")
-public class NeatGenome extends NeuralNetwork {
+@AlgorithmInformation(name="Improved NEAT", description = "Neural Network using a modified NEAT algorithm. The network starts with two connections from random inputs that goes into the two outputs. With each generations, the network grows to try to find the best solution.")
+public class ImprovedNeatGenome extends NeuralNetwork {
 
     private ArrayList<ConnectionGene> connections;
     private ArrayList<NodeGene> nodes;
 
     private final int nbOutput = 2;
 
-    public NeatGenome(){
+    public ImprovedNeatGenome(HashMap<String, Option> neuralNetworkModel){
+        super(neuralNetworkModel);
         this.connections = new ArrayList<>();
         this.nodes = new ArrayList<>();
     }
@@ -47,9 +48,13 @@ public class NeatGenome extends NeuralNetwork {
         ArrayList<NodeGene> inputNodes = this.getInputNodes();
         ArrayList<NodeGene> outputNodes = this.getOutputNodes();
         NodeGene randomNodeInput1 = inputNodes.get(Random.getRandomIntegerValue(inputNodes.size()));
+        NodeGene randomNodeInput2;
+        do {
+            randomNodeInput2 = inputNodes.get(Random.getRandomIntegerValue(inputNodes.size()));
+        }while(randomNodeInput2 == randomNodeInput1);
 
         this.connections.add(new ConnectionGene(randomNodeInput1,  this.getOutputNodes().get(0)));
-
+        this.connections.add(new ConnectionGene(randomNodeInput2,  this.getOutputNodes().get(1)));
 
     }
 
@@ -61,10 +66,10 @@ public class NeatGenome extends NeuralNetwork {
      */
     @Override
     public NeuralNetwork crossOver(NeuralNetwork network1, NeuralNetwork network2) {
-        NeatGenome child = new NeatGenome();
+        ImprovedNeatGenome child = new ImprovedNeatGenome(this.options);
 
-        NeatGenome parent1 = (NeatGenome) network1;
-        NeatGenome parent2 = (NeatGenome) network2;
+        ImprovedNeatGenome parent1 = (ImprovedNeatGenome) network1;
+        ImprovedNeatGenome parent2 = (ImprovedNeatGenome) network2;
 
         for(NodeGene node : parent1.getNodes()){
             if(parent2.getNodes().contains(node)){
@@ -149,8 +154,7 @@ public class NeatGenome extends NeuralNetwork {
      * 10% chance of adding a connection
      * 10% chance of adding a node between a connection
      */
-    @Override
-    public void generationFinish() {
+    public void mutate() {
         int chanceWeightMutation = Random.getRandomIntegerValue(100);
         int chanceAddConnection = Random.getRandomIntegerValue(100);
         int chanceAddNode = Random.getRandomIntegerValue(100);
@@ -289,6 +293,11 @@ public class NeatGenome extends NeuralNetwork {
         }
 
         this.receiver.setNeuralNetworkOutput(outputNodesValues);
+    }
+
+    @Override
+    public void generationFinish() {
+        this.mutate();
     }
 
     /**

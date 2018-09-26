@@ -4,10 +4,8 @@ import org.knowm.xchart.XChartPanel;
 import org.knowm.xchart.XYChart;
 import org.knowm.xchart.XYChartBuilder;
 import org.knowm.xchart.XYSeries;
-import org.knowm.xchart.style.markers.Marker;
 import org.knowm.xchart.style.markers.SeriesMarkers;
-import org.lrima.espece.network.annotations.AlgorithmInformation;
-import org.lrima.espece.network.interfaces.NeuralNetwork;
+import org.lrima.espece.network.interfaces.NeuralNetworkModel;
 import org.lrima.simulation.SimulationInformation;
 
 import javax.swing.*;
@@ -21,12 +19,12 @@ public class ChartComponent extends JComponent {
     private double[][] dataY;
 
     private ArrayList<SimulationInformation> simulations;
-    private Class<?extends NeuralNetwork> algorithm;
+    private NeuralNetworkModel algorithm;
 
     private Dimension screensize;
     private double max, min;
 
-    public ChartComponent(Class<?extends NeuralNetwork> algorithm, ArrayList<SimulationInformation> simulations, double max, double min){
+    public ChartComponent(NeuralNetworkModel algorithm, ArrayList<SimulationInformation> simulations, double max, double min){
         super();
         this.algorithm = algorithm;
         this.simulations = simulations;
@@ -41,7 +39,7 @@ public class ChartComponent extends JComponent {
 
     private void showChart(){
         int chartWidth = (screensize.width / 2) - (ChartPanel.MARGIN_BETWEEN_CHARTS);
-        batchChart = new XYChartBuilder().title(algorithm.getAnnotation(AlgorithmInformation.class).name()).xAxisTitle("Generation").yAxisTitle("Fitness").width(chartWidth).height(screensize.height / 3).build();
+        batchChart = new XYChartBuilder().title(algorithm.getAlgorithmInformationAnnotation().name()).xAxisTitle("Generation").yAxisTitle("Fitness").width(chartWidth).height(screensize.height / 3).build();
         batchChart.getStyler().setYAxisMax(max);
         batchChart.getStyler().setYAxisMin(min);
         this.getData();

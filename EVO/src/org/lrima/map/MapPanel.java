@@ -19,13 +19,11 @@ import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
 import org.lrima.Interface.FrameManager;
-import org.lrima.core.EVO;
 import org.lrima.core.UserPrefs;
 import org.lrima.espece.Espece;
 import org.lrima.espece.network.annotations.AlgorithmInformation;
 import org.lrima.map.Studio.Drawables.Line;
 import org.lrima.map.Studio.Drawables.Obstacle;
-import org.lrima.Interface.EspeceInfoPanel;
 import org.lrima.simulation.Simulation;
 import org.lrima.simulation.SimulationBatch;
 
@@ -263,7 +261,7 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 		graphics.setFont(new Font("Helvetica", Font.PLAIN, FONT_SIZE));
 		graphics.drawString((this.simulation.simulationTime / 1000.0 )+ "", 200,200);
 
-		String text = 	"Algorithm: " + this.simulation.getAlgorithm().getAnnotation(AlgorithmInformation.class).name() + " ("+ currentBatchNumber +" / " + maxBatch+")";
+		String text = 	"Algorithm: " + this.simulation.getAlgorithm().getAlgorithmInformationAnnotation().name() + " ("+ currentBatchNumber +" / " + maxBatch+")";
 		if(this.currentSimulationBatch != null) {
 			text += "\nSimulation " + (this.currentSimulationBatch.getCurrentSimulationIndex() + 1) + " / " + this.currentSimulationBatch.getSimulations().length;
 		}

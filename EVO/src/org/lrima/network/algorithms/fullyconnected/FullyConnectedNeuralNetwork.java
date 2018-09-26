@@ -3,15 +3,17 @@ package org.lrima.espece.network.algorithms.fullyconnected;
 import java.awt.*;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.lrima.espece.network.annotations.AlgorithmInformation;
 import org.lrima.espece.network.interfaces.NeuralNetwork;
+import org.lrima.espece.network.interfaces.NeuralNetworkModel;
 import org.lrima.espece.network.interfaces.NeuralNetworkReceiver;
 import org.lrima.espece.network.interfaces.NeuralNetworkTransmitter;
 import org.apache.commons.math3.linear.RealMatrix;
+import org.lrima.espece.network.interfaces.options.Option;
 
-@AlgorithmInformation(name="Fully Connected", description = "Fully connected network with one hidden layer containing 2 neurons. All neurons are connected to each neurons in the next layer.")
 public class FullyConnectedNeuralNetwork extends NeuralNetwork implements Serializable {
 
 	private final Integer[] nbHiddenNodes = {2};
@@ -25,8 +27,8 @@ public class FullyConnectedNeuralNetwork extends NeuralNetwork implements Serial
 	private ArrayList<RealMatrix> layerOutputs = new ArrayList<>();
 	private ArrayList<RealMatrix> weigthMatrices = new ArrayList<>();
 
-
-	public FullyConnectedNeuralNetwork() {
+	public FullyConnectedNeuralNetwork(HashMap<String, Option> options) {
+		super(options);
 	}
 
 
@@ -61,7 +63,7 @@ public class FullyConnectedNeuralNetwork extends NeuralNetwork implements Serial
 
 	@Override
 	public NeuralNetwork crossOver(NeuralNetwork network1, NeuralNetwork network2) {
-		return new FullyConnectedNeuralNetwork();
+		return new FullyConnectedNeuralNetwork(this.options);
 	}
 
 	public void feedForward(){
