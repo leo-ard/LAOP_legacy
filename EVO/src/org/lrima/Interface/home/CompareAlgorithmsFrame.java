@@ -1,16 +1,25 @@
 package org.lrima.Interface.home;
 
 import org.lrima.network.algorithms.AlgorithmManager;
+import org.lrima.network.annotations.AlgorithmInformation;
 import org.lrima.network.interfaces.NeuralNetworkModel;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.GroupLayout.Alignment;
 
 public class CompareAlgorithmsFrame extends JFrame {
 
     private JTable algorithmList = new JTable();
+    private JScrollPane algorithmScrollPane;
+    private JLabel algorithmsLabel = new JLabel("Algorithms");
+    private JButton addButton = new JButton("+");
     private JTextPane descriptionPane = new JTextPane();
     private JButton simulateButton = new JButton("Simulate");
     private JButton backButton = new JButton("Back");
@@ -18,18 +27,64 @@ public class CompareAlgorithmsFrame extends JFrame {
     private JPanel content = new JPanel();
     private JFrame lastFrame;
 
+    private ArrayList<Class<?extends NeuralNetworkModel>> models = new ArrayList<>();
+
     public CompareAlgorithmsFrame(JFrame lastFrame){
         this.lastFrame = lastFrame;
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        this.setBounds(Constant.bounds);
-        this.setContentPane(content);
-        this.setName("Algorithm Options");
+        this.setBounds(lastFrame.getBounds().x, lastFrame.getBounds().y, Constant.FRAME_WIDTH, Constant.FRAME_HEIGHT);
+        this.setTitle("Algorithm Options");
+        this.setResizable(false);
 
         this.setupComponents();
+        this.reload();
+    }
 
+    private void reload(){
+        content = new JPanel();
+        this.setContentPane(content);
         GroupLayout layout = new GroupLayout(content);
 
-
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(layout.createParallelGroup(Alignment.LEADING)
+                                        .addGroup(layout.createParallelGroup(Alignment.LEADING)
+                                                .addGroup(layout.createSequentialGroup()
+                                                        .addComponent(backButton)
+                                                        .addPreferredGap(ComponentPlacement.RELATED, 192, Short.MAX_VALUE)
+                                                        .addComponent(simulateButton)
+                                                        .addContainerGap())
+                                                .addGroup(Alignment.TRAILING, layout.createSequentialGroup()
+                                                        .addGroup(layout.createParallelGroup(Alignment.TRAILING)
+                                                                .addComponent(algorithmList, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 382, Short.MAX_VALUE)
+                                                                .addComponent(descriptionPane, GroupLayout.DEFAULT_SIZE, 382, Short.MAX_VALUE))
+                                                        .addContainerGap())
+                                                .addGroup(layout.createSequentialGroup()
+                                                        .addComponent(algorithmsLabel)
+                                                        .addContainerGap(303, Short.MAX_VALUE)))
+                                        .addGroup(Alignment.TRAILING, layout.createSequentialGroup()
+                                                .addComponent(addButton)
+                                                .addContainerGap())))
+        );
+        layout.setVerticalGroup(
+                layout.createParallelGroup(Alignment.LEADING)
+                        .addGroup(Alignment.TRAILING, layout.createSequentialGroup()
+                                .addGap(33)
+                                .addComponent(descriptionPane, GroupLayout.PREFERRED_SIZE, 118, GroupLayout.PREFERRED_SIZE)
+                                .addGap(21)
+                                .addComponent(algorithmsLabel)
+                                .addPreferredGap(ComponentPlacement.RELATED)
+                                .addComponent(algorithmList, GroupLayout.PREFERRED_SIZE, 97, GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(ComponentPlacement.RELATED)
+                                .addComponent(addButton)
+                                .addPreferredGap(ComponentPlacement.RELATED, 119, Short.MAX_VALUE)
+                                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                        .addComponent(simulateButton)
+                                        .addComponent(backButton))
+                                .addContainerGap())
+        );
 
         this.getContentPane().setLayout(layout);
     }
@@ -40,6 +95,15 @@ public class CompareAlgorithmsFrame extends JFrame {
         descriptionPane.setEditable(false);
 
         this.setupAlgorithmTable();
+
+        //Add button
+        this.addButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ModelListDialog dialog = new ModelListDialog(CompareAlgorithmsFrame.this);
+                dialog.setVisible(true);
+            }
+        });
 
         //Bottom buttons
         this.backButton.addActionListener(new ActionListener() {
@@ -52,22 +116,51 @@ public class CompareAlgorithmsFrame extends JFrame {
     }
 
     private void setupAlgorithmTable(){
-        this.algorithmList.setShowGrid(false);
-        this.algorithmList.setTableHeader(null);
+        String[] columnName = new String[]{"Algorithm Name", "Edit Button"};
 
-        String[] rowName = new String[]{"Algorithm Name", "Edit Button"};
-
-        ArrayList<Class<?extends NeuralNetworkModel>> models = AlgorithmManager.algorithms;
         String[] algorithmNames = new String[models.size()];
         for(int i = 0 ; i < algorithmNames.length ; i++){
-            String name = AlgorithmManager.algorithmsName.get(i);
+            String name = models.get(i).getAnnotation(AlgorithmInformation.class).name();
             algorithmNames[i] = name;
         }
 
-        Object[][] tableRows = new Object[algorithmNames.length][rowName.length];
+        Object[][] tableRows = new Object[algorithmNames.length][columnName.length];
 
-        /*for(int algorithmName = 0 ; algorithmName < tableRows.length ; algorithmName++){
-            for(int algori)
-        }*/
+        for(int row = 0 ; row < tableRows.length ; row++){
+
+            tableRows[row] = new Object[]{algorithmNames[row], "Options"};
+        }
+
+        this.algorithmList = new JTable(tableRows, columnName);
+        this.algorithmList.setShowGrid(false);
+        this.algorithmList.setTableHeader(null);
+
+        algorithmList.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                try {
+                    int row = algorithmList.rowAtPoint(e.getPoint());
+                    int col = algorithmList.columnAtPoint(e.getPoint());
+
+                    if (col == 1) {
+                        Class<? extends NeuralNetworkModel> model = models.get(row);
+                        //TODO: Show option dialog for the model
+                    }
+                }catch (IndexOutOfBoundsException error){ }
+            }
+        });
+
+        this.algorithmScrollPane = new JScrollPane(algorithmList);
+    }
+
+    /**
+     * Adds a list of models to the models table
+     * @param models the models to add
+     */
+    public void addModels(ArrayList<Class<?extends NeuralNetworkModel>> models){
+        this.models.addAll(models);
+        this.setupAlgorithmTable();
+        this.reload();
     }
 }

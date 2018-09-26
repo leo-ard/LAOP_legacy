@@ -10,7 +10,6 @@ import java.awt.event.ActionListener;
 
 public class ConfigureSimulationFrame extends JFrame {
 
-    private JLabel header = new JLabel("Configure the simulation");
     private JTextPane descriptionTextPane;
     private JRadioButton testOneAlgorithmRadio;
     private JRadioButton compareAlgorithmRadio;
@@ -26,9 +25,11 @@ public class ConfigureSimulationFrame extends JFrame {
         this.lastFrame = lastFrame;
 
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setBounds(Constant.bounds);
+        this.setBounds(lastFrame.getBounds().x, lastFrame.getBounds().y, Constant.FRAME_WIDTH, Constant.FRAME_HEIGHT);
         this.setTitle("Configure the simulation");
         this.setContentPane(content);
+        this.setResizable(false);
+
 
         this.configureComponents();
 
@@ -37,40 +38,29 @@ public class ConfigureSimulationFrame extends JFrame {
                 layout.createParallelGroup(Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
                                 .addContainerGap()
-                                .addComponent(backButton)
-                                .addPreferredGap(ComponentPlacement.RELATED, 247, Short.MAX_VALUE)
-                                .addComponent(nextButton, GroupLayout.DEFAULT_SIZE, 75, GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap())
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(simulationOptionButton, GroupLayout.DEFAULT_SIZE, 50, Short.MAX_VALUE)
-                                .addContainerGap())
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
                                 .addGroup(layout.createParallelGroup(Alignment.LEADING)
-                                        .addComponent(descriptionTextPane)
                                         .addComponent(compareAlgorithmRadio)
-                                        .addComponent(testOneAlgorithmRadio))
+                                        .addComponent(testOneAlgorithmRadio)
+                                        .addComponent(descriptionTextPane, GroupLayout.DEFAULT_SIZE, 382, Short.MAX_VALUE)
+                                        .addComponent(simulationOptionButton, GroupLayout.DEFAULT_SIZE, 382, Short.MAX_VALUE)
+                                        .addGroup(Alignment.TRAILING, layout.createSequentialGroup()
+                                                .addComponent(backButton)
+                                                .addPreferredGap(ComponentPlacement.RELATED, 166, Short.MAX_VALUE)
+                                                .addComponent(nextButton)))
                                 .addContainerGap())
-                        .addGroup(layout.createSequentialGroup()
-                                .addGap(145)
-                                .addComponent(header, GroupLayout.DEFAULT_SIZE, 50, Short.MAX_VALUE)
-                                .addGap(145))
         );
         layout.setVerticalGroup(
-                layout.createParallelGroup(Alignment.TRAILING)
+                layout.createParallelGroup(Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
-                                .addGap(13)
-                                .addComponent(header)
-                                .addGap(21)
-                                .addComponent(descriptionTextPane, GroupLayout.PREFERRED_SIZE, 165, GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(ComponentPlacement.UNRELATED)
+                                .addContainerGap()
+                                .addComponent(descriptionTextPane, GroupLayout.PREFERRED_SIZE, 118, GroupLayout.PREFERRED_SIZE)
+                                .addGap(18)
                                 .addComponent(testOneAlgorithmRadio)
                                 .addPreferredGap(ComponentPlacement.RELATED)
                                 .addComponent(compareAlgorithmRadio)
-                                .addGap(29)
+                                .addGap(18)
                                 .addComponent(simulationOptionButton)
-                                .addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addPreferredGap(ComponentPlacement.RELATED, 189, Short.MAX_VALUE)
                                 .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                         .addComponent(nextButton)
                                         .addComponent(backButton))
@@ -82,8 +72,6 @@ public class ConfigureSimulationFrame extends JFrame {
     }
 
     private void configureComponents(){
-        this.header.setHorizontalTextPosition(SwingConstants.CENTER);
-
         //Description pane
         this.descriptionTextPane = new JTextPane();
         descriptionTextPane.setEditable(false);
@@ -93,8 +81,9 @@ public class ConfigureSimulationFrame extends JFrame {
         //Radio buttons
         this.radioGroup = new ButtonGroup();
         this.testOneAlgorithmRadio = new JRadioButton("I want to test one algorithm.");
-        testOneAlgorithmRadio.setSelected(true);
+        //testOneAlgorithmRadio.setSelected(true);
         this.compareAlgorithmRadio = new JRadioButton("I want to compare multiple algorithms.");
+        compareAlgorithmRadio.setSelected(true);
         this.radioGroup.add(testOneAlgorithmRadio);
         this.radioGroup.add(compareAlgorithmRadio);
 
@@ -119,7 +108,9 @@ public class ConfigureSimulationFrame extends JFrame {
                     setVisible(false);
                 }
                 else if(compareAlgorithmRadio.isSelected()){
-
+                    CompareAlgorithmsFrame compareAlgorithmsFrame = new CompareAlgorithmsFrame(ConfigureSimulationFrame.this);
+                    compareAlgorithmsFrame.setVisible(true);
+                    setVisible(false);
                 }
             }
         });

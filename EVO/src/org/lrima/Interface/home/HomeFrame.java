@@ -25,9 +25,10 @@ public class HomeFrame extends JFrame {
 
     public HomeFrame(){
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setBounds(Constant.bounds);
+        this.setBounds(Constant.screenCenter.x, Constant.screenCenter.y, Constant.FRAME_WIDTH, Constant.FRAME_HEIGHT);
         this.content = new JPanel();
         this.setContentPane(content);
+        this.setResizable(false);
 
         GroupLayout layout = new GroupLayout(content);
 

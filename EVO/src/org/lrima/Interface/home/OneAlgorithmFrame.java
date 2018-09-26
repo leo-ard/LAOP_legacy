@@ -27,9 +27,10 @@ public class OneAlgorithmFrame extends JFrame {
         this.lastFrame = lastFrame;
 
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        this.setBounds(Constant.bounds);
+        this.setBounds(lastFrame.getBounds().x, lastFrame.getBounds().y, Constant.FRAME_WIDTH, Constant.FRAME_HEIGHT);
         this.setTitle("Algorithm Options");
         this.setContentPane(content);
+        this.setResizable(false);
 
         this.setupComponents();
 
