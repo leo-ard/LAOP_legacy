@@ -4,12 +4,14 @@ import java.awt.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.lrima.network.interfaces.NeuralNetwork;
 import org.lrima.network.interfaces.NeuralNetworkReceiver;
 import org.lrima.network.interfaces.NeuralNetworkTransmitter;
 import org.apache.commons.math3.linear.RealMatrix;
+import org.lrima.network.interfaces.options.AlgorithmOptionPanel;
 import org.lrima.network.interfaces.options.Option;
 
 public class FullyConnectedNeuralNetwork extends NeuralNetwork implements Serializable {
@@ -25,8 +27,9 @@ public class FullyConnectedNeuralNetwork extends NeuralNetwork implements Serial
 	private ArrayList<RealMatrix> layerOutputs = new ArrayList<>();
 	private ArrayList<RealMatrix> weigthMatrices = new ArrayList<>();
 
-	public FullyConnectedNeuralNetwork(HashMap<String, Option> options) {
+	public FullyConnectedNeuralNetwork(LinkedHashMap<String, Option> options) {
 		super(options);
+		AlgorithmOptionPanel optionPanel = new AlgorithmOptionPanel(this.options);
 	}
 
 
@@ -114,7 +117,6 @@ public class FullyConnectedNeuralNetwork extends NeuralNetwork implements Serial
 		this.layerInputs.add(MatrixUtils.createColumnRealMatrix(inputsWithBias));
 		this.layerOutputs.add(layerInputs.get(0).copy());
 	}
-
 
 	public void generationFinish(){
 		for(Layer layer : this.layers){

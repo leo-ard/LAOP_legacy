@@ -5,15 +5,16 @@ import org.lrima.network.interfaces.options.Option;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public abstract class NeuralNetwork {
 
     protected ArrayList<?extends NeuralNetworkTransmitter> transmitters;
     protected NeuralNetworkReceiver receiver;
     protected double fitness;
-    protected HashMap<String, Option> options;
+    protected LinkedHashMap<String, Option> options;
 
-    public NeuralNetwork(HashMap<String, Option> options){
+    public NeuralNetwork(LinkedHashMap<String, Option> options){
         this.options = options;
     }
 
