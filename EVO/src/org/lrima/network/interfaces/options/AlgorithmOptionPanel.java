@@ -4,10 +4,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.*;
 
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.layout.ColumnSpec;
-import com.jgoodies.forms.layout.RowSpec;
-import com.jgoodies.forms.layout.FormSpecs;
 import org.lrima.Interface.options.OptionPanel;
 
 public class AlgorithmOptionPanel extends JPanel implements OptionPanel{
