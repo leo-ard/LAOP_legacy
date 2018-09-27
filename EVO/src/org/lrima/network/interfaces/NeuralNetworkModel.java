@@ -11,7 +11,7 @@ public abstract class NeuralNetworkModel<T extends NeuralNetwork> {
     /**
      * Characteristics of the algorithm. See {@link #getDefaultOptions} to know witch variable is available.
      */
-    protected LinkedHashMap<String, Option> options;
+    protected LinkedHashMap<String, Option> options = new LinkedHashMap<>();
     protected NeuralNetworkSuperviser superviser = new NaturalSelectionSupervisor();
 
     /**
@@ -39,7 +39,7 @@ public abstract class NeuralNetworkModel<T extends NeuralNetwork> {
      */
     public T getInstance(){
         try {
-            return (T) getNeuralNetworkClass().getConstructor(new Class[]{HashMap.class}).newInstance(new Object[]{options});
+            return (T) getNeuralNetworkClass().getConstructor(new Class[]{LinkedHashMap.class}).newInstance(getOptions());
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             System.err.println("There was an error while instancing the neural network");
             e.printStackTrace();

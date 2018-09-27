@@ -1,8 +1,11 @@
 package org.lrima.Interface.home;
 
+import org.lrima.Interface.FrameManager;
 import org.lrima.network.algorithms.AlgorithmManager;
 import org.lrima.network.interfaces.NeuralNetwork;
 import org.lrima.network.interfaces.NeuralNetworkModel;
+import org.lrima.simulation.Simulation;
+import org.lrima.simulation.SimulationBatch;
 
 import javax.swing.*;
 import javax.swing.LayoutStyle.ComponentPlacement;
@@ -19,6 +22,8 @@ public class OneAlgorithmFrame extends JFrame {
     private JButton configureButton = new JButton("Configure");
     private JButton simulateButton = new JButton("Simulate");
     private JButton backButton = new JButton("Back");
+
+    private ArrayList<Class<?extends NeuralNetworkModel>> modelClasses = new ArrayList<>();
 
     private JPanel content = new JPanel();
     private JFrame lastFrame;
@@ -95,11 +100,29 @@ public class OneAlgorithmFrame extends JFrame {
 
             }
         });
+
+        //Simulate button
+        this.simulateButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    dispose();
+
+                    FrameManager frameManager = new FrameManager();
+                    NeuralNetworkModel model = modelClasses.get(algorithmCombo.getSelectedIndex()).getConstructor().newInstance();
+                    frameManager.addBatch(model, 2);
+                    frameManager.setVisible(true);
+                    frameManager.startBatches();
+                }catch (Exception error){
+                    error.printStackTrace();
+                }
+            }
+        });
     }
 
     private void setupComboBox(){
-        ArrayList<Class<?extends NeuralNetworkModel>> models = AlgorithmManager.algorithms;
-        String[] algorithmString = new String[models.size()];
+        this.modelClasses = AlgorithmManager.algorithms;
+        String[] algorithmString = new String[modelClasses.size()];
 
         for(int i = 0 ; i  < algorithmString.length ; i++){
             String name = AlgorithmManager.algorithmsName.get(i);
