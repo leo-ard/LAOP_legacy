@@ -3,6 +3,7 @@ package org.lrima.Interface.actions;
 import org.lrima.core.UserPrefs;
 import org.lrima.map.Map;
 import org.lrima.map.MapPanel;
+import org.lrima.Interface.options.types.OptionString;
 import org.lrima.simulation.Simulation;
 
 import javax.swing.*;
@@ -44,7 +45,8 @@ public class LoadMapAction extends AbstractAction {
             FileInputStream fis = new FileInputStream(file);
             ObjectInputStream ois = new ObjectInputStream(fis);
 
-            UserPrefs.preferences.put(UserPrefs.KEY_MAP_TO_USE, file.getPath());
+
+            UserPrefs.set(UserPrefs.KEY_MAP_TO_USE, new OptionString(file.getPath()));
 
             this.mapPanel.setMap((Map) ois.readObject());
             simulation.setShouldRestart(true);

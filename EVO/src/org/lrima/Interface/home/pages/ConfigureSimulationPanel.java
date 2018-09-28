@@ -1,5 +1,7 @@
-package org.lrima.Interface.home;
+package org.lrima.Interface.home.pages;
 
+import org.lrima.Interface.home.HomeFrameManager;
+import org.lrima.Interface.home.PagePanel;
 import org.lrima.Interface.options.OptionsDialog;
 
 import javax.swing.*;
@@ -8,7 +10,7 @@ import javax.swing.GroupLayout.Alignment;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class ConfigureSimulationFrame extends JFrame {
+public class ConfigureSimulationPanel extends PagePanel {
 
     private JTextPane descriptionTextPane;
     private JRadioButton testOneAlgorithmRadio;
@@ -18,22 +20,11 @@ public class ConfigureSimulationFrame extends JFrame {
     private JButton nextButton;
     private JButton backButton;
 
-    private JPanel content = new JPanel();
-    private JFrame lastFrame;
-
-    public ConfigureSimulationFrame(JFrame lastFrame){
-        this.lastFrame = lastFrame;
-
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setBounds(lastFrame.getBounds().x, lastFrame.getBounds().y, Constant.FRAME_WIDTH, Constant.FRAME_HEIGHT);
-        this.setTitle("Configure the simulation");
-        this.setContentPane(content);
-        this.setResizable(false);
-
-
+    public ConfigureSimulationPanel(HomeFrameManager homeFrameManager) {
+        super(homeFrameManager);
         this.configureComponents();
 
-        GroupLayout layout = new GroupLayout(this.getContentPane());
+        GroupLayout layout = new GroupLayout(this);
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
@@ -67,7 +58,7 @@ public class ConfigureSimulationFrame extends JFrame {
                                 .addContainerGap())
         );
 
-        this.getContentPane().setLayout(layout);
+        setLayout(layout);
         //this.pack();
     }
 
@@ -103,25 +94,22 @@ public class ConfigureSimulationFrame extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if(testOneAlgorithmRadio.isSelected()){
-                    OneAlgorithmFrame oneAlgorithmFrame = new OneAlgorithmFrame(ConfigureSimulationFrame.this);
-                    oneAlgorithmFrame.setVisible(true);
-                    setVisible(false);
+                    OneAlgorithmPanel oneAlgorithmPanel = new OneAlgorithmPanel(homeFrameManager);
+                    homeFrameManager.next(oneAlgorithmPanel);
                 }
                 else if(compareAlgorithmRadio.isSelected()){
-                    CompareAlgorithmsFrame compareAlgorithmsFrame = new CompareAlgorithmsFrame(ConfigureSimulationFrame.this);
-                    compareAlgorithmsFrame.setVisible(true);
-                    setVisible(false);
+                    CompareAlgorithmsPanel compareAlgorithmsPanel = new CompareAlgorithmsPanel(homeFrameManager);
+                    homeFrameManager.next(compareAlgorithmsPanel);
                 }
             }
         });
 
         this.backButton = new JButton("Back");
-        backButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                lastFrame.setVisible(true);
-                setVisible(false);
-            }
-        });
+        backButton.addActionListener(e -> homeFrameManager.back());
+    }
+
+    @Override
+    public String getName() {
+        return "Configure the simulation";
     }
 }

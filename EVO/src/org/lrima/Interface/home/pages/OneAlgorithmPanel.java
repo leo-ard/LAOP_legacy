@@ -1,21 +1,17 @@
-package org.lrima.Interface.home;
+package org.lrima.Interface.home.pages;
 
 import org.lrima.Interface.FrameManager;
+import org.lrima.Interface.home.HomeFrameManager;
+import org.lrima.Interface.home.PagePanel;
 import org.lrima.network.algorithms.AlgorithmManager;
-import org.lrima.network.interfaces.NeuralNetwork;
 import org.lrima.network.interfaces.NeuralNetworkModel;
-import org.lrima.simulation.Simulation;
-import org.lrima.simulation.SimulationBatch;
 
 import javax.swing.*;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.GroupLayout.Alignment;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.lang.reflect.InvocationTargetException;
 
-public class OneAlgorithmFrame extends JFrame {
+public class OneAlgorithmPanel extends PagePanel {
 
     private JTextPane descriptionPane = new JTextPane();
     private JComboBox algorithmCombo;
@@ -23,23 +19,21 @@ public class OneAlgorithmFrame extends JFrame {
     private JButton simulateButton = new JButton("Simulate");
     private JButton backButton = new JButton("Back");
 
-    private ArrayList<Class<?extends NeuralNetworkModel>> modelClasses = new ArrayList<>();
+    private NeuralNetworkModel currentModel;
+    {
+        try {
+            currentModel = AlgorithmManager.algorithms.get(0).getConstructor().newInstance();
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+    }
 
-    private JPanel content = new JPanel();
-    private JFrame lastFrame;
-
-    public OneAlgorithmFrame(JFrame lastFrame){
-        this.lastFrame = lastFrame;
-
-        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        this.setBounds(lastFrame.getBounds().x, lastFrame.getBounds().y, Constant.FRAME_WIDTH, Constant.FRAME_HEIGHT);
-        this.setTitle("Algorithm Options");
-        this.setContentPane(content);
-        this.setResizable(false);
+    public OneAlgorithmPanel(HomeFrameManager homeFrameManager){
+        super(homeFrameManager);
 
         this.setupComponents();
 
-        GroupLayout layout = new GroupLayout(content);
+        GroupLayout layout = new GroupLayout(this);
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
@@ -73,7 +67,7 @@ public class OneAlgorithmFrame extends JFrame {
                                 .addContainerGap())
         );
 
-        this.getContentPane().setLayout(layout);
+        setLayout(layout);
 
     }
 
@@ -82,54 +76,41 @@ public class OneAlgorithmFrame extends JFrame {
         this.descriptionPane.setText("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ac lobortis nulla. Donec at turpis sed purus commodo fringilla vel nec ex. Vivamus placerat luctus malesuada. Ut odio dui, lobortis vitae finibus eget, fermentum eu sem. Etiam suscipit augue ut nunc hendrerit, consequat tincidunt lacus porttitor.");
         this.descriptionPane.setEditable(false);
 
-        this.setupComboBox();
+
+        this.algorithmCombo = new JComboBox(AlgorithmManager.algorithmsName.toArray());
 
         //Bottom buttons
-        this.backButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                lastFrame.setVisible(true);
-                setVisible(false);
-            }
-        });
+        this.backButton.addActionListener(e -> homeFrameManager.back());
 
         //Configure button
-        this.configureButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
+        this.configureButton.addActionListener(e -> currentModel.displayOptions());
 
+        //
+        this.algorithmCombo.addActionListener(e -> {
+            try {
+                currentModel = AlgorithmManager.algorithms.get(this.algorithmCombo.getSelectedIndex()).getConstructor().newInstance();
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e1) {
+                e1.printStackTrace();
             }
         });
 
         //Simulate button
-        this.simulateButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    dispose();
+        this.simulateButton.addActionListener(e -> {
+            try {
+                homeFrameManager.close();
 
-                    FrameManager frameManager = new FrameManager();
-                    NeuralNetworkModel model = modelClasses.get(algorithmCombo.getSelectedIndex()).getConstructor().newInstance();
-                    frameManager.addBatch(model, 2);
-                    frameManager.setVisible(true);
-                    frameManager.startBatches();
-                }catch (Exception error){
-                    error.printStackTrace();
-                }
+                FrameManager frameManager = new FrameManager();
+                frameManager.addBatch(currentModel, 2);
+                frameManager.setVisible(true);
+                frameManager.startBatches();
+            }catch (Exception error){
+                error.printStackTrace();
             }
         });
     }
 
-    private void setupComboBox(){
-        this.modelClasses = AlgorithmManager.algorithms;
-        String[] algorithmString = new String[modelClasses.size()];
-
-        for(int i = 0 ; i  < algorithmString.length ; i++){
-            String name = AlgorithmManager.algorithmsName.get(i);
-            algorithmString[i] = name;
-        }
-
-        //Combo box and settings
-        this.algorithmCombo = new JComboBox(algorithmString);
+    @Override
+    public String getName() {
+        return "Configure algorithm";
     }
 }

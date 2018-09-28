@@ -1,30 +1,49 @@
 package org.lrima.network.interfaces;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 
+import org.lrima.Interface.options.OptionsDialog;
 import org.lrima.network.annotations.AlgorithmInformation;
-import org.lrima.network.interfaces.options.Option;
+import org.lrima.Interface.options.Option;
 
 public abstract class NeuralNetworkModel<T extends NeuralNetwork> {
+	
+	public static NeuralNetworkModel getInstanceOf(Class<? extends NeuralNetworkModel> modelClass) {
+        try {
+            return modelClass.getConstructor().newInstance();
+        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+	
     /**
      * Characteristics of the algorithm. See {@link #getDefaultOptions} to know witch variable is available.
      */
-    protected LinkedHashMap<String, Option> options = new LinkedHashMap<>();
+    protected LinkedHashMap<String, Option> options;
     protected NeuralNetworkSuperviser superviser = new NaturalSelectionSupervisor();
+    private OptionsDialog optionsDialog;
 
     /**
      * Set the default values of the hashmap.
      *
      * @return A hashmap populated with default values
      */
-    public abstract LinkedHashMap<String, Option> getDefaultOptions();
+    protected abstract LinkedHashMap<String, Option> getDefaultOptions();
 
+    public void displayOptions(){
+        if(optionsDialog == null)
+            optionsDialog = new OptionsDialog(this.getClass().getAnnotation(AlgorithmInformation.class).name(), this.getOptions());
+        optionsDialog.setVisible(true);
+    }
 
     public LinkedHashMap<String, Option> getOptions() {
-        if(options == null)
-            return getDefaultOptions();
+        if(options == null){
+            options = new LinkedHashMap<>();
+            options = getDefaultOptions();
+        }
         return options;
     }
 

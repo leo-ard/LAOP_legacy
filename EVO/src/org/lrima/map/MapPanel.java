@@ -176,7 +176,7 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 	protected void doTransforms(Graphics2D graphics){
 
 
-		if(UserPrefs.FOLLOW_BEST){
+		if(UserPrefs.getBoolean(UserPrefs.KEY_FOLLOW_BEST)){
 			Espece bestEspece = simulation.getBest();
 			translateX = (int) -bestEspece.getX() + getWidth() / 2;
 			translateY = (int) -bestEspece.getY() + getHeight() / 2;

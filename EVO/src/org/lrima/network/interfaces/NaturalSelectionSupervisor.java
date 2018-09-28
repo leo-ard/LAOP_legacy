@@ -28,7 +28,7 @@ public class NaturalSelectionSupervisor implements NeuralNetworkSuperviser {
      * Kill half of the cars to keep the best half
      */
     private void kill50(ArrayList<Espece> especes) {
-        int numberOfCar = UserPrefs.preferences.getInt(UserPrefs.KEY_NUMBER_OF_CAR, UserPrefs.DEFAULT_NUMBER_OF_CAR);
+        int numberOfCar = UserPrefs.getInt(UserPrefs.KEY_NUMBER_OF_CAR);
 
         while(especes.size() > numberOfCar/2) {
             especes.remove(especes.size() - 1);
@@ -41,7 +41,7 @@ public class NaturalSelectionSupervisor implements NeuralNetworkSuperviser {
      * Create the cars that was destroyed in kill50 to always keep the same number of cars
      */
     private void repopulate(ArrayList<Espece> especes, Simulation simulation ) {
-        int numberOfCar = UserPrefs.preferences.getInt(UserPrefs.KEY_NUMBER_OF_CAR, UserPrefs.DEFAULT_NUMBER_OF_CAR);
+        int numberOfCar = UserPrefs.getInt(UserPrefs.KEY_NUMBER_OF_CAR);
 
         ArrayList<Espece> newCars = new ArrayList<>();
 

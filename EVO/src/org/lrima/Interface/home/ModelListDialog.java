@@ -1,5 +1,6 @@
 package org.lrima.Interface.home;
 
+import org.lrima.Interface.home.pages.CompareAlgorithmsPanel;
 import org.lrima.network.algorithms.AlgorithmManager;
 import org.lrima.network.interfaces.NeuralNetworkModel;
 
@@ -10,22 +11,18 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 public class ModelListDialog extends JDialog {
-
-    ArrayList<Class<?extends NeuralNetworkModel>> models;
     ArrayList<JCheckBox> modelCheckBoxes = new ArrayList<>();
-    CompareAlgorithmsFrame compareAlgorithmsFrame;
+    CompareAlgorithmsPanel compareAlgorithmsPanel;
 
-    public ModelListDialog(CompareAlgorithmsFrame parent){
-        compareAlgorithmsFrame = parent;
+    public ModelListDialog(CompareAlgorithmsPanel parent){
+        compareAlgorithmsPanel = parent;
         this.setTitle("Add Model");
-
-        models = AlgorithmManager.algorithms;
 
         JPanel checkBoxPanel = new JPanel();
 
-        checkBoxPanel.setLayout(new GridLayout(models.size(), 2));
+        checkBoxPanel.setLayout(new GridLayout(AlgorithmManager.algorithms.size(), 2));
 
-        for(int i = 0 ; i < models.size() ; i++){
+        for(int i = 0 ; i < AlgorithmManager.algorithms.size() ; i++){
             JCheckBox checkBox = new JCheckBox();
             modelCheckBoxes.add(checkBox);
             JLabel label = new JLabel(AlgorithmManager.algorithmsName.get(i));
@@ -37,21 +34,17 @@ public class ModelListDialog extends JDialog {
         this.add(checkBoxPanel);
 
         JButton addButton = new JButton("Add");
-        addButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ArrayList<Class<?extends NeuralNetworkModel>> modelsToAdd = new ArrayList<>();
+        addButton.addActionListener(e -> {
+            ArrayList<NeuralNetworkModel> modelsToAdd = new ArrayList<>();
 
-                for(int i = 0 ; i < modelCheckBoxes.size() ; i++){
-                    if(modelCheckBoxes.get(i).isSelected()){
-                        modelsToAdd.add(models.get(i));
-                    }
+            for(int i = 0 ; i < modelCheckBoxes.size() ; i++){
+                if(modelCheckBoxes.get(i).isSelected()){
+                    modelsToAdd.add(NeuralNetworkModel.getInstanceOf(AlgorithmManager.algorithms.get(i)));
                 }
-
-                compareAlgorithmsFrame.addModels(modelsToAdd);
-
-                dispose();
             }
+
+            compareAlgorithmsPanel.addModels(modelsToAdd);
+            dispose();
         });
 
         this.add(addButton, BorderLayout.SOUTH);

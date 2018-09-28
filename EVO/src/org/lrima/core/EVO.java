@@ -1,33 +1,28 @@
 package org.lrima.core;
 
-import org.lrima.Interface.home.HomeFrame;
+import org.lrima.Interface.home.HomeFrameManager;
+
+import java.awt.*;
 
 public class EVO {
 
 	public static void main(String[] args) {
-        UserPrefs.load();
 		start();
 
 	}
 
 	public static void restart() {
-        UserPrefs.load();
         start();
     }
 
     private static void start(){
-        HomeFrame homeFrame = new HomeFrame();
-        homeFrame.setVisible(true);
-
-        /*EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    frame = new FrameManager();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+        EventQueue.invokeLater(() -> {
+            try {
+                HomeFrameManager homeFrameManager = new HomeFrameManager();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        });*/
+        });
     }
 
 }

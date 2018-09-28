@@ -2,6 +2,7 @@ package org.lrima.Interface.actions;
 
 import org.lrima.core.UserPrefs;
 import org.lrima.Interface.FrameManager;
+import org.lrima.Interface.options.types.OptionBoolean;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -36,7 +37,7 @@ public class WindowAddPanelAction extends AbstractAction {
         }
 
         //Save the state into the preferences
-        UserPrefs.preferences.putBoolean(prefKey, state);
+        UserPrefs.set(prefKey, new OptionBoolean(state));
         frameManager.revalidate();
     }
 }

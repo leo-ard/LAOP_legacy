@@ -4,7 +4,7 @@ import org.lrima.network.annotations.AlgorithmInformation;
 import org.lrima.network.interfaces.NeuralNetwork;
 import org.lrima.network.interfaces.NeuralNetworkReceiver;
 import org.lrima.network.interfaces.NeuralNetworkTransmitter;
-import org.lrima.network.interfaces.options.Option;
+import org.lrima.Interface.options.Option;
 import org.lrima.utils.Random;
 
 import java.awt.*;

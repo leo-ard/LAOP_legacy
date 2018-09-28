@@ -3,7 +3,6 @@ package org.lrima.network.algorithms.fullyconnected;
 import java.awt.*;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 import org.apache.commons.math3.linear.MatrixUtils;
@@ -11,8 +10,8 @@ import org.lrima.network.interfaces.NeuralNetwork;
 import org.lrima.network.interfaces.NeuralNetworkReceiver;
 import org.lrima.network.interfaces.NeuralNetworkTransmitter;
 import org.apache.commons.math3.linear.RealMatrix;
-import org.lrima.network.interfaces.options.AlgorithmOptionPanel;
-import org.lrima.network.interfaces.options.Option;
+import org.lrima.Interface.options.OptionsDisplayPanel;
+import org.lrima.Interface.options.Option;
 
 public class FullyConnectedNeuralNetwork extends NeuralNetwork implements Serializable {
 
@@ -29,7 +28,7 @@ public class FullyConnectedNeuralNetwork extends NeuralNetwork implements Serial
 
 	public FullyConnectedNeuralNetwork(LinkedHashMap<String, Option> options) {
 		super(options);
-		AlgorithmOptionPanel optionPanel = new AlgorithmOptionPanel(this.options);
+		OptionsDisplayPanel optionPanel = new OptionsDisplayPanel(this.options);
 	}
 
 

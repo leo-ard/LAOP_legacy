@@ -2,8 +2,8 @@ package org.lrima.network.algorithms.neat;
 
 import org.lrima.network.annotations.AlgorithmInformation;
 import org.lrima.network.interfaces.NeuralNetworkModel;
-import org.lrima.network.interfaces.options.Option;
-import org.lrima.network.interfaces.options.OptionInt;
+import org.lrima.Interface.options.Option;
+import org.lrima.Interface.options.types.OptionInt;
 
 import java.util.LinkedHashMap;
 
@@ -14,7 +14,7 @@ public class NeatModel extends NeuralNetworkModel<NeatGenome> {
 
     @Override
     public LinkedHashMap<String, Option> getDefaultOptions() {
-        options.put("options 1", new OptionInt(10));
+        options.put("OPTION_1", new OptionInt(10));
         return this.options;
     }
 
