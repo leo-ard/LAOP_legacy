@@ -1,23 +1,68 @@
 package org.lrima.Interface.options;
 
-import org.lrima.core.EVO;
+import org.lrima.core.UserPrefs;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
 public class OptionsDialog extends JDialog implements ActionListener {
+    public LinkedHashMap<String, OptionsDisplayPanel> optionPanel;
 
-    private OptionVoiturePanel optionVoiturePanel;
-    private OptionSimulationPanel optionSimulationPanel;
-    private JButton saveButton, cancelButton;
+    private JButton okButton;
+
+    private LinkedHashMap<String, ArrayList<String>> allTabs;
 
     public OptionsDialog(){
         setTitle("Options");
         this.setupSize();
         this.setupButtons();
+        this.setupDefault();
+        this.setUpOptionPanel();
         this.setupTabs();
+    }
+
+    public OptionsDialog(String name, LinkedHashMap<String, Option> options) {
+        setTitle("Options");
+        this.setupSize();
+        this.setupButtons();
+        this.optionPanel = new LinkedHashMap<>();
+        this.optionPanel.put(name, new OptionsDisplayPanel(options));
+        this.setupTabs();
+
+    }
+
+    private void setUpOptionPanel() {
+        optionPanel = new LinkedHashMap<>();
+        allTabs.forEach((String name, ArrayList<String> keys) -> {
+           LinkedHashMap<String, Option> options = new LinkedHashMap<>();
+           keys.stream().forEach(key -> {
+               options.put(key, UserPrefs.getOption(key));
+           });
+
+           optionPanel.put(name, new OptionsDisplayPanel(options));
+        });
+    }
+
+    private void setupDefault() {
+        allTabs = new LinkedHashMap<>();
+
+        //Simulation tabs
+        ArrayList<String> simulationTab = new ArrayList<>();
+        simulationTab.add(UserPrefs.KEY_TIME_LIMIT);
+        simulationTab.add(UserPrefs.KEY_USE_LAST_SAVED);
+
+        allTabs.put("Simulation", simulationTab);
+
+        //Car tab
+        ArrayList<String> carTab = new ArrayList<>();
+        carTab.add(UserPrefs.KEY_NUMBER_OF_CAR);
+        carTab.add(UserPrefs.KEY_TURN_RATE);
+        allTabs.put("Car", carTab);
+
     }
 
     /**
@@ -41,17 +86,12 @@ public class OptionsDialog extends JDialog implements ActionListener {
      */
     private void setupButtons(){
         //The save button
-        saveButton = new JButton("Save");
-        saveButton.addActionListener(this);
-
-        //The cancel button
-        cancelButton = new JButton("Cancel");
-        cancelButton.addActionListener(this);
+        okButton = new JButton("Ok");
+        okButton.addActionListener(this);
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
-        buttonPanel.add(saveButton);
-        buttonPanel.add(cancelButton);
+        buttonPanel.add(okButton);
 
         //Add the two button to the bottom of the dialog box
         add(buttonPanel, "South");
@@ -61,43 +101,32 @@ public class OptionsDialog extends JDialog implements ActionListener {
      * Adds the options tabs to the dialog
      */
     private void setupTabs(){
-        JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.setTabPlacement(JTabbedPane.LEFT);
+        if(this.optionPanel.size() > 1){
+            JTabbedPane tabbedPane = new JTabbedPane();
+            tabbedPane.setTabPlacement(JTabbedPane.LEFT);
 
-        optionVoiturePanel = new OptionVoiturePanel();
-        optionSimulationPanel = new OptionSimulationPanel();
+            optionPanel.forEach((name, optionPanel)->{
+                tabbedPane.addTab(name, optionPanel);
+            });
 
-        tabbedPane.addTab("Voiture", optionVoiturePanel);
-        tabbedPane.addTab("Simulation", optionSimulationPanel);
+            add(tabbedPane);
+        }
+        else{
+            String key = optionPanel.keySet().iterator().next();
 
-        add(tabbedPane);
+            this.setTitle(fromKeyToNormalText(key));
+            this.add(this.optionPanel.get(key));
+        }
+    }
+
+    static String fromKeyToNormalText(String key){
+        return key.charAt(0) + key.substring(1).toLowerCase().replaceAll("_", " ");
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(e.getSource() == cancelButton){
+        if(e.getSource() == okButton){
             setVisible(false);
-        }
-        else if(e.getSource() == saveButton){
-            //Notify the user that the simulation will restart
-            boolean erreur = false;
-
-            //There was an error in the values of the options in the car tab
-            if (!optionVoiturePanel.save()) {
-                JOptionPane.showMessageDialog(this, "Veuillez verifier les informations pour les voitures", "Erreur", JOptionPane.ERROR_MESSAGE);
-                erreur = true;
-            }
-            //There was an error in the values of the simulation tab
-            if (!optionSimulationPanel.save()) {
-                JOptionPane.showMessageDialog(this, "Veuillez verifier les informations pour la simulation", "Erreur", JOptionPane.ERROR_MESSAGE);
-                erreur = true;
-            }
-
-            //If all the options are valid
-            if(!erreur){
-                dispose();
-                //EVO.restart();
-            }
         }
     }
 }

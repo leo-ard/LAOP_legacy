@@ -39,8 +39,7 @@ public class Map implements Serializable {
      */
     static public Map loadMapFromPreferences(){
         try {
-            UserPrefs.load();
-            String filePath = UserPrefs.MAP_TO_USE_PATH;
+            String filePath = UserPrefs.getString(UserPrefs.KEY_MAP_TO_USE);
 
             //Open the file
             FileInputStream fis = new FileInputStream(filePath);
@@ -55,15 +54,13 @@ public class Map implements Serializable {
 
             //If the path of the map to use in the preferences doesn't exist, Use default.map instead
             try {
-                String filePath = UserPrefs.DEFAULT_MAP_TO_USE_PATH;
+                String filePath = "./default.map";
 
                 //Open the file
                 FileInputStream fis = new FileInputStream(filePath);
                 ObjectInputStream ois = new ObjectInputStream(fis);
 
                 Map map = (Map) ois.readObject();
-
-                UserPrefs.preferences.put(UserPrefs.KEY_MAP_TO_USE, UserPrefs.DEFAULT_MAP_TO_USE_PATH);
 
                 return map;
 

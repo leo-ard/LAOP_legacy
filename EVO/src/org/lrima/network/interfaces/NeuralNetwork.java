@@ -1,10 +1,9 @@
 package org.lrima.network.interfaces;
 
-import org.lrima.network.interfaces.options.Option;
+import org.lrima.Interface.options.Option;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 public abstract class NeuralNetwork {

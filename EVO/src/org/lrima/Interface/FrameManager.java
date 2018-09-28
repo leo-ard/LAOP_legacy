@@ -225,10 +225,11 @@ public class FrameManager extends JFrame implements SimulationListener, BatchLis
      * in the user preferences
      */
     private void setMenuButtonStates(){
-        checkBoxRealtime.setState(UserPrefs.REAL_TIME);
-        checkBoxFollowBest.setState(UserPrefs.FOLLOW_BEST);
-        checkBoxGraphique.setState(UserPrefs.SHOW_WINDOW_GRAPHIQUE);
-        checkBoxEspeceInfo.setState(UserPrefs.SHOW_WINDOW_ESPECE_INFO);
+        //TODO : CAN BE OPTIMISED WITH GETTING OPTION DIRRECTLY
+        checkBoxRealtime.setState(UserPrefs.getBoolean(UserPrefs.KEY_REAL_TIME));
+        checkBoxFollowBest.setState(UserPrefs.getBoolean(UserPrefs.KEY_FOLLOW_BEST));
+        checkBoxGraphique.setState(UserPrefs.getBoolean(UserPrefs.KEY_WINDOW_GRAPHIQUE));
+        checkBoxEspeceInfo.setState(UserPrefs.getBoolean(UserPrefs.KEY_WINDOW_ESPECE_INFO));
     }
 
     /**

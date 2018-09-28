@@ -5,13 +5,11 @@ import org.lrima.Interface.home.HomeFrame;
 public class EVO {
 
 	public static void main(String[] args) {
-        UserPrefs.load();
 		start();
 
 	}
 
 	public static void restart() {
-        UserPrefs.load();
         start();
     }
 

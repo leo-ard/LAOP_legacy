@@ -1,7 +1,9 @@
 package org.lrima.Interface.home;
 
 import org.lrima.Interface.FrameManager;
+import org.lrima.Interface.options.OptionsDialog;
 import org.lrima.network.algorithms.AlgorithmManager;
+import org.lrima.network.annotations.AlgorithmInformation;
 import org.lrima.network.interfaces.NeuralNetwork;
 import org.lrima.network.interfaces.NeuralNetworkModel;
 import org.lrima.simulation.Simulation;
@@ -12,6 +14,7 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.GroupLayout.Alignment;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -23,10 +26,17 @@ public class OneAlgorithmFrame extends JFrame {
     private JButton simulateButton = new JButton("Simulate");
     private JButton backButton = new JButton("Back");
 
-    private ArrayList<Class<?extends NeuralNetworkModel>> modelClasses = new ArrayList<>();
-
     private JPanel content = new JPanel();
     private JFrame lastFrame;
+
+    private NeuralNetworkModel currentModel;
+    {
+        try {
+            currentModel = AlgorithmManager.algorithms.get(0).getConstructor().newInstance();
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+    }
 
     public OneAlgorithmFrame(JFrame lastFrame){
         this.lastFrame = lastFrame;
@@ -82,7 +92,8 @@ public class OneAlgorithmFrame extends JFrame {
         this.descriptionPane.setText("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ac lobortis nulla. Donec at turpis sed purus commodo fringilla vel nec ex. Vivamus placerat luctus malesuada. Ut odio dui, lobortis vitae finibus eget, fermentum eu sem. Etiam suscipit augue ut nunc hendrerit, consequat tincidunt lacus porttitor.");
         this.descriptionPane.setEditable(false);
 
-        this.setupComboBox();
+
+        this.algorithmCombo = new JComboBox(AlgorithmManager.algorithmsName.toArray());
 
         //Bottom buttons
         this.backButton.addActionListener(new ActionListener() {
@@ -97,7 +108,16 @@ public class OneAlgorithmFrame extends JFrame {
         this.configureButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                currentModel.displayOptions();
+            }
+        });
 
+        //
+        this.algorithmCombo.addActionListener(e -> {
+            try {
+                currentModel = AlgorithmManager.algorithms.get(this.algorithmCombo.getSelectedIndex()).getConstructor().newInstance();
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e1) {
+                e1.printStackTrace();
             }
         });
 
@@ -109,8 +129,7 @@ public class OneAlgorithmFrame extends JFrame {
                     dispose();
 
                     FrameManager frameManager = new FrameManager();
-                    NeuralNetworkModel model = modelClasses.get(algorithmCombo.getSelectedIndex()).getConstructor().newInstance();
-                    frameManager.addBatch(model, 2);
+                    frameManager.addBatch(currentModel, 2);
                     frameManager.setVisible(true);
                     frameManager.startBatches();
                 }catch (Exception error){
@@ -118,18 +137,5 @@ public class OneAlgorithmFrame extends JFrame {
                 }
             }
         });
-    }
-
-    private void setupComboBox(){
-        this.modelClasses = AlgorithmManager.algorithms;
-        String[] algorithmString = new String[modelClasses.size()];
-
-        for(int i = 0 ; i  < algorithmString.length ; i++){
-            String name = AlgorithmManager.algorithmsName.get(i);
-            algorithmString[i] = name;
-        }
-
-        //Combo box and settings
-        this.algorithmCombo = new JComboBox(algorithmString);
     }
 }

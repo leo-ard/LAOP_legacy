@@ -1,10 +1,17 @@
 package org.lrima.core;
 
+import org.lrima.Interface.options.*;
+import org.lrima.Interface.options.types.OptionBoolean;
+import org.lrima.Interface.options.types.OptionDouble;
+import org.lrima.Interface.options.types.OptionInt;
+import org.lrima.Interface.options.types.OptionString;
+
+import javax.swing.*;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.prefs.Preferences;
 
 public class UserPrefs {
-    public static Preferences preferences = Preferences.userRoot().node(UserPrefs.class.getName());
-
     public static final String SRC_LRIMA = "/images/LRIMA.png";
 
     public static final String SRC_TOOLS_START = "/images/icons/tools/start.gif";
@@ -13,75 +20,108 @@ public class UserPrefs {
     public static final String SRC_TOOLS_REACTANGLE = "/images/icons/tools/rectangle.png";
     public static final String SRC_TOOLS_SELECTION = "/images/icons/tools/selection.png";
 
-    public static int NUMBERCARS;
-    public static int VITESSE_VOITURE;
-    public static double TURNRATE;
 
-    public static boolean REAL_TIME;
-    public static boolean FOLLOW_BEST;
+    private static Preferences preferences = Preferences.userRoot().node(UserPrefs.class.getName());
+    private static LinkedHashMap<String, Option> allOptions = new LinkedHashMap<>();
+    private static int NUMBERCARS;
+    private static int VITESSE_VOITURE;
+    private static double TURNRATE;
 
-    public static boolean SHOW_WINDOW_GRAPHIQUE;
-    public static boolean SHOW_WINDOW_NEURAL_NETWORK;
-    public static boolean SHOW_WINDOW_ESPECE_INFO;
+    private static boolean REAL_TIME;
+    private static boolean FOLLOW_BEST;
 
-    public static String MAP_TO_USE_PATH;
+    private static boolean SHOW_WINDOW_GRAPHIQUE;
+    private static boolean SHOW_WINDOW_NEURAL_NETWORK;
+    private static boolean SHOW_WINDOW_ESPECE_INFO;
+
+    private static String MAP_TO_USE_PATH;
 
     //en millis
-    public static int TIME_LIMIT = 10_000;
+    private static int TIME_LIMIT = 10_000;
 
     //Si on devrait utiliser le meilleur NN sauvegarde
-    public static boolean USE_BEST = false;
+    private static boolean USE_BEST = false;
 
     //Preferences keys
     final public static String KEY_NUMBER_OF_CAR = "NUMBER_OF_CAR";
     final public static String KEY_CAR_SPEED = "CAR_SPEED";
     final public static String KEY_TURN_RATE = "TURN_RATE";
-
-    final public static String KEY_TIME_LIMIT = "TIME_LIMIT";
+          
+    final public static String KEY_TIME_LIMIT = "TIME_LIMIT_IN_SECONDS";
     final public static String KEY_USE_LAST_SAVED = "USE_LAST_SAVED";
-
+          
     final public static String KEY_REAL_TIME = "REAL_TIME";
     final public static String KEY_FOLLOW_BEST = "FOLLOW_BEST";
-
+          
     final public static String KEY_WINDOW_GRAPHIQUE = "WINDOW_GRAPHIQUE";
     final public static String KEY_WINDOW_NEURAL_NET = "WINDOW_NEURAL_NET";
     final public static String KEY_WINDOW_ESPECE_INFO = "WINDOW_ESPECE_INFO";
-
+          
     final public static String KEY_MAP_TO_USE = "MAP_TO_USE";
 
     //Defaults
-    final public static int DEFAULT_NUMBER_OF_CAR = 200;
-    final public static int DEFAULT_CAR_SPEED = 50;
-    final public static double DEFAULT_TURN_RATE = 0.5;
+    final private static HashMap<String, Option> defaultValues = new HashMap<>();
 
-    final public static int DEFAULT_TIME_LIMIT = 60000;
-    final public static boolean DEFAULT_USE_LAST_SAVED = false;
+    static{
+        defaultValues.put(KEY_NUMBER_OF_CAR, new OptionInt(200, 1, 10_000, 10));
+        defaultValues.put(KEY_CAR_SPEED,  new OptionInt(50));
+        defaultValues.put(KEY_TURN_RATE, new OptionDouble(0.5, 0, 1, 0.1));
+        defaultValues.put(KEY_TIME_LIMIT, new OptionInt(60_000, 0, 1_000_000, 10_000));
+        defaultValues.put(KEY_USE_LAST_SAVED, new OptionBoolean(false));
+        defaultValues.put(KEY_REAL_TIME, new OptionBoolean(false));
+        defaultValues.put(KEY_FOLLOW_BEST, new OptionBoolean(true));
+        defaultValues.put(KEY_WINDOW_GRAPHIQUE, new OptionBoolean(false));
+        defaultValues.put(KEY_WINDOW_NEURAL_NET, new OptionBoolean(false));
+        defaultValues.put(KEY_WINDOW_ESPECE_INFO, new OptionBoolean(false));
+        defaultValues.put(KEY_MAP_TO_USE, new OptionString("./default.map"));
+    }
 
-    final public static boolean DEFAULT_REAL_TIME = false;
-    final public static boolean DEFAULT_RANDOM_MAP = false;
-    final public static boolean DEFAULT_FOLLOW_BEST = true;
+    public static int getInt(String key){
+        return UserPrefs.<Integer>get(key).getValue();
+    }
 
-    final public static boolean DEFAULT_WINDOW_GRAPHIQUE = false;
-    final public static boolean DEFAULT_WINDOW_NEURAL_NET = false;
-    final public static boolean DEFAULT_WINDOW_ESPECE_INFO = false;
+    public static double getDouble(String key){
+        return UserPrefs.<Double>get(key).getValue();
+    }
 
-    final public static String DEFAULT_MAP_TO_USE_PATH = "./default.map";
+    public static boolean getBoolean(String key){
+        return UserPrefs.<Boolean>get(key).getValue();
+    }
 
-    public static void load(){
-        NUMBERCARS = preferences.getInt(KEY_NUMBER_OF_CAR, DEFAULT_NUMBER_OF_CAR);
-        VITESSE_VOITURE = preferences.getInt(KEY_CAR_SPEED, DEFAULT_CAR_SPEED);
-        TURNRATE = preferences.getDouble(KEY_TURN_RATE, DEFAULT_TURN_RATE);
+    public static String getString(String key){
+        return UserPrefs.<String>get(key).getValue();
+    }
 
-        TIME_LIMIT = preferences.getInt(KEY_TIME_LIMIT, DEFAULT_TIME_LIMIT);
-        USE_BEST = preferences.getBoolean(KEY_USE_LAST_SAVED, DEFAULT_USE_LAST_SAVED);
+    private static <T> Option<T> get(String key){
+        Option<T> currentOption = allOptions.get(key);
 
-        REAL_TIME = preferences.getBoolean(KEY_REAL_TIME, DEFAULT_REAL_TIME);
-        FOLLOW_BEST = preferences.getBoolean(KEY_FOLLOW_BEST, DEFAULT_FOLLOW_BEST);
+        if(currentOption == null){
+            if(defaultValues.get(key).getClassValue() == String.class)
+                currentOption = (Option<T>) new OptionString(preferences.get(key, (String) defaultValues.get(key).getValue()));
+            else if(defaultValues.get(key).getClassValue() == Integer.class)
+                currentOption = (Option<T>) new OptionInt(preferences.getInt(key, (int) defaultValues.get(key).getValue()), (OptionInt) defaultValues.get(key));
+            else if(defaultValues.get(key).getClassValue() == Double.class)
+                currentOption = (Option<T>) new OptionDouble(preferences.getDouble(key, (double) defaultValues.get(key).getValue()), (OptionDouble) defaultValues.get(key));
+            else if(defaultValues.get(key).getClassValue() == Boolean.class)
+                currentOption = (Option<T>) new OptionBoolean(preferences.getBoolean(key, (boolean) defaultValues.get(key).getValue()));
+            currentOption.addOptionValueChangeListener(option -> option.save(key, preferences));
+            allOptions.put(key, currentOption);
+        }
 
-        SHOW_WINDOW_GRAPHIQUE = preferences.getBoolean(KEY_WINDOW_GRAPHIQUE, DEFAULT_WINDOW_GRAPHIQUE);
-        SHOW_WINDOW_NEURAL_NETWORK = preferences.getBoolean(KEY_WINDOW_NEURAL_NET, DEFAULT_WINDOW_NEURAL_NET);
-        SHOW_WINDOW_ESPECE_INFO = preferences.getBoolean(KEY_WINDOW_ESPECE_INFO, DEFAULT_WINDOW_ESPECE_INFO);
+        return currentOption;
+    }
 
-        MAP_TO_USE_PATH = preferences.get(KEY_MAP_TO_USE, DEFAULT_MAP_TO_USE_PATH);
+    public static void set(String key, Option value){
+        allOptions.put(key, value);
+        value.addOptionValueChangeListener(option -> option.save(key, preferences));
+        value.save(key, preferences);
+    }
+
+    public static JComponent getComponent(String key){
+        return get(key).show();
+    }
+
+    public static Option getOption(String key){
+        return get(key);
     }
 }

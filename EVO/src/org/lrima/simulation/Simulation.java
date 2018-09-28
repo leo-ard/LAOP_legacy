@@ -80,7 +80,7 @@ public class Simulation extends Thread{
 			}
 
 			if(!pausing) {
-				if(especesOpen.size() != 0 && Simulation.simulationTime < UserPrefs.TIME_LIMIT) {
+				if(especesOpen.size() != 0 && Simulation.simulationTime < UserPrefs.getInt(UserPrefs.KEY_TIME_LIMIT)) {
 					//Add the current time to the Simulation.simulationTime
 					currentTime = System.currentTimeMillis();
 					Simulation.simulationTime += msBetweenFrames;
@@ -107,7 +107,7 @@ public class Simulation extends Thread{
 					nextGeneration();
 				}
 			}
-			if(UserPrefs.REAL_TIME) {
+			if(UserPrefs.getBoolean(UserPrefs.KEY_REAL_TIME)) {
 				try {
 					timePassed = System.currentTimeMillis() - currentTime;
 					Simulation.sleep((long) ((msBetweenFrames - timePassed) > 0 ?msBetweenFrames - timePassed: 0));
@@ -177,9 +177,6 @@ public class Simulation extends Thread{
 
 		this.generation++;
 
-	    //Reload les préférences du user
-	    UserPrefs.load();
-
 	    //Kill all cars and add them to especesClosed
         for(int i = 0; i < especesOpen.size(); i++) {
             Espece espece = especesOpen.get(i);
@@ -228,7 +225,7 @@ public class Simulation extends Thread{
 		especesClosed = new ArrayList<>();
 
 		//Retreive the number of cars the user want
-		int numberOfCar = UserPrefs.preferences.getInt(UserPrefs.KEY_NUMBER_OF_CAR, UserPrefs.DEFAULT_NUMBER_OF_CAR);
+		int numberOfCar = UserPrefs.getInt(UserPrefs.KEY_NUMBER_OF_CAR);
 
 		//Add a new car until you reach the max number of car
 		while(especesOpen.size() < numberOfCar) {

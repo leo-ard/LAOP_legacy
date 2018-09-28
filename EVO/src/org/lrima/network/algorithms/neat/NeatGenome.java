@@ -1,7 +1,7 @@
 package org.lrima.network.algorithms.neat;
 
 import org.lrima.network.interfaces.*;
-import org.lrima.network.interfaces.options.Option;
+import org.lrima.Interface.options.Option;
 import org.lrima.utils.Random;
 
 import java.awt.*;
