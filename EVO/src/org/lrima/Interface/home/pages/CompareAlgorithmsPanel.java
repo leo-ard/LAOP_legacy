@@ -1,21 +1,19 @@
-package org.lrima.Interface.home;
+package org.lrima.Interface.home.pages;
 
-import org.lrima.network.algorithms.AlgorithmManager;
-import org.lrima.network.annotations.AlgorithmInformation;
+import org.lrima.Interface.home.ModelListDialog;
+import org.lrima.Interface.home.HomeFrameManager;
+import org.lrima.Interface.home.PagePanel;
 import org.lrima.network.interfaces.NeuralNetworkModel;
 
 import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.table.DefaultTableModel;
 
-public class CompareAlgorithmsFrame extends JFrame {
-
+public class CompareAlgorithmsPanel extends PagePanel {
     private JTable algorithmList = new JTable();
     private JScrollPane algorithmScrollPane;
     private JLabel algorithmsLabel = new JLabel("Algorithms");
@@ -24,26 +22,16 @@ public class CompareAlgorithmsFrame extends JFrame {
     private JButton simulateButton = new JButton("Simulate");
     private JButton backButton = new JButton("Back");
 
-    private JPanel content = new JPanel();
-    private JFrame lastFrame;
+    private ArrayList<NeuralNetworkModel> models = new ArrayList<>();
 
-    private ArrayList<Class<?extends NeuralNetworkModel>> models = new ArrayList<>();
-
-    public CompareAlgorithmsFrame(JFrame lastFrame){
-        this.lastFrame = lastFrame;
-        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        this.setBounds(lastFrame.getBounds().x, lastFrame.getBounds().y, Constant.FRAME_WIDTH, Constant.FRAME_HEIGHT);
-        this.setTitle("Algorithm Options");
-        this.setResizable(false);
-
+    public CompareAlgorithmsPanel(HomeFrameManager homeFrameManager){
+        super(homeFrameManager);
         this.setupComponents();
-        this.reload();
+        this.setUp();
     }
 
-    private void reload(){
-        content = new JPanel();
-        this.setContentPane(content);
-        GroupLayout layout = new GroupLayout(content);
+    private void setUp(){
+        GroupLayout layout = new GroupLayout(this);
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
@@ -86,7 +74,7 @@ public class CompareAlgorithmsFrame extends JFrame {
                                 .addContainerGap())
         );
 
-        this.getContentPane().setLayout(layout);
+        setLayout(layout);
     }
 
     private void setupComponents(){
@@ -97,44 +85,29 @@ public class CompareAlgorithmsFrame extends JFrame {
         this.setupAlgorithmTable();
 
         //Add button
-        this.addButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ModelListDialog dialog = new ModelListDialog(CompareAlgorithmsFrame.this);
-                dialog.setVisible(true);
-            }
+        this.addButton.addActionListener(e -> {
+            ModelListDialog dialog = new ModelListDialog(this);
+            dialog.setVisible(true);
         });
 
         //Bottom buttons
-        this.backButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                lastFrame.setVisible(true);
-                setVisible(false);
-            }
-        });
+        this.backButton.addActionListener(e -> homeFrameManager.back());
     }
+    
 
     private void setupAlgorithmTable(){
         String[] columnName = new String[]{"Algorithm Name", "Edit Button"};
-
-        String[] algorithmNames = new String[models.size()];
-        for(int i = 0 ; i < algorithmNames.length ; i++){
-            String name = models.get(i).getAnnotation(AlgorithmInformation.class).name();
-            algorithmNames[i] = name;
-        }
-
-        Object[][] tableRows = new Object[algorithmNames.length][columnName.length];
+        Object[][] tableRows = new Object[models.size()][columnName.length];
 
         for(int row = 0 ; row < tableRows.length ; row++){
-
-            tableRows[row] = new Object[]{algorithmNames[row], "Options"};
+            tableRows[row] = new Object[]{models.get(row).getAlgorithmInformationAnnotation().name(), "Options"};
         }
+        
+        algorithmList.setModel(new DefaultTableModel(tableRows, columnName));
+        algorithmList.setShowGrid(false);
+        algorithmList.setTableHeader(null);
 
-        this.algorithmList = new JTable(tableRows, columnName);
-        this.algorithmList.setShowGrid(false);
-        this.algorithmList.setTableHeader(null);
-
+        //TODO : peut-etre mettre un bouton à la place ?
         algorithmList.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -144,23 +117,25 @@ public class CompareAlgorithmsFrame extends JFrame {
                     int col = algorithmList.columnAtPoint(e.getPoint());
 
                     if (col == 1) {
-                        Class<? extends NeuralNetworkModel> model = models.get(row);
-                        //TODO: Show option dialog for the model
+                       models.get(row).displayOptions();
                     }
                 }catch (IndexOutOfBoundsException error){ }
             }
         });
 
-        this.algorithmScrollPane = new JScrollPane(algorithmList);
     }
 
     /**
      * Adds a list of models to the models table
      * @param models the models to add
      */
-    public void addModels(ArrayList<Class<?extends NeuralNetworkModel>> models){
+    public void addModels(ArrayList<NeuralNetworkModel> models){
         this.models.addAll(models);
         this.setupAlgorithmTable();
-        this.reload();
+    }
+
+    @Override
+    public String getName() {
+        return "Compare algorithms frame";
     }
 }

@@ -30,7 +30,8 @@ public class AlgorithmManager {
                 //// ADD YOUR ALGORITHMS MODELS BELOW ////
                 //////////////////////////////////////////
                 FullyConnectedNeuralModel.class,
-                NeatModel.class)
+                NeatModel.class
+        )
         );
 
 

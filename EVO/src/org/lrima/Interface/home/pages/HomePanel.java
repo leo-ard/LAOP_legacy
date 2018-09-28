@@ -1,36 +1,24 @@
-package org.lrima.Interface.home;
+package org.lrima.Interface.home.pages;
 
+import org.lrima.Interface.home.HomeFrameManager;
 import org.lrima.Interface.utils.ImagePanel;
 
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
 
-public class HomeFrame extends JFrame {
-
-
-    private JPanel content;
+public class HomePanel extends org.lrima.Interface.home.PagePanel {
 
     private JEditorPane descriptionEVO;
     private ImagePanel lrimaImagePanel;
     private JButton configureButton;
     private JButton runLastButton;
 
-
-
-    public HomeFrame(){
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setBounds(Constant.screenCenter.x, Constant.screenCenter.y, Constant.FRAME_WIDTH, Constant.FRAME_HEIGHT);
-        this.content = new JPanel();
-        this.setContentPane(content);
-        this.setResizable(false);
-
-        GroupLayout layout = new GroupLayout(content);
+    public HomePanel(HomeFrameManager homeFrameManager){
+        super(homeFrameManager);
+        GroupLayout layout = new GroupLayout(this);
 
         this.setupComponents();
 
@@ -76,18 +64,15 @@ public class HomeFrame extends JFrame {
 
     private void setupDescription(){
         descriptionEVO = new JTextPane();
-        descriptionEVO.addHyperlinkListener(new HyperlinkListener() {
-            @Override
-            public void hyperlinkUpdate(HyperlinkEvent e) {
-                if(e.getEventType() == HyperlinkEvent.EventType.ACTIVATED){
-                    if(Desktop.isDesktopSupported()){
-                        try{
-                            Desktop.getDesktop().browse(e.getURL().toURI());
-                        }catch (Exception error){
-                            error.printStackTrace();
-                        }
-
+        descriptionEVO.addHyperlinkListener(e -> {
+            if(e.getEventType() == HyperlinkEvent.EventType.ACTIVATED){
+                if(Desktop.isDesktopSupported()){
+                    try{
+                        Desktop.getDesktop().browse(e.getURL().toURI());
+                    }catch (Exception error){
+                        error.printStackTrace();
                     }
+
                 }
             }
         });
@@ -105,16 +90,17 @@ public class HomeFrame extends JFrame {
 
     private void setupButtons(){
         this.configureButton = new JButton("Configure");
-        configureButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                setVisible(false);
-                ConfigureSimulationFrame configureSimulationFrame = new ConfigureSimulationFrame(HomeFrame.this);
-                configureSimulationFrame.setVisible(true);
-            }
+        configureButton.addActionListener(e -> {
+            ConfigureSimulationPanel configureSimulationPanel = new ConfigureSimulationPanel(homeFrameManager);
+            homeFrameManager.next(configureSimulationPanel);
         });
 
         this.runLastButton = new JButton("Run last simulation");
+    }
+
+    @Override
+    public String getName() {
+        return "Welcome to EVO";
     }
 }
 

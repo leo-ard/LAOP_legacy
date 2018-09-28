@@ -8,6 +8,17 @@ import org.lrima.network.annotations.AlgorithmInformation;
 import org.lrima.Interface.options.Option;
 
 public abstract class NeuralNetworkModel<T extends NeuralNetwork> {
+	
+	public static NeuralNetworkModel getInstanceOf(Class<? extends NeuralNetworkModel> modelClass) {
+        try {
+            return modelClass.getConstructor().newInstance();
+        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+	
     /**
      * Characteristics of the algorithm. See {@link #getDefaultOptions} to know witch variable is available.
      */
