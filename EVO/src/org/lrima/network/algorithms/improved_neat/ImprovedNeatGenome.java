@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
-@AlgorithmInformation(name="Improved NEAT", description = "Neural Network using a modified NEAT algorithm. The network starts with two connections from random inputs that goes into the two outputs. With each generations, the network grows to try to find the best solution.")
 public class ImprovedNeatGenome extends NeuralNetwork {
 
     private ArrayList<ConnectionGene> connections;

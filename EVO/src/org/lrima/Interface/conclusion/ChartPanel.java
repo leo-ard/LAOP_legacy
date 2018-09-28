@@ -10,6 +10,7 @@ import org.lrima.simulation.SimulationInformation;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Set;
 
 public class ChartPanel extends JPanel {
     //private HashMap<Class<?extends NeuralNetwork>, ArrayList<SimulationInformation>> simulationInformations;
@@ -63,7 +64,20 @@ public class ChartPanel extends JPanel {
         XYChart allAlgorithmChart = new XYChartBuilder().title("Overall fitness over time").xAxisTitle("Generation").yAxisTitle("Fitness").width(chartWidth).height(chartHeight).build();
 
         for(SimulationBatch batch : this.algorithmBatches){
-            allAlgorithmChart.addSeries(batch.getAlgorithmModel().getAlgorithmInformationAnnotation().name(), this.getGenerationsAsList(batch), batch.getAverageFitnessPerGeneration());
+            ArrayList<String> names = new ArrayList<>(allAlgorithmChart.getSeriesMap().keySet());
+            String serieName = batch.getAlgorithmModel().getAlgorithmInformationAnnotation().name();
+
+            if(names.size() > 0) {
+                serieName = names.get(0);
+                int i = 1;
+                do {
+                    serieName = batch.getAlgorithmModel().getAlgorithmInformationAnnotation().name() + i;
+                    i++;
+                } while (names.contains(serieName));
+            }
+
+            allAlgorithmChart.addSeries(serieName, this.getGenerationsAsList(batch), batch.getAverageFitnessPerGeneration());
+
         }
 
         XChartPanel<XYChart> chartPanel = new XChartPanel<>(allAlgorithmChart);

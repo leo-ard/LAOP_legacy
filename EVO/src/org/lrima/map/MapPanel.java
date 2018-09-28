@@ -258,7 +258,6 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 	protected void drawInformation(Graphics2D graphics){
 		graphics.setColor(COLOR_TEXT);
 		graphics.setFont(new Font("Helvetica", Font.PLAIN, FONT_SIZE));
-		graphics.drawString((this.simulation.simulationTime / 1000.0 )+ "", 200,200);
 
 		String text = 	"Algorithm: " + this.simulation.getAlgorithm().getAlgorithmInformationAnnotation().name() + " ("+ currentBatchNumber +" / " + maxBatch+")";
 		if(this.currentSimulationBatch != null) {

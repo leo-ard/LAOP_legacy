@@ -461,11 +461,11 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 	}
 
 	public double getX() {
-		return x;
+		return x + Espece.ESPECES_WIDTH / 2;
 	}
 
 	public double getY() {
-		return y;
+		return y + ESPECES_HEIGHT / 2;
 	}
 
 	public double getFitness() {
