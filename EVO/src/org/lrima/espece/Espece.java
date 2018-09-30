@@ -176,7 +176,10 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 	private void setupSensors(){
 		//Setup the sensors base on the number of sensors
 		//Note that the maximum number of sensors is limited to 180 because of this
-		for(int i = 90 ; i > -90 ; i -= 180 / NB_CAPTEUR){
+
+		double sensorEveryDeg = 180 / (NB_CAPTEUR - 1);
+
+		for(double i = 90 ; i >= -90 ; i -= sensorEveryDeg){
 			capteurs.add(new Capteur(this, i, 0, 0));
 		}
 	}
@@ -281,9 +284,8 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 		}*/
 		g.drawPolyline(pointX, pointY, 5);
 
-		//TODO: Make the sensors start in the middle of the car and not on the bottom left
 		g.setStroke(new BasicStroke(3));
-		g.rotate(orientationRad,x, y);
+		//g.rotate(orientationRad,x, y);
 
 		//Draw the sensors
 		if(selected) {
@@ -293,7 +295,7 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 			}
 		}
 		//Resets the orientation
-		g.rotate(-orientationRad, x, y);
+		//g.rotate(-orientationRad, x, y);
 	}
 
 	/**

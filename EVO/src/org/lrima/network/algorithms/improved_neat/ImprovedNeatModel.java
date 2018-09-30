@@ -2,8 +2,8 @@ package org.lrima.network.algorithms.improved_neat;
 
 import org.lrima.network.annotations.AlgorithmInformation;
 import org.lrima.network.interfaces.NeuralNetworkModel;
-import org.lrima.network.interfaces.options.Option;
-import org.lrima.network.interfaces.options.OptionInt;
+import org.lrima.Interface.options.Option;
+import org.lrima.Interface.options.types.OptionInt;
 
 import java.util.LinkedHashMap;
 

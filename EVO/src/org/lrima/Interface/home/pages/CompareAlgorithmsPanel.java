@@ -1,11 +1,14 @@
 package org.lrima.Interface.home.pages;
 
+import org.lrima.Interface.FrameManager;
 import org.lrima.Interface.home.ModelListDialog;
 import org.lrima.Interface.home.HomeFrameManager;
 import org.lrima.Interface.home.PagePanel;
 import org.lrima.network.interfaces.NeuralNetworkModel;
 
 import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -92,6 +95,20 @@ public class CompareAlgorithmsPanel extends PagePanel {
 
         //Bottom buttons
         this.backButton.addActionListener(e -> homeFrameManager.back());
+        this.simulateButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                homeFrameManager.close();
+
+                FrameManager frameManager = new FrameManager();
+                for(NeuralNetworkModel model : models){
+                    frameManager.addBatch(model, 2);
+                }
+
+                frameManager.setVisible(true);
+                frameManager.startBatches();
+            }
+        });
     }
     
 

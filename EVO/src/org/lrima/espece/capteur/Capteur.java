@@ -21,17 +21,15 @@ public class Capteur implements NeuralNetworkTransmitter {
 	Simulation simulation;
 
 	private final Color SENSOR_COLOR = new Color(117, 104, 255);
+	private final Color SENSOR_LINE_COLOR = new Color(31, 233, 13, 155);
 	private final Dimension SENSOR_DOT_SIZE = new Dimension(10, 10);
 	
-	public Capteur(/*Simulation simulation, */Espece e, double angle, int x, int y) {
+	public Capteur(Espece e, double angle, int x, int y) {
 		this.e = e;
 		this.angle = Math.toRadians(angle);
 		value = 1;
-		this.x = x;
-		this.y = y;
-
-		//this.simulation = simulation;
-		//simulation.getMapPanel().getPointOnMap(new Point(x, y));
+		this.x = e.getX();
+		this.y = e.getY();
 	}
 	
 	public void reset() {
@@ -52,18 +50,11 @@ public class Capteur implements NeuralNetworkTransmitter {
 	 * @param g
 	 */
 	public void draw(Graphics2D g) {
-		// = e.getX();// + e.getHeight();
-		//this.y = e.getY();// - e.getWidth();
-
-		int x1 = (int)(e.getX());
-		int y1 = (int)(e.getY());
-		int lx = (int) (CAPTEUR_LENGHT*Math.cos(-this.angle));
-		int ly = (int) (CAPTEUR_LENGHT*Math.sin(-this.angle));
-
-		g.drawLine((int)getPoint1().x, (int)getPoint1().y, (int)getPoint2().x, (int)getPoint2().y);
-
 		g.setColor(this.SENSOR_COLOR);
-		g.fillOval((int)getPoint1().x + (int)(getLongeurX()*value),(int)getPoint1().y + (int)(getLongeurY()*value), SENSOR_DOT_SIZE.width, SENSOR_DOT_SIZE.height);
+		g.fillOval((int)getPoint1().x + (int)(getLongeurX()*value) - SENSOR_DOT_SIZE.width / 2,(int)getPoint1().y + (int)(getLongeurY()*value) - (SENSOR_DOT_SIZE.height / 2), SENSOR_DOT_SIZE.width, SENSOR_DOT_SIZE.height);
+
+		g.setColor(this.SENSOR_LINE_COLOR);
+		g.drawLine((int)getPoint1().x, (int)getPoint1().y, (int)getPoint2().x, (int)getPoint2().y);
 	}
 
 	public Point.Double getPoint1(){
@@ -88,7 +79,7 @@ public class Capteur implements NeuralNetworkTransmitter {
 		/*double a = e.getOrientation()-angle;
 		return CAPTEUR_LENGHT * Math.cos(a) ;*/
 
-		double lx = (CAPTEUR_LENGHT*Math.cos(-this.angle));
+		double lx = (CAPTEUR_LENGHT*Math.cos((-e.getOrientation() - this.angle)));
 
 		return lx;
 
@@ -102,7 +93,7 @@ public class Capteur implements NeuralNetworkTransmitter {
 		/*double a = e.getOrientation()-angle;
 		return CAPTEUR_LENGHT * Math.sin(a);*/
 
-		double ly = (CAPTEUR_LENGHT*Math.sin(-this.angle));
+        double ly = (CAPTEUR_LENGHT*Math.sin((e.getOrientation() + this.angle)));
 		return ly;
 	}
 	
