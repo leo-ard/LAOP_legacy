@@ -42,7 +42,16 @@ public class NodeGene {
             sum += weight * gene.getValue();
         }
 
-        this.value = sum;
+        this.value = sigmoid(sum);
+    }
+
+    /**
+     * Applies the sigmoid function for a value
+     * @param a the value to apply the sigmoid function to
+     * @return the mapping of 'a' to the sigmoid function
+     */
+    private double sigmoid(double a){
+        return (1 / (1 + Math.pow(Math.E, -a))) - 0.5;
     }
 
 

@@ -286,9 +286,9 @@ public class ImprovedNeatGenome extends NeuralNetwork {
             NodeGene outputNode = outputNodes.get(i);
 
             //To have a value between 0 and 1.
-            double mappedValue = (outputNode.getValue() + 1)/(2);
+            //double mappedValue = (outputNode.getValue() + 1)/(2);
 
-            outputNodesValues[i] = mappedValue;
+            outputNodesValues[i] = outputNode.getValue();
         }
 
         this.receiver.setNeuralNetworkOutput(outputNodesValues);
