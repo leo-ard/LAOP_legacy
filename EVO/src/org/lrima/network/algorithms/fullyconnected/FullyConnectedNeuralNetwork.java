@@ -32,7 +32,7 @@ public class FullyConnectedNeuralNetwork extends NeuralNetwork implements Serial
 	}
 
 
-	public void draw(Graphics2D graphics){
+	public void draw(Graphics2D graphics, Dimension panelDimensions){
 
 	}
 

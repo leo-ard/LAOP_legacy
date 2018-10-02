@@ -38,8 +38,12 @@ public abstract class NeuralNetwork {
     //TODO : Change the parameter by something general (like ArrayList<NeuralNetworkReceiver>)
     //public abstract ArrayList<Espece> alterEspecesListAtGenerationFinish(ArrayList<Espece> currentBatch);
     public abstract void generationFinish();
-    public abstract void draw(Graphics2D g);
+    public abstract void draw(Graphics2D g, Dimension panelDimensions);
     public abstract NeuralNetwork crossOver(NeuralNetwork network1, NeuralNetwork network2);
+
+    public void setFitness(double fitness){
+        this.fitness = fitness;
+    }
 
 
 

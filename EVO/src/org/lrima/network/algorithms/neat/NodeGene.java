@@ -23,7 +23,7 @@ public class NodeGene {
         NodeGene.currentInnovation = this.innovation + 1;
     }
 
-    private NodeGene(Type type, int innovation){
+    public NodeGene(Type type, int innovation){
         this.type = type;
         this.innovation = innovation;
     }

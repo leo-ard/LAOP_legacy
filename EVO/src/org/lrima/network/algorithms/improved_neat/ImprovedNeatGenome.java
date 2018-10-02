@@ -367,7 +367,7 @@ public class ImprovedNeatGenome extends NeuralNetwork {
     private final int HIDDEN_NODE_POSITION_X = (INPUT_NODE_POSITION_X + OUTPUT_NODE_POSITION_X) / 2;
 
     @Override
-    public void draw(Graphics2D g) {
+    public void draw(Graphics2D g, Dimension panelDimensions) {
 
         ArrayList<NodeGene> inputNodes = this.getInputNodes();
         ArrayList<NodeGene> outputNodes = this.getOutputNodes();

@@ -31,12 +31,14 @@ public class EspeceInfoPanel extends JPanel {
         //setSize(600, screenSize.height);
         setPreferredSize(new Dimension(screenSize.width / 5, screenSize.height));
 
-        add(boxLayout, BorderLayout.NORTH);
+        GridLayout layout = new GridLayout(2, 1);
+        this.setLayout(layout);
+        add(boxLayout);
 
         load();
 
         networkPanel = new NetworkPanel(null);
-        this.add(networkPanel, BorderLayout.SOUTH);
+        this.add(networkPanel);
     }
 
     private void load(){
@@ -118,7 +120,7 @@ public class EspeceInfoPanel extends JPanel {
             getEspeceFields();
         }catch (Exception error){};
 
-        this.networkPanel.setEspece(espece);
+        this.networkPanel.setEspece(e);
 
         this.revalidate();
     }

@@ -225,6 +225,7 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 
 		//Set the fitness to the car
 		this.calculateFitnessScore();
+		this.neuralNetwork.setFitness(this.fitness);
 
 		neuralNetwork.feedForward();
 
@@ -233,22 +234,22 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
         double savedTurnRate = UserPrefs.getDouble(UserPrefs.KEY_TURN_RATE);
 
 		//Applies the speed of each side of the car to move it to the next position
-		//orientationRad -= Math.toRadians(leftSpeed*timePassed - rightSpeed*timePassed)*savedTurnRate;
-		//acceleration = rightSpeed*timePassed*savedCarSpeed/100 + leftSpeed*timePassed*savedCarSpeed/100;
-		//vitesse += acceleration - vitesse;
+		orientationRad -= Math.toRadians(leftSpeed*timePassed - rightSpeed*timePassed)*savedTurnRate;
+		acceleration = rightSpeed*timePassed*savedCarSpeed/100 + leftSpeed*timePassed*savedCarSpeed/100;
+		vitesse += acceleration - vitesse;
 
 		double accelerationInX = Math.cos(orientationRad) * acceleration;
 		double accelerationInY = Math.sin(orientationRad) * acceleration;
 		double speedInX = Math.cos(orientationRad) * vitesse;
 		double speedInY = Math.cos(orientationRad) * vitesse;
 
-		this.x += speedInX*timePassed + (accelerationInX*Math.pow(timePassed, 2))/2;
-		this.y += speedInY*timePassed + (accelerationInY*Math.pow(timePassed, 2))/2;
+		//this.x += speedInX*timePassed + (accelerationInX*Math.pow(timePassed, 2))/2;
+		//this.y += speedInY*timePassed + (accelerationInY*Math.pow(timePassed, 2))/2;
 
-		this.vitesse += acceleration*timePassed;
+		//this.vitesse += acceleration*timePassed;
 
-		//this.x += vitesse*Math.cos(orientationRad);
-		//this.y += vitesse*Math.sin(orientationRad);
+		this.x += vitesse*Math.cos(orientationRad);
+		this.y += vitesse*Math.sin(orientationRad);
 
 		//The car can't go backward
 		if(vitesse < 0) {
@@ -532,10 +533,10 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 
 	@Override
 	public void setNeuralNetworkOutput(double... outputs) {
-		//this.rightSpeed = outputs[0];
-		//this.leftSpeed = outputs[1];
-		this.orientationRad += outputs[0];
-		this.acceleration = outputs[1];
+		this.rightSpeed = outputs[0];
+		this.leftSpeed = outputs[1];
+		//this.orientationRad += outputs[0];
+		//this.acceleration = outputs[1];
 
 	}
 

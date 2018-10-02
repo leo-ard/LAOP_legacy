@@ -1,9 +1,13 @@
 package org.lrima.network.algorithms.neat;
 
+import org.lrima.espece.Espece;
+import org.lrima.espece.capteur.Capteur;
 import org.lrima.network.interfaces.*;
 import org.lrima.Interface.options.Option;
+import org.lrima.simulation.Simulation;
 import org.lrima.utils.Random;
 
+import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,8 +17,57 @@ public class NeatGenome extends NeuralNetwork {
 
     private ArrayList<ConnectionGene> connections;
     private ArrayList<NodeGene> nodes;
+    private int currentNodeInnovation = 0;
 
     private final int nbOutput = 2;
+
+    public static void main(String[] args) {
+        NeuralNetworkModel model = new NeatModel();
+        Simulation simulation = new Simulation(model);
+
+        Espece e1 = new Espece(simulation);
+        Capteur c1 = new Capteur(e1, 0, 0, 0);
+        Capteur c2 = new Capteur(e1, 0, 0, 0);
+        Capteur c3 = new Capteur(e1, 0, 0, 0);
+        ArrayList<Capteur> capteurs1 = new ArrayList<>();
+        capteurs1.add(c1);
+        capteurs1.add(c2);
+        capteurs1.add(c3);
+        NeatGenome parent1 = new NeatGenome(null);
+        parent1.init(capteurs1, e1);
+        parent1.test1();
+
+        Espece e2 = new Espece(simulation);
+        Capteur c12 = new Capteur(e2, 0, 0, 0);
+        Capteur c22 = new Capteur(e2, 0, 0, 0);
+        Capteur c32 = new Capteur(e2, 0, 0, 0);
+        ArrayList<Capteur> capteurs12 = new ArrayList<>();
+        capteurs12.add(c12);
+        capteurs12.add(c22);
+        capteurs12.add(c32);
+        NeatGenome parent2 = new NeatGenome(null);
+        parent2.init(capteurs12, e2);
+        parent2.test2();
+
+        NeatGenome child = (NeatGenome) parent1.crossOver(parent1, parent2);
+
+
+        JFrame frame = new JFrame();
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        frame.setSize(1000, 600);
+        GridLayout layout = new GridLayout(2, 2);
+
+        JPanel content = new JPanel();
+        content.setLayout(layout);
+
+        content.add(new TestPanel(parent1));
+        content.add(new TestPanel(parent2));
+        content.add(new TestPanel(child));
+
+        frame.add(new JScrollPane(content));
+
+        frame.setVisible(true);
+    }
 
     public NeatGenome(LinkedHashMap<String, Option> options) {
         super(options);
@@ -35,12 +88,16 @@ public class NeatGenome extends NeuralNetwork {
         //Create the default nodes
         //Inputs
         for(NeuralNetworkTransmitter transmitter : transmitters){
-            nodes.add(new NodeGene(NodeGene.Type.INPUT));
+            nodes.add(new NodeGene(NodeGene.Type.INPUT, ++currentNodeInnovation));
         }
         //Output
         for(int i = 0 ; i < nbOutput ; i++){
-            nodes.add(new NodeGene(NodeGene.Type.OUTPUT));
+            nodes.add(new NodeGene(NodeGene.Type.OUTPUT, ++currentNodeInnovation));
         }
+        //TEST:
+        //nodes.add(new NodeGene(NodeGene.Type.OUTPUT, ++currentNodeInnovation));
+
+
         //A connection between a random input and output
         ArrayList<NodeGene> inputNodes = this.getInputNodes();
         ArrayList<NodeGene> outputNodes = this.getOutputNodes();
@@ -48,7 +105,60 @@ public class NeatGenome extends NeuralNetwork {
 
         this.connections.add(new ConnectionGene(randomNodeInput1,  this.getOutputNodes().get(0)));
 
+    }
 
+    //Cree les connections qu'on voit dans le paper de NEAT 1
+    private void test1(){
+        NodeGene hiddenNode1 = new NodeGene(NodeGene.Type.HIDDEN, ++currentNodeInnovation);
+        ConnectionGene c1 = new ConnectionGene(getInputNodes().get(0), getOutputNodes().get(0));
+        ConnectionGene c2 = new ConnectionGene(getInputNodes().get(1), getOutputNodes().get(0));
+        c2.setExpresed(false);
+        ConnectionGene c3 = new ConnectionGene(getInputNodes().get(2), getOutputNodes().get(0));
+        ConnectionGene c4 = new ConnectionGene(getInputNodes().get(1), hiddenNode1);
+        ConnectionGene c5 = new ConnectionGene(hiddenNode1, getOutputNodes().get(0));
+        ConnectionGene c6 = new ConnectionGene(getInputNodes().get(0), hiddenNode1);
+
+        this.nodes.add(hiddenNode1);
+
+        this.connections.add(c1);
+        this.connections.add(c2);
+        this.connections.add(c3);
+        this.connections.add(c4);
+        this.connections.add(c5);
+        this.connections.add(c6);
+    }
+
+    //Cree les connections qu'on voit dans le paper de NEAT 2
+    private void test2(){
+        NodeGene hiddenNode5 = new NodeGene(NodeGene.Type.HIDDEN, ++currentNodeInnovation);
+        NodeGene hiddenNode6 = new NodeGene(NodeGene.Type.HIDDEN, ++currentNodeInnovation);
+
+        this.nodes.add(hiddenNode5);
+        this.nodes.add(hiddenNode6);
+
+        NodeGene output = getOutputNodes().get(0);
+
+        ConnectionGene c1 = new ConnectionGene(getInputNodes().get(0), output);
+        ConnectionGene c2 = new ConnectionGene(getInputNodes().get(1), output);
+        c2.setExpresed(false);
+        ConnectionGene c3 = new ConnectionGene(getInputNodes().get(2), output);
+        ConnectionGene c4 = new ConnectionGene(getInputNodes().get(1), hiddenNode5);
+        ConnectionGene c5 = new ConnectionGene(hiddenNode5, output);
+        c5.setExpresed(false);
+        ConnectionGene c6 = new ConnectionGene(hiddenNode5, hiddenNode6);
+        ConnectionGene c7 = new ConnectionGene(hiddenNode6, output);
+        ConnectionGene c8 = new ConnectionGene(getInputNodes().get(2), hiddenNode5);
+        ConnectionGene c9 = new ConnectionGene(getInputNodes().get(0), hiddenNode6);
+
+        this.connections.add(c1);
+        this.connections.add(c2);
+        this.connections.add(c3);
+        this.connections.add(c4);
+        this.connections.add(c5);
+        this.connections.add(c6);
+        this.connections.add(c7);
+        this.connections.add(c8);
+        this.connections.add(c9);
     }
 
     /**
@@ -58,38 +168,55 @@ public class NeatGenome extends NeuralNetwork {
      * @return a child genome from parent1 and parent2
      */
     @Override
-    public NeuralNetwork crossOver(NeuralNetwork network1, NeuralNetwork network2) {
+    public  NeuralNetwork crossOver(NeuralNetwork network1, NeuralNetwork network2) {
         NeatGenome child = new NeatGenome(this.options);
 
         NeatGenome parent1 = (NeatGenome) network1;
         NeatGenome parent2 = (NeatGenome) network2;
 
         for(NodeGene node : parent1.getNodes()){
-            if(parent2.getNodes().contains(node)){
-                NodeGene node2 = parent2.getNodeWithInnovation(node.getInnovation());
-                NodeGene childNode = Random.getRandomBoolean() ? node.copy() : node2.copy();
-                child.addNode(childNode);
-            }
-            else{ //Excess node, copy from the fittest parent
-                child.addNode(node.copy());
+            for(NodeGene node2: parent2.getNodes()){
+                if(node.equals(node2)){
+                    if(!child.getNodes().contains(node)) {
+                        NodeGene childNode = Random.getRandomBoolean() ? node.copy() : node2.copy();
+                        child.addNode(childNode);
+                    }
+                }
+                else{ //Excess node, copy from the fittest parent
+                    if(!child.getNodes().contains(node)) {
+                        child.addNode(node.copy());
+                    }
+                    if(!child.getNodes().contains(node2)){
+                        child.addNode(node2.copy());
+                    }
+                }
             }
         }
 
+
         for(ConnectionGene connection : parent1.getConnections()){
-            if(parent2.getConnections().contains(connection)){
-                ConnectionGene parent2Connection = parent2.getConnectionWithInnovation(connection.getInnovation());
-                ConnectionGene childConnection = Random.getRandomBoolean() ? connection.copy() : parent2Connection.copy();
-                child.addConnection(childConnection);
-            }
-            else{ //Excess or disjoint
-                //Get connection from fittest parrent
-                NodeGene inputNode = connection.getInput();
-                NodeGene outputNode = connection.getOutput();
+            for(ConnectionGene connection2 : parent2.getConnections()) {
+                if (connection.equals(connection2)) {
+                    if(!child.getConnections().contains(connection)) {
+                        ConnectionGene childConnection = Random.getRandomBoolean() ? connection.copy() : connection2.copy();
 
-                NodeGene childInputNode = child.getNodeWithInnovation(inputNode.getInnovation());
-                NodeGene childOutputNode = child.getNodeWithInnovation(outputNode.getInnovation());
+                        child.addConnection(childConnection);
+                    }
+                } else { //Excess or disjoint
+                    //TODO: Ne devrait pas etre aleatoire, mais selon le meilleur fitness
+                    if(Random.getRandomBoolean()){
+                        if(!child.getConnections().contains(connection)) {
+                            child.addConnection(connection.copy());
+                        }
+                    }
+                    else{
+                        if(!child.getConnections().contains(connection2)) {
+                            child.addConnection(connection2.copy());
+                        }
+                    }
 
-                child.addConnection(new ConnectionGene(childInputNode, childOutputNode));
+
+                }
             }
         }
 
@@ -269,7 +396,18 @@ public class NeatGenome extends NeuralNetwork {
                 ArrayList<NodeGene> nodesConnectingToIt = this.getInputsIntoNode(node);
                 ArrayList<Double> weightsConnectingToIt = this.getWeightsIntoNode(node);
 
+                //TODO: le output peut etre calculé avant les hiddens !!
                 node.calculateWeightedSum(nodesConnectingToIt, weightsConnectingToIt);
+            }
+        }
+
+        System.out.println("----");
+        for(NodeGene gene : this.nodes){
+            if(gene.getType() != NodeGene.Type.INPUT){
+                if(gene.getType() == NodeGene.Type.OUTPUT) {
+                    System.out.print("Output: ");
+                }
+                System.out.println(gene.getInnovation());
             }
         }
 
@@ -286,6 +424,7 @@ public class NeatGenome extends NeuralNetwork {
             outputNodesValues[i] = mappedValue;
         }
 
+
         this.receiver.setNeuralNetworkOutput(outputNodesValues);
     }
 
@@ -297,7 +436,7 @@ public class NeatGenome extends NeuralNetwork {
     private ArrayList<NodeGene> getInputsIntoNode(NodeGene node){
         ArrayList<NodeGene> inputs = new ArrayList<>();
         for(ConnectionGene connection : this.connections){
-            if(connection.getOutput() == node){
+            if(connection.getOutput().equals(node)){
                 inputs.add(connection.getInput());
             }
         }
@@ -313,7 +452,7 @@ public class NeatGenome extends NeuralNetwork {
     private ArrayList<Double> getWeightsIntoNode(NodeGene node) {
         ArrayList<Double> weights = new ArrayList<>();
         for (ConnectionGene connection : this.connections) {
-            if (connection.getOutput() == node) {
+            if (connection.getOutput().equals(node)) {
                 weights.add(connection.getWeight());
             }
         }
@@ -321,43 +460,14 @@ public class NeatGenome extends NeuralNetwork {
         return weights;
     }
 
-    /**
-     * Goes through all the connections to find the one with a certain innovation number
-     * @param innovation the innovation number
-     * @return the connection with the specified innovation number
-     */
-    private ConnectionGene getConnectionWithInnovation(int innovation){
-        for(ConnectionGene connection : this.connections){
-            if(connection.getInnovation() == innovation){
-                return connection;
-            }
-        }
-        return null;
-    }
 
-    /**
-     * Goes through all the nodes and find the one with the specified innovation number
-     * @param innovation the innovation number
-     * @return the node with the specified innovation number
-     */
-    private NodeGene getNodeWithInnovation(int innovation){
-        for(NodeGene node : this.nodes){
-            if(node.getInnovation() == innovation){
-                return node;
-            }
-        }
-        return null;
-    }
-
-
-    private final int NODE_MARGIN = 75;
-    private final int NODE_SIZE = 50;
-    private final int INPUT_NODE_POSITION_X = 0;
-    private final int OUTPUT_NODE_POSITION_X = (NODE_SIZE + NODE_MARGIN) * 3;
-    private final int HIDDEN_NODE_POSITION_X = (INPUT_NODE_POSITION_X + OUTPUT_NODE_POSITION_X) / 2;
 
     @Override
-    public void draw(Graphics2D g) {
+    public void draw(Graphics2D g, Dimension panelDimensions) {
+        final int NODE_SIZE = panelDimensions.width / 7;
+        final int NODE_MARGIN = (int)(NODE_SIZE * 1);
+        final int INPUT_NODE_POSITION_X = NODE_MARGIN;
+        final int OUTPUT_NODE_POSITION_X = panelDimensions.width - NODE_SIZE - NODE_MARGIN;
 
         ArrayList<NodeGene> inputNodes = this.getInputNodes();
         ArrayList<NodeGene> outputNodes = this.getOutputNodes();
@@ -371,17 +481,21 @@ public class NeatGenome extends NeuralNetwork {
             nodePositions.put(node, position);
 
             g.drawOval(position.x, position.y, NODE_SIZE, NODE_SIZE);
-            g.drawString(String.format("%.2f", node.getValue()), position.x, position.y + 25);
+            //g.drawString(String.format("%.2f", node.getValue()), position.x, position.y + 25);
+            g.drawString(node.getInnovation() + "", position.x, position.y + 25);
         }
 
         for(int i = 0 ; i < hiddenNodes.size(); i++){
             NodeGene node = hiddenNodes.get(i);
 
-            Point position = new Point(HIDDEN_NODE_POSITION_X, i * NODE_MARGIN);
+            int xPosition = Random.getRandomIntegerValue(INPUT_NODE_POSITION_X, OUTPUT_NODE_POSITION_X);
+
+            Point position = new Point(i * NODE_MARGIN + NODE_MARGIN, i * NODE_MARGIN + 50);
             nodePositions.put(node, position);
 
             g.drawOval(position.x, position.y, NODE_SIZE, NODE_SIZE);
-            g.drawString(String.format("%.2f", node.getValue()), position.x, position.y + 25);
+            //g.drawString(String.format("%.2f", node.getValue()), position.x, position.y + 25);
+            g.drawString(node.getInnovation() + "", position.x, position.y + 25);
         }
 
         for(int i = 0 ; i < outputNodes.size(); i++){
@@ -391,11 +505,17 @@ public class NeatGenome extends NeuralNetwork {
             nodePositions.put(node, position);
 
             g.drawOval(position.x, position.y, NODE_SIZE, NODE_SIZE);
-            g.drawString(String.format("%.2f", node.getValue()), position.x, position.y + 25);
+            //g.drawString(String.format("%.2f", node.getValue()), position.x, position.y + 25);
+            g.drawString(node.getInnovation() + "", position.x, position.y + 25);
         }
 
         for(ConnectionGene connection : this.connections){
-            if(connection.isExpresed()) {
+            if(!connection.isExpresed()) {
+                g.setColor(Color.PINK);
+            }
+            else{
+                g.setColor(Color.BLACK);
+            }
                 NodeGene input = connection.getInput();
                 NodeGene output = connection.getOutput();
 
@@ -403,7 +523,7 @@ public class NeatGenome extends NeuralNetwork {
                 Point lineEnd = nodePositions.get(output);
 
                 try {
-                    g.drawLine(lineStart.x, lineStart.y, lineEnd.x, lineEnd.y);
+                    g.drawLine(lineStart.x + NODE_SIZE / 2, lineStart.y + NODE_SIZE / 2, lineEnd.x + NODE_SIZE / 2, lineEnd.y + NODE_SIZE / 2);
                 }catch (Exception e){
                     System.out.println("Input: " + inputNodes.size());
                     System.out.println("Hidden: " + hiddenNodes.size());
@@ -411,7 +531,7 @@ public class NeatGenome extends NeuralNetwork {
                     System.out.println("Start: " + lineStart);
                     System.out.println("End: " + lineEnd);
                 }
-            }
+
         }
 
     }

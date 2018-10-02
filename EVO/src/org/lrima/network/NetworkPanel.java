@@ -16,7 +16,6 @@ public class NetworkPanel extends JPanel{
 		super();
 		this.setPreferredSize(new Dimension(500, 500));
 		this.espece = espece;
-		this.setBackground(Color.PINK);
 	}
 	
 	public void start() {
@@ -38,13 +37,13 @@ public class NetworkPanel extends JPanel{
 
 
 		g.setFont(new Font("Arial", 12, 12));
-		g.setColor(Color.red);
+		//g.setColor(Color.red);
 		g.setStroke(new BasicStroke(2));
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
 		//Draw the neural network
 		if (this.espece != null) {
-			this.espece.getNeuralNetwork().draw(g);
+			this.espece.getNeuralNetwork().draw(g, this.getSize());
 		}
 	}
 	

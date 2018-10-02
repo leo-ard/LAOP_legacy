@@ -51,7 +51,7 @@ public class NodeGene {
      * @return the mapping of 'a' to the sigmoid function
      */
     private double sigmoid(double a){
-        return (1 / (1 + Math.pow(Math.E, -a))) - 0.5;
+        return (1 / (1 + Math.pow(Math.E, -a)));
     }
 
 

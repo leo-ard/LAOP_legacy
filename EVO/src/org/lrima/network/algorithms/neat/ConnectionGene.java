@@ -20,6 +20,11 @@ public class ConnectionGene {
         ConnectionGene.currentInnovation += 1;
     }
 
+    public ConnectionGene(NodeGene input, NodeGene output, int innovation){
+        this(input, output);
+        this.innovation = innovation;
+    }
+
     public void mutate(){
         double delta = Random.getRandomDoubleValue(-0.2, 0.2);
         this.weight += delta;
@@ -49,7 +54,7 @@ public class ConnectionGene {
         try{
             ConnectionGene connection2 = (ConnectionGene) obj;
 
-            return connection2.innovation == this.innovation;
+            return input.equals(connection2.input) && output.equals(connection2.output);
 
         }catch (Exception e){
             return false;
