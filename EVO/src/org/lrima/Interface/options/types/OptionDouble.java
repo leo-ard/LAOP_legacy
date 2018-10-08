@@ -50,7 +50,6 @@ public class OptionDouble implements Option<Double> {
 
     @Override
     public void addOptionValueChangeListener(OptionValueChangeListener listener) {
-        System.out.println("hey hey HEY!");
         final OptionDouble thisOption = this;
         this.spinner.addChangeListener(e -> {
             listener.optionChange(thisOption);

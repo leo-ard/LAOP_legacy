@@ -3,7 +3,6 @@ package org.lrima.Interface.home;
 
 import org.lrima.Interface.home.pages.HomePanel;
 import org.lrima.network.interfaces.NeuralNetworkModel;
-import org.lrima.utils.ObjectAppendOutputStream;
 
 import javax.swing.*;
 import java.awt.*;
