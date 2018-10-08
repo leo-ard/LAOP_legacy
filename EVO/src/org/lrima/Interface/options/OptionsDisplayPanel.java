@@ -9,41 +9,6 @@ import java.awt.*;
 import java.util.*;
 
 public class OptionsDisplayPanel extends JPanel {
-
-    public static void main(String args[]) {
-    	JFrame frame = new JFrame("juste a name");
-    	LinkedHashMap<String, Option> options = new LinkedHashMap<>();
-    	OptionString ob = new OptionString("heyhey");
-    	ob.addOptionValueChangeListener(option -> System.out.println(option.getValue()));
-    	OptionDouble od = new OptionDouble(10.0);
-    	od.addOptionValueChangeListener(option -> System.out.println(option.getValue()));
-    	options.put("test1", ob);
-        options.put("test2", od);
-        options.put("test3", new OptionBoolean(true));
-        options.put("test4", new OptionString("Ha ha hA"));
-        options.put("test5", new OptionString("Ha ha hA"));
-        options.put("test6", new OptionString("Ha ha hA"));
-        options.put("test7", new OptionString("Ha ha hA"));
-        options.put("test8", new OptionString("Ha ha hA"));
-        options.put("test9", new OptionString("Ha ha hA"));
-        options.put("test10", new OptionString("Ha ha hA"));
-        options.put("test11", new OptionString("Ha ha hA"));
-        options.put("Tres lon nom .......... Tres tres long", new OptionString("Ha ha hA"));
-        options.put("test13", new OptionString("Ha ha hA"));
-        options.put("test14", new OptionString("Ha ha hA"));
-        options.put("test15", new OptionString("Ha ha hA"));
-        options.put("test16", new OptionString("Ha ha hA"));
-        options.get("test2").getValue();
-
-        //System.out.println(UserPrefs.getString(UserPrefs.KEY_MAP_TO_USE));
-
-    	frame.getContentPane().add(new OptionsDisplayPanel(options));
-    	frame.pack();
-    	frame.setVisible(true);
-    	frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-
-    }
-
     public OptionsDisplayPanel(LinkedHashMap<String, Option> options){
         super();
         setLayout(new BorderLayout(0, 0));
@@ -81,9 +46,5 @@ public class OptionsDisplayPanel extends JPanel {
         
         JScrollPane scrollPane = new JScrollPane(modificationPanel);
         add(scrollPane, BorderLayout.CENTER);
-
-
-        //this.setBackground(Color.white);
-        //this.setLayout(new BoxLayout());
     }
 }

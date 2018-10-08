@@ -5,6 +5,7 @@ import org.lrima.Interface.home.HomeFrameManager;
 import org.lrima.Interface.home.PagePanel;
 import org.lrima.network.algorithms.AlgorithmManager;
 import org.lrima.network.interfaces.NeuralNetworkModel;
+import org.lrima.simulation.SimulationManager;
 
 import javax.swing.*;
 import javax.swing.LayoutStyle.ComponentPlacement;
@@ -105,10 +106,12 @@ public class OneAlgorithmPanel extends PagePanel {
 
                 homeFrameManager.addModelsToSaved(models);
 
-                FrameManager frameManager = new FrameManager();
-                frameManager.addBatch(currentModel, 2);
+                SimulationManager simulationManager = new SimulationManager();
+                simulationManager.addBatch(currentModel, 2);
+                simulationManager.start();
+
+                FrameManager frameManager = new FrameManager(simulationManager);
                 frameManager.setVisible(true);
-                frameManager.startBatches();
             }catch (Exception error){
                 error.printStackTrace();
             }

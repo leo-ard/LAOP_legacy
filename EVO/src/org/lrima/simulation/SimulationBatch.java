@@ -3,6 +3,7 @@ package org.lrima.simulation;
 import org.lrima.network.interfaces.NeuralNetworkModel;
 
 import java.util.ArrayList;
+import java.util.Queue;
 
 public class SimulationBatch implements SimulationListener {
     private Simulation[] simulations;
@@ -13,13 +14,16 @@ public class SimulationBatch implements SimulationListener {
 
     private ArrayList<BatchListener> batchListeners = new ArrayList<>();
 
+    private final int maxGeneration = 5;
+    private ArrayList<SimulationListener> simulationListeners = new ArrayList<>();
+
     public SimulationBatch(NeuralNetworkModel algorithmModel, int numberInBatch){
         this.simulations = new Simulation[numberInBatch];
         this.numberInBatch = numberInBatch;
         this.algorithmModel = algorithmModel;
 
         for(int i = 0 ; i < simulations.length ; i++){
-            simulations[i] = new Simulation(algorithmModel);
+            simulations[i] = new Simulation(algorithmModel, maxGeneration);
             simulations[i].addSimulationListener(this);
         }
     }
@@ -64,31 +68,24 @@ public class SimulationBatch implements SimulationListener {
 
         getCurrentSimulation().terminate();
 
-        //Starts the next simulation
-        if(currentSimulation < numberInBatch - 1) {
-            this.currentSimulation++;
-            this.getCurrentSimulation().start();
+        //the limit is hit
+        if(currentSimulation + 1 >= numberInBatch ) {
+            this.batchListeners.forEach(BatchListener::batchFinished);
         }
         else{
-            this.batchEnd();
+            this.currentSimulation++;
+            this.getCurrentSimulation().start();
         }
     }
 
     private void addSimulationInformation(){
-
         SimulationInformation information = new SimulationInformation(this.getCurrentSimulation().getGenerations());
         this.simulationInformations.add(information);
     }
 
-    private void batchEnd(){
-        for(BatchListener listener : this.batchListeners){
-            listener.batchFinished();
-        }
-    }
-
     @Override
     public void onNextGeneration() {
-
+        this.simulationListeners.forEach(SimulationListener::onNextGeneration);
     }
 
     @Override
@@ -106,5 +103,13 @@ public class SimulationBatch implements SimulationListener {
 
     public ArrayList<SimulationInformation> getSimulationInformations() {
         return simulationInformations;
+    }
+
+    public int getBatchSize() {
+        return this.numberInBatch;
+    }
+
+    public void addSimulationListener(SimulationListener simulationListener) {
+        simulationListeners.add(simulationListener);
     }
 }

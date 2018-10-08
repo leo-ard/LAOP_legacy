@@ -5,6 +5,7 @@ import org.lrima.Interface.home.ModelListDialog;
 import org.lrima.Interface.home.HomeFrameManager;
 import org.lrima.Interface.home.PagePanel;
 import org.lrima.network.interfaces.NeuralNetworkModel;
+import org.lrima.simulation.SimulationManager;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -101,15 +102,16 @@ public class CompareAlgorithmsPanel extends PagePanel {
                 homeFrameManager.close();
 
 
-                FrameManager frameManager = new FrameManager();
+                SimulationManager simulationManager = new SimulationManager();
                 for(NeuralNetworkModel model : models){
-                    frameManager.addBatch(model, 2);
+                    simulationManager.addBatch(model, 2);
                 }
+                simulationManager.start();
 
                 homeFrameManager.addModelsToSaved(models);
 
+                FrameManager frameManager = new FrameManager(simulationManager);
                 frameManager.setVisible(true);
-                frameManager.startBatches();
             }
         });
     }

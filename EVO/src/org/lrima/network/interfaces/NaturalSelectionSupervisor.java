@@ -5,24 +5,23 @@ import org.lrima.espece.Espece;
 import org.lrima.simulation.Simulation;
 import org.lrima.utils.Random;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.function.Consumer;
 
 public class NaturalSelectionSupervisor implements NeuralNetworkSuperviser {
     private Espece best = null;
     private ArrayList<Espece> halfBestEspece = new ArrayList<>();
 
-
     @Override
     public ArrayList<Espece> alterEspeceListAtGenerationFinish(ArrayList<Espece> especes, Simulation simulation) {
-        Collections.sort(especes);
         best = especes.get(0);
         this.kill50(especes);
         this.repopulate(especes, simulation);
 
         return especes;
     }
-
 
     /**
      * Kill half of the cars to keep the best half

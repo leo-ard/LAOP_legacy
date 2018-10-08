@@ -4,6 +4,7 @@ import org.lrima.Interface.FrameManager;
 import org.lrima.Interface.home.HomeFrameManager;
 import org.lrima.Interface.utils.ImagePanel;
 import org.lrima.network.interfaces.NeuralNetworkModel;
+import org.lrima.simulation.SimulationManager;
 
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
@@ -108,13 +109,15 @@ public class HomePanel extends org.lrima.Interface.home.PagePanel {
                 if(savedModels != null){
                     homeFrameManager.close();
 
-                    FrameManager frameManager = new FrameManager();
+                    SimulationManager simulationManager = new SimulationManager();
                     for(NeuralNetworkModel model : savedModels){
-                        frameManager.addBatch(model, 2);
+                        simulationManager.addBatch(model, 2);
                     }
 
+                    simulationManager.start();
+
+                    FrameManager frameManager = new FrameManager(simulationManager);
                     frameManager.setVisible(true);
-                    frameManager.startBatches();
                 }
                 else{
                     JOptionPane.showMessageDialog(HomePanel.this, "The file containing the last simulation doesn't exist. Try to run a simulation before.", "Error", JOptionPane.ERROR_MESSAGE);

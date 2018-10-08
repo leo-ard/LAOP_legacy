@@ -15,7 +15,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 
 public class NeatGenome extends NeuralNetwork {
-
     private ArrayList<ConnectionGene> connections;
     private ArrayList<NodeGene> nodes;
     private int currentNodeInnovation = 0;

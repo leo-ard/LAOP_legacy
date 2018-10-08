@@ -31,11 +31,6 @@ public class FullyConnectedNeuralNetwork extends NeuralNetwork implements Serial
 		OptionsDisplayPanel optionPanel = new OptionsDisplayPanel(this.options);
 	}
 
-
-	public void draw(Graphics2D graphics, Dimension panelDimensions){
-
-	}
-
 	@Override
 	public void init(ArrayList<? extends NeuralNetworkTransmitter> transmitters, NeuralNetworkReceiver receiver) {
 		this.transmitters = transmitters;
@@ -63,6 +58,11 @@ public class FullyConnectedNeuralNetwork extends NeuralNetwork implements Serial
 
 	@Override
 	public NeuralNetwork crossOver(NeuralNetwork network1, NeuralNetwork network2) {
+		return new FullyConnectedNeuralNetwork(this.options);
+	}
+
+
+	public NeuralNetwork copy() {
 		return new FullyConnectedNeuralNetwork(this.options);
 	}
 
@@ -121,6 +121,11 @@ public class FullyConnectedNeuralNetwork extends NeuralNetwork implements Serial
 		for(Layer layer : this.layers){
 			layer.mutate();
 		}
+	}
+
+	@Override
+	public void draw(Graphics2D g, Dimension panelDimensions) {
+
 	}
 
 	public void setLayers(ArrayList<Layer> layers) {

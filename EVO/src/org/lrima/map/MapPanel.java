@@ -25,6 +25,7 @@ import org.lrima.map.Studio.Drawables.Line;
 import org.lrima.map.Studio.Drawables.Obstacle;
 import org.lrima.simulation.Simulation;
 import org.lrima.simulation.SimulationBatch;
+import org.lrima.simulation.SimulationManager;
 
 /**
  * Panel that displays a map
@@ -46,9 +47,6 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 	//Stores the logo of LRIMA;
 	private BufferedImage LRIMA_image;
 
-	//The simulation to use
-	private Simulation simulation;
-
 	//Colors used on the map
 	private final Color COLOR_BACKGROUND = new Color(238, 238, 238);
 	private final Color COLOR_BACKGROUND_LINES = new Color(136, 136, 136);
@@ -63,9 +61,8 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 
 	private Timer uploadCheckerTimer;
 
-	private SimulationBatch currentSimulationBatch = null;
-	private int currentBatchNumber = 0;
-	private int maxBatch = 0;
+	private SimulationManager simulationManager;
+	private FrameManager frameManager;
 
 	private double translateX, translateY;
 
@@ -102,12 +99,13 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 	/**
 	 * Creates a panel to display the map's simulation and especes
 	 *
-	 * @param simulation the map's simulation to be displayed
+	 * @param frameManager the map of the SimulationManager of the frameManager to be displayed (yes this is deep);
 	 */
-	public MapPanel(Simulation simulation) {
-		this(simulation.getMap());
+	public MapPanel(FrameManager frameManager) {
+		this(frameManager.getSimulationManager().getCurrentSimulation().getMap());
 		//Setup variables
-		this.simulation = simulation;
+        this.frameManager = frameManager;
+		this.simulationManager = frameManager.getSimulationManager();
 	}
 
 	/**
@@ -174,10 +172,8 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 	 * @param graphics the graphics to modify
 	 */
 	protected void doTransforms(Graphics2D graphics){
-
-
 		if(UserPrefs.getBoolean(UserPrefs.KEY_FOLLOW_BEST)){
-			Espece bestEspece = simulation.getBest();
+			Espece bestEspece = simulationManager.getCurrentSimulation().getBest();
 			translateX = (int) -bestEspece.getX() + getWidth() / 2;
 			translateY = (int) -bestEspece.getY() + getHeight() / 2;
 
@@ -246,7 +242,7 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 	 */
 	protected void drawCars(Graphics2D graphics){
 		graphics.setColor(Color.blue);
-		for(Espece e : this.simulation.getAllEspeces()) {
+		for(Espece e : this.simulationManager.getCurrentSimulation().getAllEspeces()) {
 			e.draw(graphics);
 		}
 	}
@@ -259,14 +255,10 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 		graphics.setColor(COLOR_TEXT);
 		graphics.setFont(new Font("Helvetica", Font.PLAIN, FONT_SIZE));
 
-		String text = 	"Algorithm: " + this.simulation.getAlgorithm().getAlgorithmInformationAnnotation().name() + " ("+ currentBatchNumber +" / " + maxBatch+")";
-		if(this.currentSimulationBatch != null) {
-			text += "\nSimulation " + (this.currentSimulationBatch.getCurrentSimulationIndex() + 1) + " / " + this.currentSimulationBatch.getSimulations().length;
-		}
-		text += 		"\nGeneration: " + this.simulation.getGeneration() + " / " + this.simulation.getMaxGenerations();
-		text += 		"\nTime: " + Simulation.simulationTime / 1000;
+		String text = this.simulationManager.getCurrentInfos();
 
-		drawText(graphics,text, new Point(TEXT_MARGIN, getHeight() * 2 - TEXT_MARGIN), "up");
+
+		drawText(graphics,text, new Point(TEXT_MARGIN, getHeight() - TEXT_MARGIN), "up");
 	}
 
 	/**
@@ -294,14 +286,15 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 		}
 	}
 
+	//TODO : déplacer ce code dans SImulationManager ou FrameManager ou ailleur (pour détecter si une espèce est procge d'un point)
 	@Override
 	public void mouseClicked(MouseEvent e) {
 
 		Point pointClickedOnMap = mapPointFromScreenPoint(e.getPoint());
 
-		Espece selected = this.simulation.getAllEspeces().get(0);
+		Espece selected = simulationManager.getCurrentSimulation().getAllEspeces().get(0);
 		int proche = selected.distanceFrom(pointClickedOnMap);
-		for(Espece espece : this.simulation.getAllEspeces()) {
+		for(Espece espece : simulationManager.getCurrentSimulation().getAllEspeces()) {
 			//Reset selected
 			espece.selected = false;
 
@@ -312,9 +305,8 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 
 		}
 		selected.setSelected(true);
+		frameManager.changeCarFocus(selected);
 
-		//TODO: Meilleure facon de faire ca?
-		FrameManager.instance.changeCarFocus(selected);
 	}
 
 	public Point mapPointFromScreenPoint(Point screenPoint){
@@ -381,17 +373,5 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 
 	public Map getMap() {
 		return map;
-	}
-
-	public void setCurrentSimulationBatch(SimulationBatch currentSimulationBatch) {
-		this.currentSimulationBatch = currentSimulationBatch;
-	}
-
-	public void setMaxBatch(int maxBatch) {
-		this.maxBatch = maxBatch;
-	}
-
-	public void setCurrentBatchNumber(int currentBatchNumber) {
-		this.currentBatchNumber = currentBatchNumber;
 	}
 }

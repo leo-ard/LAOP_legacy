@@ -17,12 +17,13 @@ import org.lrima.simulation.Simulation;
 import org.lrima.map.Map;
 
 public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
-	
+
+	@DisplayInfo
+	private final int NB_CAPTEUR = 6; //Maxiumum of 180
 	//Width has to be bigger than the height
 	private static final int ESPECES_WIDTH = 74, ESPECES_HEIGHT = 50;
 
 	//Stores the position of the car
-	@DisplayInfo
 	private double x, y;
 
 	private double rightSpeed, leftSpeed;
@@ -30,9 +31,6 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 	//Is the car still alive?
 	@DisplayInfo
 	private boolean alive;
-
-
-	private double diedAtTime = 0;
 
 	//Orientation of the car in radian
 	@DisplayInfo
@@ -53,7 +51,6 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 
 	//Array to store all the sensors
 	private ArrayList<Capteur> capteurs = new ArrayList<>();
-	private int NB_CAPTEUR = 6; //Maxiumum of 180
 
 	//The neural network of the car
 	private NeuralNetwork neuralNetwork;
@@ -85,8 +82,6 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 	@DisplayInfo
 	private int bornOnGeneration = 0;
 
-
-
 	//Used to store the color of the car
 	private Color voitureColor = Color.RED;
 	private final Color SELECTED_CAR_BORDER_COLOR = new Color(83, 75, 255, 158);
@@ -95,6 +90,7 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 	private Simulation simulation;
 	private NeuralNetworkModel algorithmModel;
 
+	private double diedAtTime;
 
 	/**
 	 * Initialize the car with the map to put him into
@@ -102,7 +98,6 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 	 * @param simulation the simulation the car is into
 	 */
 	public Espece(Simulation simulation) {
-
 		this.algorithmModel = simulation.getAlgorithm();
 
 		//Do the base configuration
@@ -126,14 +121,29 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 		this.neuralNetwork.init(this.capteurs, this);
     }
 
+    //TODO: do a real copy
 	/**
 	 * Used to clone a car
+	 * ONLY WORKS FOR FITNESS AND THE NEURALNETWORK
 	 * @param e the car to clone
 	 */
 	public Espece(Espece e){
-		this.fitness = e.getFitness();
-		this.neuralNetwork = e.getNeuralNetwork();
+			this.fitness = e.getFitness();
+			this.neuralNetwork = e.getNeuralNetwork();
 	}
+
+	/*public Espece copy(){
+		Espece e = new Espece(this.simulation);
+
+		e.fitness = this.fitness;
+		e.x = this.x;
+		e.y = this.y;
+		e.orientationRad = this.orientationRad;
+		e.neuralNetwork = this.neuralNetwork;
+		e.alive = this.alive;
+
+		return e;
+	}*/
 
 	/**
 	 * The function used to calculate the fitness of the car
@@ -184,7 +194,6 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 		}
 	}
 
-	//TODO: Doesn't work
 	/**
 	 * Set the color of the car depending on its fitness
 	 * The better the fitness, the greener it gets. The worst the fitness is, the more it is red
@@ -210,7 +219,6 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 		}
 		
 		return capteursValue;
-		
 	}
 
 	/**
@@ -291,13 +299,9 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 		if(selected){
 			g.setColor(SELECTED_CAR_BORDER_COLOR);
 		}
-		/*if(simulation.getBest() == this){
-			g.setColor(Color.YELLOW);
-		}*/
 		g.drawPolyline(pointX, pointY, 5);
 
 		g.setStroke(new BasicStroke(3));
-		//g.rotate(orientationRad,x, y);
 
 		//Draw the sensors
 		if(selected) {
@@ -306,8 +310,6 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 				c.draw(g);
 			}
 		}
-		//Resets the orientation
-		//g.rotate(-orientationRad, x, y);
 	}
 
 	/**
@@ -506,11 +508,6 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 	 * @param selected Should this car be selected?
 	 */
 	public void setSelected(boolean selected) {
-		//Reset la selection des especes a false
-		if(selected){
-			this.simulation.resetSelected();
-			FrameManager.instance.changeCarFocus(this);
-		}
 		this.selected = selected;
 	}
 

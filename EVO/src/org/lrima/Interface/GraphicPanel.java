@@ -10,8 +10,8 @@ import java.awt.*;
 import java.util.ArrayList;
 
 //TODO: Finir le graphique
+//TODO: s'updater tout seul avec un listener
 public class GraphicPanel extends JPanel {
-
     private ArrayList<Generation> generations;
     private XYChart chart;
     private XChartPanel<XYChart> chartPanel;
@@ -26,8 +26,8 @@ public class GraphicPanel extends JPanel {
     private ArrayList<Integer> xMoyenneData = new ArrayList<>();;
     private ArrayList<Integer> yMoyenneData = new ArrayList<>();;
 
-    public GraphicPanel(Simulation simulation){
-        this.generations = simulation.getGenerationList();
+    public GraphicPanel(FrameManager frameManager){
+        this.generations = frameManager.getSimulationManager().getCurrentSimulation().getGenerationList();
         screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         setPreferredSize(new Dimension(0, screenSize.height / 4));
         this.setLayout(new BorderLayout());
@@ -86,7 +86,6 @@ public class GraphicPanel extends JPanel {
     }
 
     public void updateChart(Simulation simulation){
-
         //Keep a maximum of 50 generations
         if(this.generations.size() > 50){
             //Randomly remove a generation

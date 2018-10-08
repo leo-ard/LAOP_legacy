@@ -14,15 +14,17 @@ import org.lrima.map.Studio.Drawables.Line;
 import org.lrima.map.Studio.Drawables.Obstacle;
 
 public class Simulation extends Thread{
-
 	public static double simulationTime = 0.0;
 
 	//Stores the map information
+	//TODO: déplacer la map dans le simulationManager
 	private Map map;
+
+	private Espece currentBest;
 
 	//Keep track of the current generation
 	private int generation = 1;
-	private int maxGenerations = 20;
+	private int maxGenerations;
 
 	//Stores the cars in the simulation
 	private ArrayList<Espece> especesOpen;
@@ -41,9 +43,6 @@ public class Simulation extends Thread{
     //The neural network that the cars in the next generation will have
     private NeuralNetworkModel algorithmModel;
 
-    //NeuralNetworkSupervisor
-	private NeuralNetworkSuperviser neuralNetworkSuperviser;
-
     //Stores information about all the generations
     private ArrayList<Generation> generations;
 
@@ -55,7 +54,6 @@ public class Simulation extends Thread{
 	public Simulation(NeuralNetworkModel algorithmModel) {
 		super();
 		this.algorithmModel = algorithmModel;
-		this.neuralNetworkSuperviser = algorithmModel.getSuperviser();
 
 		Simulation.simulationTime = 0;
 		this.running = true;
@@ -63,22 +61,22 @@ public class Simulation extends Thread{
 		this.map = Map.loadMapFromPreferences();
 
 		this.initializeCars();
+
+		this.maxGenerations = 0;
+	}
+
+	public Simulation(NeuralNetworkModel algorithmModel, int generationLimit){
+		this(algorithmModel);
+		this.maxGenerations = generationLimit;
 	}
 
 	/**
 	 * Main loop of the simulation
 	 */
 	public void run() {
-
 		long currentTime = System.currentTimeMillis();
 		long timePassed = (long)msBetweenFrames;
 		while(running) {
-			if(generation > maxGenerations){
-
-				this.simulationEnd();
-				this.terminate();
-			}
-
 			if(!pausing) {
 				if(especesOpen.size() != 0 && Simulation.simulationTime < UserPrefs.getInt(UserPrefs.KEY_TIME_LIMIT)) {
 					//Add the current time to the Simulation.simulationTime
@@ -186,8 +184,11 @@ public class Simulation extends Thread{
             especesOpen.remove(i);
         }
 
+        Collections.sort(this.especesClosed);
+        this.currentBest = this.especesClosed.get(0);
+
         //Reset the arrays
-		especesOpen = new ArrayList<Espece>(this.neuralNetworkSuperviser.alterEspeceListAtGenerationFinish(especesClosed, this));
+		especesOpen = new ArrayList<Espece>(this.algorithmModel.getSuperviser().alterEspeceListAtGenerationFinish(especesClosed, this));
         especesClosed = new ArrayList<Espece>();
 
 
@@ -198,6 +199,10 @@ public class Simulation extends Thread{
 
         //Reset the time of the simulation
         Simulation.simulationTime = 0;
+
+		if(this.maxGenerations != 0 && this.generation >= this.maxGenerations){
+			this.simulationEnd();
+		}
     }
 
     private void restart(){
@@ -212,7 +217,6 @@ public class Simulation extends Thread{
 		}
 
 		this.initializeCars();
-
 	}
 
 	/**
@@ -231,6 +235,8 @@ public class Simulation extends Thread{
 		while(especesOpen.size() < numberOfCar) {
 			especesOpen.add(new Espece(this));
 		}
+
+		currentBest = especesOpen.get(0);
 	}
 
 	/**
@@ -246,19 +252,7 @@ public class Simulation extends Thread{
 	 * @return the car with the highest fitness
 	 */
 	public Espece getBest(){
-		//Combine cars from especesOpen and especesClosed into same array
-		ArrayList<Espece> allCars = this.getAllEspeces();
-
-		//Sorts the new array by the fitness of the cars
-		Collections.sort(allCars);
-
-
-		//Returns the car with the highest fitness (first)
-		return allCars.get(0);
-	}
-
-	public void addNeuralNetworkSuperviser(){
-
+		return currentBest;
 	}
 
 	/**
@@ -325,6 +319,7 @@ public class Simulation extends Thread{
 		for(SimulationListener listener : this.simulationListeners){
 			listener.simulationEnded();
 		}
+		this.terminate();
 	}
 
 	//*******===========================================================================
@@ -359,14 +354,6 @@ public class Simulation extends Thread{
 	public void setRunning(boolean running) {
 		this.running = running;
 	}
-
-	public void setNeuralNetworkSuperviser(Class<? extends NeuralNetworkSuperviser> nns){
-        try {
-            this.neuralNetworkSuperviser = nns.newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
-    }
 
 	public ArrayList<Espece> getEspecesClosed() {
 		return especesClosed;

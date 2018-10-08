@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import javax.swing.*;
 
 import org.lrima.Interface.conclusion.ConclusionFrame;
+import org.lrima.Interface.options.OptionsDialog;
 import org.lrima.core.UserPrefs;
 import org.lrima.espece.Espece;
 import org.lrima.network.interfaces.NeuralNetworkModel;
@@ -15,18 +16,10 @@ import org.lrima.Interface.actions.*;
 import org.lrima.simulation.*;
 
 public class FrameManager extends JFrame implements SimulationListener, BatchListener {
-
-    public static FrameManager instance;
-
     //All the panels
-	//private NetworkPanel networkPanel;
 	private MapPanel mapPanel;
     private GraphicPanel graphicPanel;
     private EspeceInfoPanel especeInfoPanel;
-
-    //the simulation and its information
-	private ArrayList<SimulationBatch> simulationBatches = new ArrayList<>();
-	private int currentBatch = 0;
 
 	//Pour le menu
     private JCheckBoxMenuItem checkBoxRealtime;
@@ -34,64 +27,27 @@ public class FrameManager extends JFrame implements SimulationListener, BatchLis
     private JCheckBoxMenuItem checkBoxFollowBest;
     private JCheckBoxMenuItem checkBoxEspeceInfo;
 
+    //Simulations
+    SimulationManager simulationManager;
 
-	
-	public FrameManager() {
-	    if(instance == null){
-	        FrameManager.instance = this;
-        }
-	    this.setupWindow();
+	public FrameManager(SimulationManager simulationManager) {
+        this.simulationManager = simulationManager;
+        this.simulationManager.setFrameManager(this);
+        this.simulationManager.addSimulationListener(this);
+
+        this.mapPanel = new MapPanel(this);
+        this.graphicPanel = new GraphicPanel(this);
+
+        this.setupWindow();
 
         this.especeInfoPanel = new EspeceInfoPanel();
-	}
-
-    /**
-     * Sets the algorithm to use. It creates a new simulation and resets all the panels using the simulation
-     * @param algorithm the algorithm to use
-     */
-    public void addBatch(NeuralNetworkModel algorithm, int numberInBatch){
-        SimulationBatch simulationBatch = new SimulationBatch(algorithm, numberInBatch);
-        this.simulationBatches.add(simulationBatch);
-        simulationBatch.addBatchListener(this);
-
-        for(Simulation simulation : simulationBatch.getSimulations()){
-            simulation.addSimulationListener(this);
-        }
-
-    }
-
-    public void startBatches(){
-        simulationBatches.get(currentBatch).startBatch();
-        this.reloadPanels();
-    }
-
-    private void reloadPanels(){
-
-        if(this.mapPanel != null) {
-            mapPanel.stop();
-            this.remove(mapPanel);
-
-        }
-        if(graphicPanel != null){
-            this.remove(graphicPanel);
-        }
-
-        this.mapPanel = new MapPanel(simulationBatches.get(currentBatch).getCurrentSimulation());
-        this.graphicPanel = new GraphicPanel(simulationBatches.get(currentBatch).getCurrentSimulation());
-
-        mapPanel.setCurrentSimulationBatch(simulationBatches.get(currentBatch));
-        mapPanel.setCurrentBatchNumber(currentBatch + 1);
-        mapPanel.setMaxBatch(simulationBatches.size());
-
 
         createMenu();
 
         this.add(mapPanel, BorderLayout.CENTER);
-
         displaySavedPanel();
 
-        this.start();
-        revalidate();
+        this.mapPanel.start();
     }
 
     /**
@@ -115,19 +71,11 @@ public class FrameManager extends JFrame implements SimulationListener, BatchLis
                 super.keyPressed(e);
                 //Press Q to go to the next generation
                 if(e.getKeyCode() == KeyEvent.VK_Q){
-                    simulationBatches.get(currentBatch).getCurrentSimulation().goToNextGeneration();
+                    simulationManager.getCurrentSimulation().goToNextGeneration();
                 }
                 if(e.getKeyCode() == KeyEvent.VK_W){
-                    simulationBatches.get(currentBatch).getCurrentSimulation().getBest().setSelected(true);
+                    simulationManager.getCurrentSimulation().getBest().setSelected(true);
                 }
-            }
-        });
-
-        //Mouse listener
-        this.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                //requestFocus();
             }
         });
 
@@ -158,7 +106,6 @@ public class FrameManager extends JFrame implements SimulationListener, BatchLis
     private void setupFileMenu(JMenuBar menuBar){
         JMenu file = new JMenu("File");
         menuBar.add(file);
-
     }
 
     /**
@@ -178,7 +125,7 @@ public class FrameManager extends JFrame implements SimulationListener, BatchLis
         simulationMenu.add(checkBoxFollowBest);
 
         //Pause button
-        JMenuItem pause = new JMenuItem(new PauseAction("Pause", simulationBatches.get(currentBatch).getCurrentSimulation()));
+        JMenuItem pause = new JMenuItem(new PauseAction("Pause", simulationManager.getCurrentSimulation()));
         pause.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, InputEvent.CTRL_MASK));
         simulationMenu.add(pause);
 
@@ -196,10 +143,10 @@ public class FrameManager extends JFrame implements SimulationListener, BatchLis
         menuBar.add(map);
 
         //Map editor button
-        JMenuItem mapEditor = new JMenuItem(new OpenStudioAction("Open Studio", simulationBatches.get(currentBatch).getCurrentSimulation()));
+        JMenuItem mapEditor = new JMenuItem(new OpenStudioAction("Open Studio", simulationManager.getCurrentSimulation()));
         map.add(mapEditor);
 
-        JMenuItem loadMapButton = new JMenuItem(new LoadMapAction("Load Map", this.mapPanel, simulationBatches.get(currentBatch).getCurrentSimulation()));
+        JMenuItem loadMapButton = new JMenuItem(new LoadMapAction("Load Map", this.mapPanel, simulationManager.getCurrentSimulation()));
         map.add(loadMapButton);
     }
 
@@ -225,7 +172,7 @@ public class FrameManager extends JFrame implements SimulationListener, BatchLis
      * in the user preferences
      */
     private void setMenuButtonStates(){
-        //TODO : CAN BE OPTIMISED WITH GETTING OPTION DIRRECTLY
+        //TODO : CAN BE OPTIMISED WITH GETTING OPTION TYPE DIRRECTLY, i think
         checkBoxRealtime.setState(UserPrefs.getBoolean(UserPrefs.KEY_REAL_TIME));
         checkBoxFollowBest.setState(UserPrefs.getBoolean(UserPrefs.KEY_FOLLOW_BEST));
         checkBoxGraphique.setState(UserPrefs.getBoolean(UserPrefs.KEY_WINDOW_GRAPHIQUE));
@@ -244,23 +191,6 @@ public class FrameManager extends JFrame implements SimulationListener, BatchLis
         }
     }
 
-    /**
-     * Make the mapPanel and networkPanel redraw itself regularly
-     */
-    public void start() {
-		mapPanel.start();
-	}
-
-	public void stop(){
-        mapPanel.stop();
-    }
-
-	//TODO: On a tu vraiment besoin de ça?
-	public void pack() {
-		super.pack();
-		this.setLocationRelativeTo(null);
-		this.setVisible(true);
-	}
 
     /**
      * Change the car that the networkPanel uses
@@ -272,41 +202,38 @@ public class FrameManager extends JFrame implements SimulationListener, BatchLis
 
     @Override
     public void onNextGeneration() {
-        this.graphicPanel.updateChart(this.simulationBatches.get(currentBatch).getCurrentSimulation());
+        this.graphicPanel.updateChart(simulationManager.getCurrentSimulation());
         this.getContentPane().repaint();
     }
 
     @Override
     public void simulationRestarted() {
-        Map map = this.mapPanel.getMap();
-        this.simulationBatches.get(currentBatch).getCurrentSimulation().setMap(map);
+
     }
 
     @Override
     public void simulationEnded() {
-        reloadPanels();
+
+    }
+
+    @Override
+    public void dispose(){
+        System.out.println("HHHHHHHHHHHHHhh");
+        mapPanel.stop();
+        super.dispose();
+    }
+
+
+    public SimulationManager getSimulationManager() {
+        return simulationManager;
+    }
+
+    public void restart() {
+        simulationManager.restart();
     }
 
     @Override
     public void batchFinished() {
-        if(currentBatch + 1 < this.simulationBatches.size()) {
-            this.currentBatch++;
-            //Next batch
-            this.startBatches();
-        }
-        else{
-            this.allBatchFinished();
-        }
-    }
 
-    private void allBatchFinished(){
-        this.dispose();
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                ConclusionFrame conclusionFrame = new ConclusionFrame(simulationBatches);
-                conclusionFrame.setVisible(true);
-            }
-        });
     }
 }

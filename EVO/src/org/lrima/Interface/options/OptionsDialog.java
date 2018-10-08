@@ -1,5 +1,6 @@
 package org.lrima.Interface.options;
 
+import org.lrima.Interface.options.types.OptionDialogListener;
 import org.lrima.core.UserPrefs;
 
 import javax.swing.*;
@@ -10,7 +11,9 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 public class OptionsDialog extends JDialog implements ActionListener {
-    public LinkedHashMap<String, OptionsDisplayPanel> optionPanel;
+    private LinkedHashMap<String, OptionsDisplayPanel> optionPanel;
+    private ArrayList<OptionDialogListener> listeners = new ArrayList<>();
+
 
     private JButton okButton;
 
@@ -52,6 +55,7 @@ public class OptionsDialog extends JDialog implements ActionListener {
 
         //Simulation tabs
         ArrayList<String> simulationTab = new ArrayList<>();
+        //TODO : ADD ALL THE SETTINGS
         simulationTab.add(UserPrefs.KEY_TIME_LIMIT);
         simulationTab.add(UserPrefs.KEY_USE_LAST_SAVED);
 
@@ -127,6 +131,11 @@ public class OptionsDialog extends JDialog implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if(e.getSource() == okButton){
             setVisible(false);
+            this.listeners.forEach(OptionDialogListener::onOkPress);
         }
+    }
+
+    public void addOptionDialogListener(OptionDialogListener listener){
+        this.listeners.add(listener);
     }
 }
