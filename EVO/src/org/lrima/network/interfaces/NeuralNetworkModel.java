@@ -1,5 +1,6 @@
 package org.lrima.network.interfaces;
 
+import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedHashMap;
 
@@ -7,7 +8,7 @@ import org.lrima.Interface.options.OptionsDialog;
 import org.lrima.network.annotations.AlgorithmInformation;
 import org.lrima.Interface.options.Option;
 
-public abstract class NeuralNetworkModel<T extends NeuralNetwork> {
+public abstract class NeuralNetworkModel<T extends NeuralNetwork> implements Serializable {
 	
 	public static NeuralNetworkModel getInstanceOf(Class<? extends NeuralNetworkModel> modelClass) {
         try {

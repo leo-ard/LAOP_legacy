@@ -16,6 +16,7 @@ public class NodeGene {
     private Type type;
     private double value;
     private int innovation;
+    public boolean hasBeenCalculated = false;
 
     protected NodeGene(Type type){
         this.type = type;
@@ -43,6 +44,7 @@ public class NodeGene {
         }
 
         this.value = sum;
+        hasBeenCalculated = true;
     }
 
 
@@ -52,6 +54,10 @@ public class NodeGene {
 
     public double getValue() {
         return value;
+    }
+
+    public void reset(){
+        this.hasBeenCalculated = false;
     }
 
     @Override

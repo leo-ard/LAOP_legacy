@@ -11,6 +11,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 
 public class NeatGenome extends NeuralNetwork {
@@ -286,7 +287,7 @@ public class NeatGenome extends NeuralNetwork {
         if(chanceAddConnection < 10){
             this.addConnectionMutation();
         }
-        if(chanceAddNode < 10){
+        if(chanceAddNode < 120){
             this.addNodeMutation();
         }
     }
@@ -356,7 +357,9 @@ public class NeatGenome extends NeuralNetwork {
 
         //If the connection doesn't already exist, create it
         if(connectionAlreadyExist == null){
-            this.connections.add(new ConnectionGene(nodeGene1, nodeGene2));
+            if(!(nodeGene1.getType() == NodeGene.Type.OUTPUT && nodeGene1.getType() == NodeGene.Type.OUTPUT)) {
+                this.connections.add(new ConnectionGene(nodeGene1, nodeGene2));
+            }
         }
     }
 
@@ -388,28 +391,60 @@ public class NeatGenome extends NeuralNetwork {
         ArrayList<NodeGene> inputNodes = this.getInputNodes();
         for(int i = 0 ; i < inputNodes.size() ; i++){
             NodeGene input = inputNodes.get(i);
+            input.hasBeenCalculated = true;
             input.setValue(this.transmitters.get(i).getNeuralNetworkInput());
         }
 
-        for(NodeGene node : this.nodes){
-            if(node.getType() != NodeGene.Type.INPUT) {
-                ArrayList<NodeGene> nodesConnectingToIt = this.getInputsIntoNode(node);
-                ArrayList<Double> weightsConnectingToIt = this.getWeightsIntoNode(node);
+        ArrayList<NodeGene> openSet = new ArrayList<>();
+        openSet.addAll(this.nodes);
 
-                //TODO: le output peut etre calculé avant les hiddens !!
-                node.calculateWeightedSum(nodesConnectingToIt, weightsConnectingToIt);
-            }
-        }
+        do {
+            Iterator<NodeGene> nodeGeneIterator = openSet.iterator();
 
-        System.out.println("----");
-        for(NodeGene gene : this.nodes){
-            if(gene.getType() != NodeGene.Type.INPUT){
-                if(gene.getType() == NodeGene.Type.OUTPUT) {
-                    System.out.print("Output: ");
+            while(nodeGeneIterator.hasNext()){
+                NodeGene node = nodeGeneIterator.next();
+
+                if (node.getType() != NodeGene.Type.INPUT) {
+                    ArrayList<NodeGene> nodesConnectingToIt = this.getInputsIntoNode(node);
+                    ArrayList<Double> weightsConnectingToIt = this.getWeightsIntoNode(node);
+
+                    boolean shouldCalculate = true;
+
+                    //Compute the weighted sum only if connected nodes has been calculated
+                    for(NodeGene connectedNodes : nodesConnectingToIt){
+                        if(!connectedNodes.hasBeenCalculated) {
+                            shouldCalculate = false;
+
+                            if (connectedNodes.getType() == NodeGene.Type.INPUT) {
+                                shouldCalculate = true;
+                            }
+                        }
+                    }
+
+                    if(shouldCalculate) {
+                        node.calculateWeightedSum(nodesConnectingToIt, weightsConnectingToIt);
+                        nodeGeneIterator.remove();
+                    }
                 }
-                System.out.println(gene.getInnovation());
+                else{
+                    node.hasBeenCalculated = true;
+                    nodeGeneIterator.remove();
+                }
             }
-        }
+
+            for(NodeGene gene1 : openSet){
+                ArrayList<NodeGene> nodesConnectingToIt = this.getInputsIntoNode(gene1);
+                System.out.println(gene1.getType());
+                for(NodeGene gene3 :nodesConnectingToIt){
+                    System.out.println("\t" + gene3.getType() + " " + gene3.hasBeenCalculated);
+                    ArrayList<NodeGene> nodesConnectingToIt2 = this.getInputsIntoNode(gene3);
+                    for(NodeGene gene4 : nodesConnectingToIt2){
+                        System.out.println("\t\t" + gene4.getType() + " " + gene4.hasBeenCalculated);
+                    }
+                }
+            }
+
+        }while(openSet.size() > 0);
 
         ArrayList<NodeGene> outputNodes = this.getOutputNodes();
 
@@ -426,6 +461,10 @@ public class NeatGenome extends NeuralNetwork {
 
 
         this.receiver.setNeuralNetworkOutput(outputNodesValues);
+
+        for(NodeGene node : this.nodes){
+            node.reset();
+        }
     }
 
     /**
@@ -436,8 +475,10 @@ public class NeatGenome extends NeuralNetwork {
     private ArrayList<NodeGene> getInputsIntoNode(NodeGene node){
         ArrayList<NodeGene> inputs = new ArrayList<>();
         for(ConnectionGene connection : this.connections){
-            if(connection.getOutput().equals(node)){
-                inputs.add(connection.getInput());
+            if(connection.isExpresed()) {
+                if (connection.getOutput().equals(node)) {
+                    inputs.add(connection.getInput());
+                }
             }
         }
 
@@ -452,8 +493,10 @@ public class NeatGenome extends NeuralNetwork {
     private ArrayList<Double> getWeightsIntoNode(NodeGene node) {
         ArrayList<Double> weights = new ArrayList<>();
         for (ConnectionGene connection : this.connections) {
-            if (connection.getOutput().equals(node)) {
-                weights.add(connection.getWeight());
+            if(connection.isExpresed()) {
+                if (connection.getOutput().equals(node)) {
+                    weights.add(connection.getWeight());
+                }
             }
         }
 

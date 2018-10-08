@@ -10,6 +10,7 @@ import javax.swing.*;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.GroupLayout.Alignment;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 
 public class OneAlgorithmPanel extends PagePanel {
 
@@ -98,6 +99,11 @@ public class OneAlgorithmPanel extends PagePanel {
         this.simulateButton.addActionListener(e -> {
             try {
                 homeFrameManager.close();
+
+                ArrayList<NeuralNetworkModel> models = new ArrayList<>();
+                models.add(currentModel);
+
+                homeFrameManager.addModelsToSaved(models);
 
                 FrameManager frameManager = new FrameManager();
                 frameManager.addBatch(currentModel, 2);

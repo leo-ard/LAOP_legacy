@@ -100,10 +100,13 @@ public class CompareAlgorithmsPanel extends PagePanel {
             public void actionPerformed(ActionEvent e) {
                 homeFrameManager.close();
 
+
                 FrameManager frameManager = new FrameManager();
                 for(NeuralNetworkModel model : models){
                     frameManager.addBatch(model, 2);
                 }
+
+                homeFrameManager.addModelsToSaved(models);
 
                 frameManager.setVisible(true);
                 frameManager.startBatches();

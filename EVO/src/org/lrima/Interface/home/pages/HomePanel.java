@@ -1,11 +1,16 @@
 package org.lrima.Interface.home.pages;
 
+import org.lrima.Interface.FrameManager;
 import org.lrima.Interface.home.HomeFrameManager;
 import org.lrima.Interface.utils.ImagePanel;
+import org.lrima.network.interfaces.NeuralNetworkModel;
 
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
 
@@ -96,6 +101,26 @@ public class HomePanel extends org.lrima.Interface.home.PagePanel {
         });
 
         this.runLastButton = new JButton("Run last simulation");
+        runLastButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ArrayList<NeuralNetworkModel> savedModels = homeFrameManager.getSavedModels();
+                if(savedModels != null){
+                    homeFrameManager.close();
+
+                    FrameManager frameManager = new FrameManager();
+                    for(NeuralNetworkModel model : savedModels){
+                        frameManager.addBatch(model, 2);
+                    }
+
+                    frameManager.setVisible(true);
+                    frameManager.startBatches();
+                }
+                else{
+                    JOptionPane.showMessageDialog(HomePanel.this, "The file containing the last simulation doesn't exist. Try to run a simulation before.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
     }
 
     @Override

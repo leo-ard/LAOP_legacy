@@ -2,9 +2,12 @@ package org.lrima.Interface.home;
 
 
 import org.lrima.Interface.home.pages.HomePanel;
+import org.lrima.network.interfaces.NeuralNetworkModel;
+import org.lrima.utils.ObjectAppendOutputStream;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.*;
 import java.util.ArrayList;
 
 public class HomeFrameManager {
@@ -57,5 +60,66 @@ public class HomeFrameManager {
         mainFrame.dispose();
     }
 
+    /**
+     * Save the list of models to a file so that you can reinstantiate the after clicking the
+     * last simulation button
+     * @param models an array containing the models to save
+     */
+    public void addModelsToSaved(ArrayList<NeuralNetworkModel> models){
+        ArrayList<Object> objects = new ArrayList<>();
+        objects.addAll(models);
+
+
+        File file = new File("last.simulation");
+        try {
+            if (file.createNewFile()) {
+                System.out.println("File 'last.simulation' was created");
+            }
+            else{
+                //Resets the file
+                PrintWriter writer = new PrintWriter(file);
+                writer.print("");
+                writer.close();
+            }
+        }catch (IOException e){
+            System.err.println("Error when creating last.simulation file");
+        }
+
+        try {
+            FileOutputStream fos = new FileOutputStream(file);
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+
+            oos.writeObject(models);
+
+            oos.close();
+            fos.close();
+
+        }catch(Exception e){
+            System.err.println("There was an error while saving the file !");
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Retreive the saved models from the file 'last.simulation'
+     * @return an ArrayList containing the saved models
+     */
+    public ArrayList<NeuralNetworkModel> getSavedModels(){
+        try{
+            FileInputStream fis = new FileInputStream(new File("last.simulation"));
+            ObjectInputStream ois = new ObjectInputStream(fis);
+
+            return (ArrayList<NeuralNetworkModel>) ois.readObject();
+
+        } catch (FileNotFoundException e) {
+            System.err.println("The file 'last.simulation' doesn't exist !");
+        } catch (IOException e){
+            System.err.println("There was an error while loading the file !");
+        } catch (ClassNotFoundException e) {
+            System.err.println("The file contains the wrong type of object !");
+        }
+
+        return null;
+    }
 
 }
