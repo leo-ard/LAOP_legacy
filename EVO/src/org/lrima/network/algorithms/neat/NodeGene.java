@@ -11,18 +11,16 @@ public class NodeGene {
         ;
     }
 
-    private static int currentInnovation = 0;
-
     private Type type;
     private double value;
     private int innovation;
     public boolean hasBeenCalculated = false;
 
-    protected NodeGene(Type type){
+    /*protected NodeGene(Type type){
         this.type = type;
         this.innovation = NodeGene.currentInnovation;
         NodeGene.currentInnovation = this.innovation + 1;
-    }
+    }*/
 
     public NodeGene(Type type, int innovation){
         this.type = type;
