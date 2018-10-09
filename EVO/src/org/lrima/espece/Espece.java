@@ -539,8 +539,9 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 
 	public void setNeuralNetwork(NeuralNetwork network) {
 		this.neuralNetwork = network;
-		this.neuralNetwork.setTransmitters(this.capteurs);
-		this.neuralNetwork.setReceiver(this);
+		this.neuralNetwork.init(this.capteurs, this);
+		//this.neuralNetwork.setTransmitters(this.capteurs);
+		//this.neuralNetwork.setReceiver(this);
 	}
 
 	public void setFitness(double fitness) {

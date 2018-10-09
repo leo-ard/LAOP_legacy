@@ -90,25 +90,26 @@ public class NeatGenome extends NeuralNetwork {
         this.transmitters = transmitters;
         this.receiver = receiver;
 
-        //Create the default nodes
-        //Inputs
-        for(NeuralNetworkTransmitter transmitter : transmitters){
-            nodes.add(new NodeGene(NodeGene.Type.INPUT, ++currentNodeInnovation));
+        if(this.nodes.size() == 0) {
+            //Create the default nodes
+            //Inputs
+            for (NeuralNetworkTransmitter transmitter : transmitters) {
+                nodes.add(new NodeGene(NodeGene.Type.INPUT, ++currentNodeInnovation));
+            }
+            //Output
+            for (int i = 0; i < nbOutput; i++) {
+                nodes.add(new NodeGene(NodeGene.Type.OUTPUT, ++currentNodeInnovation));
+            }
         }
-        //Output
-        for(int i = 0 ; i < nbOutput ; i++){
-            nodes.add(new NodeGene(NodeGene.Type.OUTPUT, ++currentNodeInnovation));
+
+        if(this.connections.size() == 0) {
+            //A connection between a random input and output
+            ArrayList<NodeGene> inputNodes = this.getInputNodes();
+            ArrayList<NodeGene> outputNodes = this.getOutputNodes();
+            NodeGene randomNodeInput1 = inputNodes.get(Random.getRandomIntegerValue(inputNodes.size()));
+
+            this.connections.add(new ConnectionGene(randomNodeInput1, this.getOutputNodes().get(0)));
         }
-        //TEST:
-        //nodes.add(new NodeGene(NodeGene.Type.OUTPUT, ++currentNodeInnovation));
-
-
-        //A connection between a random input and output
-        ArrayList<NodeGene> inputNodes = this.getInputNodes();
-        ArrayList<NodeGene> outputNodes = this.getOutputNodes();
-        NodeGene randomNodeInput1 = inputNodes.get(Random.getRandomIntegerValue(inputNodes.size()));
-
-        this.connections.add(new ConnectionGene(randomNodeInput1,  this.getOutputNodes().get(0)));
 
     }
 

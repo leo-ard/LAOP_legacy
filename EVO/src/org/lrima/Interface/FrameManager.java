@@ -218,7 +218,6 @@ public class FrameManager extends JFrame implements SimulationListener, BatchLis
 
     @Override
     public void dispose(){
-        System.out.println("HHHHHHHHHHHHHhh");
         mapPanel.stop();
         super.dispose();
     }
