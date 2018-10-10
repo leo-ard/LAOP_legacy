@@ -1,5 +1,6 @@
 package org.lrima.network.interfaces;
 
 public interface NeuralNetworkReceiver {
-    public void setNeuralNetworkOutput(double ... outputs);
+    void setNeuralNetworkOutput(double ... outputs);
+    int getSize();
 }

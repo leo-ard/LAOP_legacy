@@ -3,6 +3,7 @@ package org.lrima.network.algorithms.fullyconnected;
 import java.awt.*;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 
 import org.apache.commons.math3.linear.MatrixUtils;
@@ -12,23 +13,19 @@ import org.lrima.network.interfaces.NeuralNetworkTransmitter;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.lrima.Interface.options.OptionsDisplayPanel;
 import org.lrima.Interface.options.Option;
+import org.lrima.utils.Random;
 
-public class FullyConnectedNeuralNetwork extends NeuralNetwork implements Serializable {
-
-	private final Integer[] nbHiddenNodes = {2};
-
-	//private ArrayList<Layer> layers;
-	private Integer nbInputs = 0;
-	private Integer nbOutputs = 0;
-	private ArrayList<Layer> layers = new ArrayList<>();
-
-	private ArrayList<RealMatrix> layerInputs = new ArrayList<>();
-	private ArrayList<RealMatrix> layerOutputs = new ArrayList<>();
-	private ArrayList<RealMatrix> weigthMatrices = new ArrayList<>();
+public class FullyConnectedNeuralNetwork extends NeuralNetwork<FullyConnectedNeuralNetwork> implements Serializable {
+	private Genotype genotype;
+	private int[] topology;
 
 	public FullyConnectedNeuralNetwork(LinkedHashMap<String, Option> options) {
 		super(options);
-		OptionsDisplayPanel optionPanel = new OptionsDisplayPanel(this.options);
+	}
+
+	private FullyConnectedNeuralNetwork(LinkedHashMap<String, Option> options, Genotype genotype){
+		super(options);
+		this.genotype = genotype;
 	}
 
 	@Override
@@ -36,91 +33,51 @@ public class FullyConnectedNeuralNetwork extends NeuralNetwork implements Serial
 		this.transmitters = transmitters;
 		this.receiver = receiver;
 
-		int numberOfInputNodes = transmitters.size();
-		int numberOfOutputNodes = 2;
+		int numberOfLayers = (int)this.options.get("NUMBER_OF_LAYERS").getValue();
+		int deepLevel = (int) this.options.get("DEEP_LEVEL").getValue();
 
+		/*this.topology = new int[numberOfLayers + 2]; //the input and output layer
 
-		//Setup the number of nodes in each of the layers
-		this.nbInputs = numberOfInputNodes;
-		this.nbOutputs = numberOfOutputNodes;
+		this.topology[0] = transmitters.size();
+		for(int i = 1; i <= numberOfLayers; i++)
+			this.topology[i] = deepLevel;
+		this.topology[this.topology.length-1] = receiver.getSize();*/
 
-		this.layers.add(new Layer(nbInputs));
-		for(int i = 0 ; i < nbHiddenNodes.length ;i++){
-			this.layers.add(new Layer(nbHiddenNodes[i]));
+		this.topology = new int[]{6, 4, 2};
+
+		genotype = new Genotype(this.topology);
+	}
+
+	@Override
+	public FullyConnectedNeuralNetwork crossOver(FullyConnectedNeuralNetwork network1, FullyConnectedNeuralNetwork network2) {
+		Genotype mutatedGenotype = network1.getGenotype().getChildren(network2.getGenotype());
+		return new FullyConnectedNeuralNetwork(options, mutatedGenotype);
+	}
+
+	private Genotype getGenotype() {
+		return this.genotype;
+	}
+
+	public void feedForward(){
+		double[] values = this.transmitters.stream().mapToDouble(NeuralNetworkTransmitter::getNeuralNetworkInput).toArray();
+
+		Layer previousLayer = new Layer(values, genotype.getSubsetForLayer(1));
+		for(int i = 1; i < topology.length-1; i++){
+			Layer currentLayer = new Layer(topology[i], genotype.getSubsetForLayer(i));
+
+			currentLayer.calculateSum(previousLayer);
+			previousLayer = currentLayer;
 		}
-		this.layers.add(new Layer(nbOutputs));
 
-		for(int i = 0 ; i < layers.size() - 1 ; i++){
-			layers.get(i).initWeights(layers.get(i + 1));
-		}
+
+
+		receiver.setNeuralNetworkOutput(previousLayer.getOutput());
 
 	}
 
 	@Override
-	public NeuralNetwork crossOver(NeuralNetwork network1, NeuralNetwork network2) {
-		return new FullyConnectedNeuralNetwork(this.options);
-	}
+	public void generationFinish() {
 
-
-	public NeuralNetwork copy() {
-		return new FullyConnectedNeuralNetwork(this.options);
-	}
-
-	public void feedForward(){
-		try {
-			RealMatrix output = this.query(getTransmitterValue());
-			this.receiver.setNeuralNetworkOutput(output.getRow(0));
-		}catch (Exception e){
-			e.printStackTrace();
-		}
-	}
-
-	/**
-	 * Used to get the value of all the transmitter into an array
-	 * @return an array containing all the transmitter values
-	 */
-	private double[] getTransmitterValue(){
-		double[] values = new double[this.transmitters.size()];
-		for(int i = 0 ; i < transmitters.size() ; i++){
-			NeuralNetworkTransmitter transmitter = transmitters.get(i);
-			values[i] = transmitter.getNeuralNetworkInput();
-		}
-
-		return values;
-	}
-
-	public RealMatrix query(double[] inputs) {
-			double[] output = inputs;
-
-			for(int i = 0 ; i < layers.size() ; i++){
-				Layer layer = layers.get(i);
-				layer.setInputs(output);
-				output = layer.calculateWeightedSum();
-			}
-
-			return MatrixUtils.createRowRealMatrix(output);
-
-	}
-
-	private void setupInputs(double[] inputs){
-		this.layerInputs = new ArrayList<>();
-		this.layerOutputs = new ArrayList<>();
-
-		//Setup the input for the input layer
-		double[] inputsWithBias = new double[inputs.length + 1];
-		for(int i = 0 ; i < inputs.length - 1 ; i++){
-			inputsWithBias[i] = inputs[i];
-		}
-		inputsWithBias[inputsWithBias.length - 1] = 1.0;
-
-		this.layerInputs.add(MatrixUtils.createColumnRealMatrix(inputsWithBias));
-		this.layerOutputs.add(layerInputs.get(0).copy());
-	}
-
-	public void generationFinish(){
-		for(Layer layer : this.layers){
-			layer.mutate();
-		}
 	}
 
 	@Override
@@ -128,19 +85,4 @@ public class FullyConnectedNeuralNetwork extends NeuralNetwork implements Serial
 
 	}
 
-	public void setLayers(ArrayList<Layer> layers) {
-		this.layers = layers;
-	}
-
-	protected ArrayList<Layer> getLayers() {
-		return layers;
-	}
-
-	public ArrayList<RealMatrix> getWeigthMatrices() {
-		return weigthMatrices;
-	}
-
-	public void setWeigthMatrices(ArrayList<RealMatrix> weigthMatrices) {
-		this.weigthMatrices = weigthMatrices;
-	}
 }

@@ -14,7 +14,7 @@ public class SimulationBatch implements SimulationListener {
 
     private ArrayList<BatchListener> batchListeners = new ArrayList<>();
 
-    private final int maxGeneration = 5;
+    private final int maxGeneration = 20;
     private ArrayList<SimulationListener> simulationListeners = new ArrayList<>();
 
     public SimulationBatch(NeuralNetworkModel algorithmModel, int numberInBatch){
@@ -31,7 +31,6 @@ public class SimulationBatch implements SimulationListener {
     public void startBatch(){
         simulations[0].start();
     }
-
 
     public double[] getAverageFitnessPerGeneration(){
         double[] fitnesses = new double[this.simulations[0].getGenerationList().size()];
