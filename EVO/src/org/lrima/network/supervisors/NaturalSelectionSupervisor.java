@@ -1,7 +1,9 @@
-package org.lrima.network.interfaces;
+package org.lrima.network.supervisors;
 
 import org.lrima.core.UserPrefs;
 import org.lrima.espece.Espece;
+import org.lrima.network.interfaces.NeuralNetwork;
+import org.lrima.network.interfaces.NeuralNetworkSuperviser;
 import org.lrima.simulation.Simulation;
 import org.lrima.utils.Random;
 
@@ -28,6 +30,9 @@ public class NaturalSelectionSupervisor implements NeuralNetworkSuperviser {
      */
     private void kill50(ArrayList<Espece> especes) {
         int numberOfCar = UserPrefs.getInt(UserPrefs.KEY_NUMBER_OF_CAR);
+
+        //test
+        this.halfBestEspece = new ArrayList<>(especes);
 
         while(especes.size() > numberOfCar/2) {
             especes.remove(especes.size() - 1);

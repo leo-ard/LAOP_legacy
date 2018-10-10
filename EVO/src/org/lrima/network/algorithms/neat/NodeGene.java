@@ -1,5 +1,7 @@
 package org.lrima.network.algorithms.neat;
 
+import org.lrima.utils.Random;
+
 import java.util.ArrayList;
 
 public class NodeGene {
@@ -25,6 +27,7 @@ public class NodeGene {
     public NodeGene(Type type, int innovation){
         this.type = type;
         this.innovation = innovation;
+        this.value = Random.getRandomDoubleValue(-1, 1);
     }
 
     protected Type getType() {

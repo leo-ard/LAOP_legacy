@@ -24,6 +24,7 @@ public class OneAlgorithmPanel extends PagePanel {
     private NeuralNetworkModel currentModel;
     {
         try {
+            //TODO: Crash si il oublie de mettre l'annotation. Ça devrait prendre des valeurs par defaut
             currentModel = AlgorithmManager.algorithms.get(0).getConstructor().newInstance();
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             e.printStackTrace();

@@ -202,9 +202,7 @@ public class ImprovedNeatGenome extends NeuralNetwork {
 
         do{
             nodeGene2 = nodes.get(Random.getRandomIntegerValue(nodes.size()));
-        }while(nodeGene1 == nodeGene2 || (nodeGene1.getType() == NodeGene.Type.INPUT && nodeGene2.getType() == NodeGene.Type.INPUT) || ((nodeGene1.getType() == NodeGene.Type.OUTPUT && nodeGene2.getType() == NodeGene.Type.OUTPUT)));
-
-
+        }while(nodeGene1 == nodeGene2 || (nodeGene2.getType() == NodeGene.Type.INPUT && nodeGene1.getType() == NodeGene.Type.INPUT));
 
         //Put nodeGene1 and nodeGene2 in the correct order
         if(nodeGene1.getType() == NodeGene.Type.HIDDEN && nodeGene2.getType() == NodeGene.Type.INPUT){
@@ -222,6 +220,8 @@ public class ImprovedNeatGenome extends NeuralNetwork {
             nodeGene1 = nodeGene2;
             nodeGene2 = tmp;
         }
+
+        System.out.println(nodeGene1.getType() + " " + nodeGene2.getType());
 
         //Check if the connection already exist
         ConnectionGene connectionAlreadyExist = null;
@@ -243,7 +243,7 @@ public class ImprovedNeatGenome extends NeuralNetwork {
      * It creates two new connections and the old connection is set to expressed(false)
      */
     private void addNodeMutation(){
-        ConnectionGene connection = connections.get(Random.getRandomIntegerValue(connections.size() - 1));
+        ConnectionGene connection = connections.get(Random.getRandomIntegerValue(connections.size()));
         connection.setExpresed(false);
 
         NodeGene input = connection.getInput();

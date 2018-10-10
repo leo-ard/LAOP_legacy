@@ -38,6 +38,7 @@ public class EspeceInfoPanel extends JPanel {
         load();
 
         networkPanel = new NetworkPanel(null);
+        networkPanel.start();
         this.add(networkPanel);
     }
 

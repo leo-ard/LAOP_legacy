@@ -269,6 +269,11 @@ public class Simulation extends Thread{
         return null;
     }
 
+    public void setSelected(Espece e){
+		resetSelected();
+		e.selected = true;
+	}
+
 	/**
 	 * Sets the selected state of all the cars to not selected
 	 */

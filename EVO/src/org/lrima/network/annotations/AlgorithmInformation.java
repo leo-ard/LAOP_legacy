@@ -1,6 +1,6 @@
 package org.lrima.network.annotations;
 
-import org.lrima.network.interfaces.NaturalSelectionSupervisor;
+import org.lrima.network.supervisors.NaturalSelectionSupervisor;
 import org.lrima.network.interfaces.NeuralNetworkSuperviser;
 
 import java.lang.annotation.ElementType;

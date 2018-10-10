@@ -19,7 +19,7 @@ import org.lrima.map.Map;
 public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 
 	@DisplayInfo
-	private final int NB_CAPTEUR = 6; //Maxiumum of 180
+	private final int NB_CAPTEUR = 5; //Maxiumum of 180
 	//Width has to be bigger than the height
 	private static final int ESPECES_WIDTH = 74, ESPECES_HEIGHT = 50;
 
@@ -190,7 +190,8 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 		double sensorEveryDeg = 180 / (NB_CAPTEUR - 1);
 
 		for(double i = 90 ; i >= -90 ; i -= sensorEveryDeg){
-			capteurs.add(new Capteur(this, i, 0, 0));
+			//TODO: Il faut ajouter +1, car à un angle de 90 deg ça bug !
+			capteurs.add(new Capteur(this, i + 1, 0, 0));
 		}
 	}
 
@@ -239,6 +240,7 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 
 		//Get the car speed and turn rate from the settings
         int savedCarSpeed = UserPrefs.getInt(UserPrefs.KEY_CAR_SPEED);
+        savedCarSpeed = 1000;
         double savedTurnRate = UserPrefs.getDouble(UserPrefs.KEY_TURN_RATE);
 
 		//Applies the speed of each side of the car to move it to the next position

@@ -7,6 +7,7 @@ import java.util.LinkedHashMap;
 import org.lrima.Interface.options.OptionsDialog;
 import org.lrima.network.annotations.AlgorithmInformation;
 import org.lrima.Interface.options.Option;
+import org.lrima.network.supervisors.NaturalSelectionSupervisor;
 
 public abstract class NeuralNetworkModel<T extends NeuralNetwork> implements Serializable {
 	

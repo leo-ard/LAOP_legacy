@@ -4,6 +4,7 @@ import org.lrima.espece.Espece;
 import org.lrima.espece.capteur.Capteur;
 
 import java.awt.*;
+import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.io.Serializable;
 
@@ -76,7 +77,9 @@ public class Line implements Serializable {
         double s = numerator2 / denominator;
 
 
-        return((r >= 0 && r <= 1) && (s >= 0 && s <= 1));
+        return(Line2D.linesIntersect(start.x, start.y, end.x, end.y, start2.x, start2.y, end2.x, end2.y));
+
+        //return((r >= 0 && r <= 1) && (s >= 0 && s <= 1));
     }
 
     /**

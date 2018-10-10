@@ -76,6 +76,16 @@ public class FrameManager extends JFrame implements SimulationListener, BatchLis
                 if(e.getKeyCode() == KeyEvent.VK_W){
                     simulationManager.getCurrentSimulation().getBest().setSelected(true);
                 }
+                if(e.getKeyCode() == KeyEvent.VK_X){
+                    int oldSelectedIndex = simulationManager.getCurrentSimulation().getAllEspeces().indexOf(simulationManager.getCurrentSimulation().getSelectedEspece());
+                    int newIndex = (oldSelectedIndex + 1) % simulationManager.getCurrentSimulation().getAllEspeces().size();
+                    changeCarFocus(simulationManager.getCurrentSimulation().getAllEspeces().get(newIndex));
+                }
+                if(e.getKeyCode() == KeyEvent.VK_Z){
+                    int oldSelectedIndex = simulationManager.getCurrentSimulation().getAllEspeces().indexOf(simulationManager.getCurrentSimulation().getSelectedEspece());
+                    int newIndex = (oldSelectedIndex - 1) % simulationManager.getCurrentSimulation().getAllEspeces().size();
+                    changeCarFocus(simulationManager.getCurrentSimulation().getAllEspeces().get(newIndex));
+                }
             }
         });
 
@@ -197,6 +207,7 @@ public class FrameManager extends JFrame implements SimulationListener, BatchLis
      * @param e the car
      */
     public void changeCarFocus(Espece e) {
+        simulationManager.getCurrentSimulation().setSelected(e);
 		especeInfoPanel.setEspece(e);
 	}
 
