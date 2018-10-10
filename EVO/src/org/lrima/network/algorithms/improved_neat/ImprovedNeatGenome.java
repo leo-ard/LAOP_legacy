@@ -6,13 +6,14 @@ import org.lrima.network.interfaces.NeuralNetworkReceiver;
 import org.lrima.network.interfaces.NeuralNetworkTransmitter;
 import org.lrima.Interface.options.Option;
 import org.lrima.utils.Random;
+import org.omg.CORBA.IMP_LIMIT;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
-public class ImprovedNeatGenome extends NeuralNetwork {
+public class ImprovedNeatGenome extends NeuralNetwork<ImprovedNeatGenome> {
 
     private ArrayList<ConnectionGene> connections;
     private ArrayList<NodeGene> nodes;
@@ -64,11 +65,11 @@ public class ImprovedNeatGenome extends NeuralNetwork {
      * @return a child genome from parent1 and parent2
      */
     @Override
-    public NeuralNetwork crossOver(NeuralNetwork network1, NeuralNetwork network2) {
+    public ImprovedNeatGenome crossOver(ImprovedNeatGenome network1, ImprovedNeatGenome network2) {
         ImprovedNeatGenome child = new ImprovedNeatGenome(this.options);
 
-        ImprovedNeatGenome parent1 = (ImprovedNeatGenome) network1;
-        ImprovedNeatGenome parent2 = (ImprovedNeatGenome) network2;
+        ImprovedNeatGenome parent1 = network1;
+        ImprovedNeatGenome parent2 = network2;
 
         for(NodeGene node : parent1.getNodes()){
             if(parent2.getNodes().contains(node)){
@@ -264,7 +265,7 @@ public class ImprovedNeatGenome extends NeuralNetwork {
 
         //Set the value to the input nodes
         ArrayList<NodeGene> inputNodes = this.getInputNodes();
-        for(int i = 0 ; i < inputNodes.size() ; i++){
+        for(int i = 0 ; i < transmitters.size() ; i++){
             NodeGene input = inputNodes.get(i);
             input.setValue(this.transmitters.get(i).getNeuralNetworkInput());
         }

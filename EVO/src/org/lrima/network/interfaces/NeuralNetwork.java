@@ -6,7 +6,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
-public abstract class NeuralNetwork {
+public abstract class NeuralNetwork<T extends NeuralNetwork> {
 
     protected ArrayList<?extends NeuralNetworkTransmitter> transmitters;
     protected NeuralNetworkReceiver receiver;
@@ -39,7 +39,7 @@ public abstract class NeuralNetwork {
     //public abstract ArrayList<Espece> alterEspecesListAtGenerationFinish(ArrayList<Espece> currentBatch);
     public abstract void generationFinish();
     public abstract void draw(Graphics2D g, Dimension panelDimensions);
-    public abstract NeuralNetwork crossOver(NeuralNetwork network1, NeuralNetwork network2);
+    public abstract T crossOver(T network1, T network2);
 
     public void setFitness(double fitness){
         this.fitness = fitness;
