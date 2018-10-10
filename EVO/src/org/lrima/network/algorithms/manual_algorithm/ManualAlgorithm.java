@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 
-public class ManualAlgorithm extends NeuralNetwork {
+public class ManualAlgorithm extends NeuralNetwork<ManualAlgorithm> {
 
     public ManualAlgorithm(LinkedHashMap<String, Option> options) {
         super(options);
@@ -38,7 +38,7 @@ public class ManualAlgorithm extends NeuralNetwork {
     }
 
     @Override
-    public NeuralNetwork crossOver(NeuralNetwork network1, NeuralNetwork network2) {
+    public ManualAlgorithm crossOver(ManualAlgorithm network1, ManualAlgorithm network2) {
         return null;
     }
 }
