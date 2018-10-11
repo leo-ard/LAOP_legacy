@@ -240,7 +240,6 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 
 		//Get the car speed and turn rate from the settings
         int savedCarSpeed = UserPrefs.getInt(UserPrefs.KEY_CAR_SPEED);
-        savedCarSpeed = 1000;
         double savedTurnRate = UserPrefs.getDouble(UserPrefs.KEY_TURN_RATE);
 
 		//Applies the speed of each side of the car to move it to the next position
