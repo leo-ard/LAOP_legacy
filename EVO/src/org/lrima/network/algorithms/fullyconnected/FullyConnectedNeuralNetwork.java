@@ -36,14 +36,12 @@ public class FullyConnectedNeuralNetwork extends NeuralNetwork<FullyConnectedNeu
 		int numberOfLayers = (int)this.options.get("NUMBER_OF_LAYERS").getValue();
 		int deepLevel = (int) this.options.get("DEEP_LEVEL").getValue();
 
-		/*this.topology = new int[numberOfLayers + 2]; //the input and output layer
+		this.topology = new int[numberOfLayers + 2]; //the input and output layer
 
 		this.topology[0] = transmitters.size();
 		for(int i = 1; i <= numberOfLayers; i++)
 			this.topology[i] = deepLevel;
-		this.topology[this.topology.length-1] = receiver.getSize();*/
-
-		this.topology = new int[]{6, 4, 2};
+		this.topology[this.topology.length-1] = receiver.getSize();
 
 		genotype = new Genotype(this.topology);
 	}
@@ -69,10 +67,7 @@ public class FullyConnectedNeuralNetwork extends NeuralNetwork<FullyConnectedNeu
 			previousLayer = currentLayer;
 		}
 
-
-
 		receiver.setNeuralNetworkOutput(previousLayer.getOutput());
-
 	}
 
 	@Override
@@ -81,8 +76,6 @@ public class FullyConnectedNeuralNetwork extends NeuralNetwork<FullyConnectedNeu
 	}
 
 	@Override
-	public void draw(Graphics2D g, Dimension panelDimensions) {
-
-	}
+	public void draw(Graphics2D g, Dimension panelDimensions) {	}
 
 }

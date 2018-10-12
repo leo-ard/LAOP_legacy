@@ -21,7 +21,7 @@ public class Genotype {
 
         genomes = new double[numberOfWeight];
         for(int i = 0; i < genomes.length; i++){
-            genomes[i] = Random.getRandomDoubleValue(1.0);
+            genomes[i] = Random.getRandomDoubleValue(-5.0,5.0);
         }
 
         this.topology = topology;
@@ -48,7 +48,7 @@ public class Genotype {
         for(int i = 0; i < newGenotype.length; i++){
             newGenotype[i] = Random.getRandomBoolean() ? parent1[i] : parent2[i];
             if(Random.getRandomIntegerValue(100 ) < 1){
-                newGenotype[i] += Random.getRandomDoubleValue(1, 1);
+                newGenotype[i] += Random.getRandomDoubleValue(-1, 1);
             }
         }
 
@@ -78,5 +78,9 @@ public class Genotype {
             sub[i-min] = this.genomes[i];
 
         return sub;
+    }
+
+    public double[] toArray() {
+        return this.genomes;
     }
 }
