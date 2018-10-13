@@ -14,7 +14,7 @@ public class SimulationBatch implements SimulationListener {
 
     private ArrayList<BatchListener> batchListeners = new ArrayList<>();
 
-    private final int maxGeneration = 25;
+    private final int maxGeneration = 10;
     private ArrayList<SimulationListener> simulationListeners = new ArrayList<>();
 
     public SimulationBatch(NeuralNetworkModel algorithmModel, int numberInBatch){

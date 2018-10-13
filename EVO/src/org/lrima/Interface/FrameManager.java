@@ -101,9 +101,9 @@ public class FrameManager extends JFrame implements SimulationListener, BatchLis
         JMenuBar menuBar = new JMenuBar();
         setJMenuBar(menuBar);
 
-        setupFileMenu(menuBar);
+        //setupFileMenu(menuBar);
         setupSimulationMenu(menuBar);
-        setupMapMenu(menuBar);
+        //setupMapMenu(menuBar);
         setupWindowMenu(menuBar);
 
         setMenuButtonStates();
