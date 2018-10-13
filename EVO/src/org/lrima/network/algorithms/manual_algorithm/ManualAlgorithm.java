@@ -25,7 +25,7 @@ public class ManualAlgorithm extends NeuralNetwork {
         double valeurRoueGauche = 1;
 
         ////  VOTRE ALGORITHME ICI  /////
-        // Modifiez valeurRoueDroite et valeurRoueGauche en fonction des inputs
+        //TODO: Modifiez valeurRoueDroite et valeurRoueGauche en fonction des inputs
 
 
 

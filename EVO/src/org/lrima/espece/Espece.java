@@ -151,7 +151,11 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 	 */
 	private double fitnessFunction(){
 		double fitness;
-		Simulation simulation = this.simulation;
+
+        totalSpeed = this.totalSpeed;
+        maxDistanceFromStart = this.maxDistanceFromStart;
+        totalDistanceTraveled = this.totalDistanceTraveled;
+        double diedAtTime = Simulation.simulationTime;
 
 
 		//TODO: Créez votre propre fonction de fitness ici

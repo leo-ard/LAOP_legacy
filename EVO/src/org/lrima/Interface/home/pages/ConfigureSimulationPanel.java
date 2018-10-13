@@ -66,7 +66,7 @@ public class ConfigureSimulationPanel extends PagePanel {
         //Description pane
         this.descriptionTextPane = new JTextPane();
         descriptionTextPane.setEditable(false);
-        descriptionTextPane.setText("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ac lobortis nulla. Donec at turpis sed purus commodo fringilla vel nec ex. Vivamus placerat luctus malesuada. Ut odio dui, lobortis vitae finibus eget, fermentum eu sem. Etiam suscipit augue ut nunc hendrerit, consequat tincidunt lacus porttitor.");
+        descriptionTextPane.setText("To configure a simulation we have to know if you want to only test one algorithm or if you want to compare multiple algorithms together.");
 
 
         //Radio buttons
