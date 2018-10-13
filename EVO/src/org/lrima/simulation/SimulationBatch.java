@@ -5,7 +5,7 @@ import org.lrima.network.interfaces.NeuralNetworkModel;
 import java.util.ArrayList;
 import java.util.Queue;
 
-public class SimulationBatch implements SimulationListener {
+public class SimulationBatch implements SimulationListener, BatchListener {
     private Simulation[] simulations;
     private int currentSimulation = 0;
     private int numberInBatch;
@@ -75,6 +75,8 @@ public class SimulationBatch implements SimulationListener {
         else{
             this.currentSimulation++;
             this.getCurrentSimulation().start();
+
+            this.batchListeners.forEach(BatchListener::nextSimulationInBatch);
         }
     }
 
@@ -111,5 +113,15 @@ public class SimulationBatch implements SimulationListener {
 
     public void addSimulationListener(SimulationListener simulationListener) {
         simulationListeners.add(simulationListener);
+    }
+
+    @Override
+    public void batchFinished() {
+
+    }
+
+    @Override
+    public void nextSimulationInBatch() {
+
     }
 }

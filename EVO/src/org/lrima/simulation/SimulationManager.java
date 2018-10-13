@@ -10,6 +10,7 @@ import java.util.ArrayList;
 public class SimulationManager implements BatchListener {
     //the simulation and its information
     private ArrayList<SimulationBatch> simulationBatches = new ArrayList<>();
+    private ArrayList<BatchListener> batchListeners = new ArrayList<>();
     private int currentBatch = 0;
     private FrameManager frameManager;
 
@@ -38,6 +39,11 @@ public class SimulationManager implements BatchListener {
             this.currentBatch++;
             this.startBatch();
         }
+    }
+
+    @Override
+    public void nextSimulationInBatch() {
+        batchListeners.forEach(BatchListener::nextSimulationInBatch);
     }
 
     private void allSimulationFinish(){
@@ -99,5 +105,9 @@ public class SimulationManager implements BatchListener {
 
     public void addSimulationListener(SimulationListener simulationListener){
         this.simulationBatches.forEach(simulationBatch -> simulationBatch.addSimulationListener(simulationListener));
+    }
+
+    public void addBatchListener(BatchListener listener){
+        this.batchListeners.add(listener);
     }
 }

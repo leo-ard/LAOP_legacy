@@ -35,6 +35,19 @@ public class GraphicPanel extends JPanel {
         createChart();
     }
 
+    public void nextSimulation(Simulation simulation){
+        this.generations = simulation.getGenerationList();
+        this.xFitnessData = new ArrayList<>();
+        this.yFitnessData = new ArrayList<>();
+        this.xMedianData = new ArrayList<>();
+        this.yMedianData = new ArrayList<>();
+        this.xMoyenneData = new ArrayList<>();
+        this.yMoyenneData = new ArrayList<>();
+
+        getFitnessData();
+        updateChart();
+    }
+
     private void createChart(){
 
         getFitnessData();
@@ -85,7 +98,7 @@ public class GraphicPanel extends JPanel {
         }
     }
 
-    public void updateChart(Simulation simulation){
+    public void updateChart(){
         //Keep a maximum of 50 generations
         if(this.generations.size() > 50){
             //Randomly remove a generation

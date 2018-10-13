@@ -38,7 +38,7 @@ public class ConclusionFrame extends JFrame {
 
         JScrollPane chartScrollPane = new JScrollPane(chartPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         tabbedPane.addTab("Charts", chartScrollPane);
-        tabbedPane.addTab("Table", tablePanel);
+        //TODO: tabbedPane.addTab("Table", tablePanel);
 
         this.getContentPane().add(tabbedPane);
     }
