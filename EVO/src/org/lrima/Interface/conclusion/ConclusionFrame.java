@@ -3,6 +3,7 @@ package org.lrima.Interface.conclusion;
 import org.lrima.simulation.SimulationBatch;
 
 import javax.swing.*;
+import java.awt.*;
 import java.util.ArrayList;
 
 public class ConclusionFrame extends JFrame {
@@ -16,6 +17,8 @@ public class ConclusionFrame extends JFrame {
     private ArrayList<SimulationBatch> simulationBatches;
 
     public ConclusionFrame(ArrayList<SimulationBatch> simulationBatches){
+        Dimension screenSizes = Toolkit.getDefaultToolkit().getScreenSize();
+        this.setSize(screenSizes);
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setTitle("Conclusion");
