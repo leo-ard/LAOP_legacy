@@ -151,31 +151,16 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 	 */
 	private double fitnessFunction(){
 		double fitness;
-		//if(alive) {
-		//fitness = getMaxDistanceFromStart() + getTotalDistanceTraveled();
+		Simulation simulation = this.simulation;
 
-		fitness = (getMaxDistanceFromStart()) / 10000;// + (diedAtTime / UserPrefs.TIME_LIMIT) * 100;
 
-		/*if(diedAtTime != 0){
-			System.out.println("--------");
-			System.out.println("Max distance from start: " + getMaxDistanceFromStart());
-			System.out.println("Died at time / time limit: " + diedAtTime / UserPrefs.TIME_LIMIT);
-			System.out.println("Fitness: " + fitness);
-		}*/
+		//TODO: Créez votre propre fonction de fitness ici
 
-		//}
-		//else{
-		//	fitness = this.diedAtTime;
-		//}
 
-		/*if(numberOfTimeWentLeft != 0 && numberOfTimeWentRight != 0) {
-			if (numberOfTimeWentRight / numberOfTimeWentLeft < 0.01 || numberOfTimeWentLeft / numberOfTimeWentRight < 0.01) {
-				fitness -= (diedAtTime / UserPrefs.TIME_LIMIT) * 100;
-			}
-		}
-		else if(numberOfTimeWentLeft == 0 || numberOfTimeWentRight == 0){
-			fitness -= (diedAtTime / UserPrefs.TIME_LIMIT) * 100;
-		}*/
+		fitness = (getMaxDistanceFromStart()) / 10000;
+
+
+		//
 
 		return fitness;
 	}
