@@ -76,9 +76,10 @@ public class Simulation extends Thread{
 	public void run() {
 		long currentTime = System.currentTimeMillis();
 		long timePassed = (long)msBetweenFrames;
+		int timeLimit = UserPrefs.getInt(UserPrefs.KEY_TIME_LIMIT);
 		while(running) {
 			if(!pausing) {
-				if(especesOpen.size() != 0 && Simulation.simulationTime < UserPrefs.getInt(UserPrefs.KEY_TIME_LIMIT)) {
+				if(especesOpen.size() != 0 && Simulation.simulationTime < timeLimit) {
 					//Add the current time to the Simulation.simulationTime
 					currentTime = System.currentTimeMillis();
 					Simulation.simulationTime += msBetweenFrames;
