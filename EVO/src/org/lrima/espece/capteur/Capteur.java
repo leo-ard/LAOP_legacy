@@ -62,13 +62,10 @@ public class Capteur implements NeuralNetworkTransmitter {
     }
 
     public Point.Double getPoint2(){
-
-
 		int ly = (int) getLongeurY();
 		int lx = (int )getLongeurX();
 
 		return new Point2D.Double(e.getX() + lx, e.getY() + ly);
-
     }
 	
 	/**
@@ -76,13 +73,9 @@ public class Capteur implements NeuralNetworkTransmitter {
 	 * @return la longueur x du capteur
 	 */
 	public double getLongeurX() {
-		/*double a = e.getOrientation()-angle;
-		return CAPTEUR_LENGHT * Math.cos(a) ;*/
-
 		double lx = (CAPTEUR_LENGHT*Math.cos((-e.getOrientation() - this.angle)));
 
 		return lx;
-
 	}
 	
 	/**
@@ -90,9 +83,6 @@ public class Capteur implements NeuralNetworkTransmitter {
 	 * @return la longeur y d capteur
 	 */
 	public double getLongeurY() {
-		/*double a = e.getOrientation()-angle;
-		return CAPTEUR_LENGHT * Math.sin(a);*/
-
         double ly = (CAPTEUR_LENGHT*Math.sin((e.getOrientation() + this.angle)));
 		return ly;
 	}
