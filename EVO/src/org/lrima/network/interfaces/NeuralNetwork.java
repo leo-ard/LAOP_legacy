@@ -6,7 +6,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
-public abstract class NeuralNetwork<T extends NeuralNetwork> {
+public abstract class NeuralNetwork {
 
     protected ArrayList<?extends NeuralNetworkTransmitter> transmitters;
     protected NeuralNetworkReceiver receiver;
@@ -33,13 +33,18 @@ public abstract class NeuralNetwork<T extends NeuralNetwork> {
         this.receiver = receiver;
     }
 
-    public abstract void init(ArrayList<? extends NeuralNetworkTransmitter> transmitters, NeuralNetworkReceiver receiver);
+    public void init(ArrayList<? extends NeuralNetworkTransmitter> transmitters, NeuralNetworkReceiver receiver){
+        this.setTransmitters(transmitters);
+        this.setReceiver(receiver);
+    }
     public abstract void feedForward();
     //TODO : Change the parameter by something general (like ArrayList<NeuralNetworkReceiver>)
     //public abstract ArrayList<Espece> alterEspecesListAtGenerationFinish(ArrayList<Espece> currentBatch);
-    public abstract void generationFinish();
-    public abstract void draw(Graphics2D g, Dimension panelDimensions);
-    public abstract T crossOver(T network1, T network2);
+    public void generationFinish(){ }
+    public void draw(Graphics2D g, Dimension panelDimensions){
+
+    }
+    public abstract NeuralNetwork crossOver(NeuralNetwork network1, NeuralNetwork network2);
 
     public void setFitness(double fitness){
         this.fitness = fitness;

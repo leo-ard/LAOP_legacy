@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
-public class ImprovedNeatGenome extends NeuralNetwork<ImprovedNeatGenome> {
+public class ImprovedNeatGenome extends NeuralNetwork {
 
     private ArrayList<ConnectionGene> connections;
     private ArrayList<NodeGene> nodes;
@@ -65,11 +65,11 @@ public class ImprovedNeatGenome extends NeuralNetwork<ImprovedNeatGenome> {
      * @return a child genome from parent1 and parent2
      */
     @Override
-    public ImprovedNeatGenome crossOver(ImprovedNeatGenome network1, ImprovedNeatGenome network2) {
+    public NeuralNetwork crossOver(NeuralNetwork network1, NeuralNetwork network2) {
         ImprovedNeatGenome child = new ImprovedNeatGenome(this.options);
 
-        ImprovedNeatGenome parent1 = network1;
-        ImprovedNeatGenome parent2 = network2;
+        ImprovedNeatGenome parent1 = (ImprovedNeatGenome) network1;
+        ImprovedNeatGenome parent2 = (ImprovedNeatGenome) network2;
 
         for(NodeGene node : parent1.getNodes()){
             if(parent2.getNodes().contains(node)){

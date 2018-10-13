@@ -15,7 +15,7 @@ import org.lrima.Interface.options.OptionsDisplayPanel;
 import org.lrima.Interface.options.Option;
 import org.lrima.utils.Random;
 
-public class FullyConnectedNeuralNetwork extends NeuralNetwork<FullyConnectedNeuralNetwork> implements Serializable {
+public class FullyConnectedNeuralNetwork extends NeuralNetwork implements Serializable {
 	private Genotype genotype;
 	private int[] topology;
 
@@ -30,8 +30,7 @@ public class FullyConnectedNeuralNetwork extends NeuralNetwork<FullyConnectedNeu
 
 	@Override
 	public void init(ArrayList<? extends NeuralNetworkTransmitter> transmitters, NeuralNetworkReceiver receiver) {
-		this.transmitters = transmitters;
-		this.receiver = receiver;
+		super.init(transmitters,receiver);
 
 		int numberOfLayers = (int)this.options.get("NUMBER_OF_LAYERS").getValue();
 		int deepLevel = (int) this.options.get("DEEP_LEVEL").getValue();
@@ -49,8 +48,11 @@ public class FullyConnectedNeuralNetwork extends NeuralNetwork<FullyConnectedNeu
 	}
 
 	@Override
-	public FullyConnectedNeuralNetwork crossOver(FullyConnectedNeuralNetwork network1, FullyConnectedNeuralNetwork network2) {
-		Genotype mutatedGenotype = network1.getGenotype().getChildren(network2.getGenotype());
+	public FullyConnectedNeuralNetwork crossOver(NeuralNetwork network1, NeuralNetwork network2) {
+		FullyConnectedNeuralNetwork parent1 = (FullyConnectedNeuralNetwork) network1;
+		FullyConnectedNeuralNetwork parent2 = (FullyConnectedNeuralNetwork) network2;
+
+		Genotype mutatedGenotype = parent1.getGenotype().getChildren(parent2.getGenotype());
 		return new FullyConnectedNeuralNetwork(options, mutatedGenotype);
 	}
 

@@ -11,34 +11,47 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 
-public class ManualAlgorithm extends NeuralNetwork<ManualAlgorithm> {
+public class ManualAlgorithm extends NeuralNetwork {
 
     public ManualAlgorithm(LinkedHashMap<String, Option> options) {
         super(options);
     }
 
     @Override
-    public void init(ArrayList<? extends NeuralNetworkTransmitter> transmitters, NeuralNetworkReceiver receiver) {
-
-    }
-
-    @Override
     public void feedForward() {
+        //Valeurs entre 0 et 1 des capteurs de la voiture.     1 -> loin    0 -> proche
+        double[] inputs = this.getValeurCapteurs();
+        double valeurRoueDroite = 1;
+        double valeurRoueGauche = 1;
 
+        ////  VOTRE ALGORITHME ICI  /////
+        // Modifiez valeurRoueDroite et valeurRoueGauche en fonction des inputs
+
+
+
+
+        ///////
+
+
+
+        //Les valeurs des roues sont envoyées à la voiture
+        this.receiver.setNeuralNetworkOutput(new double[]{valeurRoueDroite, valeurRoueGauche});
+    }
+
+    /**
+     * Pour avoir les valeurs des capteurs dans un tableau
+     * @return un tableau contenant les valeurs des capteurs
+     */
+    private double[] getValeurCapteurs(){
+        double[] capteursValue = new double[this.transmitters.size()];
+        for(int i = 0 ; i < capteursValue.length ; i++){
+            capteursValue[i] = this.transmitters.get(i).getNeuralNetworkInput();
+        }
+        return capteursValue;
     }
 
     @Override
-    public void generationFinish() {
-
-    }
-
-    @Override
-    public void draw(Graphics2D g, Dimension panelDimensions) {
-
-    }
-
-    @Override
-    public ManualAlgorithm crossOver(ManualAlgorithm network1, ManualAlgorithm network2) {
-        return null;
+    public NeuralNetwork crossOver(NeuralNetwork network1, NeuralNetwork network2) {
+        return new ManualAlgorithm(this.options);
     }
 }

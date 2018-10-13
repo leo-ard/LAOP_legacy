@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 
-public class NeatGenome extends NeuralNetwork<NeatGenome> {
+public class NeatGenome extends NeuralNetwork {
     private ArrayList<ConnectionGene> connections;
     private ArrayList<NodeGene> nodes;
     private int currentNodeInnovation = 0;
@@ -87,8 +87,7 @@ public class NeatGenome extends NeuralNetwork<NeatGenome> {
      */
     @Override
     public void init(ArrayList<? extends NeuralNetworkTransmitter> transmitters, NeuralNetworkReceiver receiver){
-        this.transmitters = transmitters;
-        this.receiver = receiver;
+        super.init(transmitters, receiver);
 
         if(this.nodes.size() == 0) {
             //Create the default nodes
@@ -177,11 +176,11 @@ public class NeatGenome extends NeuralNetwork<NeatGenome> {
      * @return a child genome from parent1 and parent2
      */
     @Override
-    public  NeatGenome crossOver(NeatGenome network1, NeatGenome network2) {
+    public  NeatGenome crossOver(NeuralNetwork network1, NeuralNetwork network2) {
         NeatGenome child = new NeatGenome(this.options, currentNodeInnovation);
 
-        NeatGenome parent1 = network1;
-        NeatGenome parent2 = network2;
+        NeatGenome parent1 = (NeatGenome) network1;
+        NeatGenome parent2 = (NeatGenome) network2;
 
         for(NodeGene node : parent1.getNodes()){
             for(NodeGene node2: parent2.getNodes()){
