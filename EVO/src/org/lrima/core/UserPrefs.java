@@ -1,12 +1,10 @@
 package org.lrima.core;
 
 import org.lrima.Interface.options.*;
-import org.lrima.Interface.options.types.OptionBoolean;
-import org.lrima.Interface.options.types.OptionDouble;
-import org.lrima.Interface.options.types.OptionInt;
-import org.lrima.Interface.options.types.OptionString;
+import org.lrima.Interface.options.types.*;
 
 import javax.swing.*;
+import java.io.File;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.prefs.Preferences;
@@ -21,7 +19,7 @@ public class UserPrefs {
     public static final String SRC_TOOLS_SELECTION = "/images/icons/tools/selection.png";
 
 
-    private static Preferences preferences = Preferences.userRoot().node(UserPrefs.class.getName());
+    public static Preferences preferences = Preferences.userRoot().node(UserPrefs.class.getName());
     private static LinkedHashMap<String, Option> allOptions = new LinkedHashMap<>();
     private static int NUMBERCARS;
     private static int VITESSE_VOITURE;
@@ -73,7 +71,7 @@ public class UserPrefs {
         defaultValues.put(KEY_WINDOW_GRAPHIQUE, new OptionBoolean(false));
         defaultValues.put(KEY_WINDOW_NEURAL_NET, new OptionBoolean(false));
         defaultValues.put(KEY_WINDOW_ESPECE_INFO, new OptionBoolean(false));
-        defaultValues.put(KEY_MAP_TO_USE, new OptionString("./default.map"));
+        defaultValues.put(KEY_MAP_TO_USE, new OptionFile(new File("./default.map")));
     }
 
     public static int getInt(String key){
@@ -92,6 +90,10 @@ public class UserPrefs {
         return UserPrefs.<String>get(key).getValue();
     }
 
+    public static File getFile(String key){
+        return UserPrefs.<File>get(key).getValue();
+    }
+
     private static <T> Option<T> get(String key){
         Option<T> currentOption = allOptions.get(key);
 
@@ -104,6 +106,9 @@ public class UserPrefs {
                 currentOption = (Option<T>) new OptionDouble(preferences.getDouble(key, (double) defaultValues.get(key).getValue()), (OptionDouble) defaultValues.get(key));
             else if(defaultValues.get(key).getClassValue() == Boolean.class)
                 currentOption = (Option<T>) new OptionBoolean(preferences.getBoolean(key, (boolean) defaultValues.get(key).getValue()));
+            else if(defaultValues.get(key).getClassValue() == File.class) {
+                currentOption = (Option<T>) new OptionFile(new File(preferences.get(key, ((File) defaultValues.get(key).getValue()).getPath())));
+            }
             currentOption.addOptionValueChangeListener(option -> option.save(key, preferences));
             allOptions.put(key, currentOption);
         }

@@ -3,6 +3,7 @@ package org.lrima.Interface.home.pages;
 import org.lrima.Interface.FrameManager;
 import org.lrima.Interface.home.HomeFrameManager;
 import org.lrima.Interface.utils.ImagePanel;
+import org.lrima.map.Studio.Studio;
 import org.lrima.network.interfaces.NeuralNetworkModel;
 import org.lrima.simulation.SimulationManager;
 
@@ -11,6 +12,7 @@ import javax.swing.event.HyperlinkEvent;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
@@ -21,9 +23,13 @@ public class HomePanel extends org.lrima.Interface.home.PagePanel {
     private ImagePanel lrimaImagePanel;
     private JButton configureButton;
     private JButton runLastButton;
+    private JButton mapStudioButton;
+
+    private HomeFrameManager homeFrameManager;
 
     public HomePanel(HomeFrameManager homeFrameManager){
         super(homeFrameManager);
+        this.homeFrameManager = homeFrameManager;
         GroupLayout layout = new GroupLayout(this);
 
         this.setupComponents();
@@ -33,26 +39,30 @@ public class HomePanel extends org.lrima.Interface.home.PagePanel {
                 layout.createParallelGroup(Alignment.TRAILING)
                         .addGroup(layout.createSequentialGroup()
                                 .addContainerGap()
-                                .addGroup(layout.createParallelGroup(Alignment.LEADING)
-                                        .addComponent(descriptionEVO, GroupLayout.DEFAULT_SIZE, 422, Short.MAX_VALUE)
-                                        .addGroup(Alignment.TRAILING, layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(Alignment.TRAILING)
+                                        .addComponent(descriptionEVO)
+                                        .addGroup(layout.createSequentialGroup()
                                                 .addComponent(runLastButton)
-                                                .addPreferredGap(ComponentPlacement.RELATED, 88, Short.MAX_VALUE)
-                                                .addComponent(configureButton)))
+                                                .addPreferredGap(ComponentPlacement.RELATED, 142, Short.MAX_VALUE)
+                                                .addGroup(layout.createParallelGroup(Alignment.LEADING, false)
+                                                        .addComponent(mapStudioButton, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .addComponent(configureButton, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                                 .addContainerGap())
                         .addGroup(layout.createSequentialGroup()
                                 .addGap(126)
-                                .addComponent(lrimaImagePanel, GroupLayout.DEFAULT_SIZE, 222, Short.MAX_VALUE)
+                                .addComponent(lrimaImagePanel, GroupLayout.DEFAULT_SIZE, 132, Short.MAX_VALUE)
                                 .addGap(116))
         );
         layout.setVerticalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
                                 .addGap(15)
-                                .addComponent(lrimaImagePanel, GroupLayout.DEFAULT_SIZE, 101, Short.MAX_VALUE)
+                                .addComponent(lrimaImagePanel, GroupLayout.DEFAULT_SIZE, 106, Short.MAX_VALUE)
                                 .addGap(18)
-                                .addComponent(descriptionEVO, GroupLayout.DEFAULT_SIZE, 92, Short.MAX_VALUE)
-                                .addGap(137)
+                                .addComponent(descriptionEVO, GroupLayout.DEFAULT_SIZE, 97, Short.MAX_VALUE)
+                                .addGap(90)
+                                .addComponent(mapStudioButton)
+                                .addPreferredGap(ComponentPlacement.RELATED)
                                 .addGroup(layout.createParallelGroup(Alignment.TRAILING, false)
                                         .addComponent(runLastButton, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                         .addComponent(configureButton, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -95,7 +105,7 @@ public class HomePanel extends org.lrima.Interface.home.PagePanel {
     }
 
     private void setupButtons(){
-        this.configureButton = new JButton("Configure");
+        this.configureButton = new JButton("Configure Simulation");
         configureButton.addActionListener(e -> {
             ConfigureSimulationPanel configureSimulationPanel = new ConfigureSimulationPanel(homeFrameManager);
             homeFrameManager.next(configureSimulationPanel);
@@ -122,6 +132,15 @@ public class HomePanel extends org.lrima.Interface.home.PagePanel {
                 else{
                     JOptionPane.showMessageDialog(HomePanel.this, "The file containing the last simulation doesn't exist. Try to run a simulation before.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
+            }
+        });
+
+        this.mapStudioButton = new JButton("Map Studio");
+        this.mapStudioButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Studio studio = new Studio();
+                studio.setVisible(true);
             }
         });
     }

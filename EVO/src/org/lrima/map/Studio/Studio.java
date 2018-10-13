@@ -179,6 +179,8 @@ public class Studio extends JFrame implements ActionListener {
             //Todo: Popup si getStart == null
             if(drawingPanel.getMap().getDepart() != null) {
                 oos.writeObject(drawingPanel.getMap());
+
+
             }
         }catch (Exception e){
             e.printStackTrace();

@@ -39,7 +39,7 @@ public class Map implements Serializable {
      */
     static public Map loadMapFromPreferences(){
         try {
-            String filePath = UserPrefs.getString(UserPrefs.KEY_MAP_TO_USE);
+            String filePath = UserPrefs.getFile(UserPrefs.KEY_MAP_TO_USE).getPath();
 
             //Open the file
             FileInputStream fis = new FileInputStream(filePath);
@@ -50,6 +50,7 @@ public class Map implements Serializable {
             return map;
 
         }catch (Exception e){
+            e.printStackTrace();
             System.err.println("Could not load the file stored in the preferences. Trying to load default.map ...");
 
             //If the path of the map to use in the preferences doesn't exist, Use default.map instead
