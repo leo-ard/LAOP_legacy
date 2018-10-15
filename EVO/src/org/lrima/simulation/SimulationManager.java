@@ -89,7 +89,7 @@ public class SimulationManager implements BatchListener {
     }
 
     public String getCurrentInfos() {
-        return ("Algorithm: " + getCurrentSimulation().getAlgorithm().getAlgorithmInformationAnnotation().name() + " ("+ currentBatch +" / " + getMaxBatches() +")" +
+        return ("Algorithm: " + getCurrentSimulation().getAlgorithm().getAlgorithmInformationAnnotation().name() + " ("+ (currentBatch+1) +" / " + getMaxBatches() +")" +
             "\nSimulation " + (getCurrentBatch().getCurrentSimulationIndex() + 1) + " / " + getCurrentBatch().getSimulations().length +
             "\nGeneration: " + getCurrentSimulation().getGeneration() + " / " + getCurrentSimulation().getMaxGenerations() +
             "\nTime: " + getCurrentSimulation().simulationTime / 1000);

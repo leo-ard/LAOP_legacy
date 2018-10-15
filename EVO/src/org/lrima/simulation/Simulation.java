@@ -199,7 +199,7 @@ public class Simulation extends Thread{
         //Reset the time of the simulation
         Simulation.simulationTime = 0;
 
-		if(this.maxGenerations != 0 && this.generation >= this.maxGenerations){
+		if(this.maxGenerations != 0 && this.generation > this.maxGenerations){
 			this.simulationEnd();
 		}
     }

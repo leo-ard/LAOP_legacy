@@ -4,6 +4,7 @@ import org.lrima.Interface.FrameManager;
 import org.lrima.Interface.home.ModelListDialog;
 import org.lrima.Interface.home.HomeFrameManager;
 import org.lrima.Interface.home.PagePanel;
+import org.lrima.core.UserPrefs;
 import org.lrima.network.interfaces.NeuralNetworkModel;
 import org.lrima.simulation.SimulationManager;
 
@@ -104,7 +105,8 @@ public class CompareAlgorithmsPanel extends PagePanel {
 
                 SimulationManager simulationManager = new SimulationManager();
                 for(NeuralNetworkModel model : models){
-                    simulationManager.addBatch(model, 2);
+                    int numberOfSimulationPerBatches = (int) UserPrefs.getOption(UserPrefs.KEY_NUMBER_SIMULATION).getValue();
+                    simulationManager.addBatch(model, numberOfSimulationPerBatches);
                 }
                 simulationManager.start();
 

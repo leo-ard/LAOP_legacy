@@ -31,6 +31,8 @@ public class FrameManager extends JFrame implements SimulationListener, BatchLis
     SimulationManager simulationManager;
 
 	public FrameManager(SimulationManager simulationManager) {
+	    this.setTitle("The simulations are running...");
+
         this.simulationManager = simulationManager;
         this.simulationManager.setFrameManager(this);
         this.simulationManager.addSimulationListener(this);
