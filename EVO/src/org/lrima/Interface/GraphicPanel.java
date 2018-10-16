@@ -26,8 +26,8 @@ public class GraphicPanel extends JPanel {
     private ArrayList<Integer> xMoyenneData = new ArrayList<>();;
     private ArrayList<Integer> yMoyenneData = new ArrayList<>();;
 
-    public GraphicPanel(FrameManager frameManager){
-        this.generations = frameManager.getSimulationManager().getCurrentSimulation().getGenerationList();
+    public GraphicPanel(Simulation simulation){
+        this.generations = simulation.getGenerationList();
         screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         setPreferredSize(new Dimension(0, screenSize.height / 4));
         this.setLayout(new BorderLayout());
@@ -110,5 +110,7 @@ public class GraphicPanel extends JPanel {
         this.chart.updateXYSeries("fitness", xFitnessData, yFitnessData, null);
         this.chart.updateXYSeries("median", xMedianData, yMedianData, null);
         this.chart.updateXYSeries("average", xMoyenneData, yMoyenneData, null);
+
+
     }
 }

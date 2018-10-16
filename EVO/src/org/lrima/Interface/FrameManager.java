@@ -37,7 +37,6 @@ public class FrameManager extends JFrame implements SimulationListener, BatchLis
         this.simulationManager.addBatchListener(this);
 
         this.mapPanel = new MapPanel(this);
-        this.graphicPanel = new GraphicPanel(this);
 
         this.setupWindow();
 
@@ -49,6 +48,7 @@ public class FrameManager extends JFrame implements SimulationListener, BatchLis
         displaySavedPanel();
 
         this.mapPanel.start();
+        this.graphicPanel = new GraphicPanel(simulationManager.getCurrentSimulation());
     }
 
     /**
@@ -225,7 +225,7 @@ public class FrameManager extends JFrame implements SimulationListener, BatchLis
 
     @Override
     public void simulationEnded() {
-
+        System.out.println("END1");
     }
 
     @Override
@@ -256,5 +256,6 @@ public class FrameManager extends JFrame implements SimulationListener, BatchLis
         //this.add(graphicPanel, "South");
         //this.add(graphicPanel, "South");
         //this.repaint();
+        System.out.println("END2");
     }
 }
