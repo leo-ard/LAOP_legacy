@@ -31,6 +31,8 @@ public class FrameManager extends JFrame implements SimulationListener, BatchLis
     SimulationManager simulationManager;
 
 	public FrameManager(SimulationManager simulationManager) {
+	    this.setTitle("The simulations are running...");
+
         this.simulationManager = simulationManager;
         this.simulationManager.setFrameManager(this);
         this.simulationManager.addSimulationListener(this);
@@ -73,9 +75,6 @@ public class FrameManager extends JFrame implements SimulationListener, BatchLis
                 //Press Q to go to the next generation
                 if(e.getKeyCode() == KeyEvent.VK_Q){
                     simulationManager.getCurrentSimulation().goToNextGeneration();
-                }
-                if(e.getKeyCode() == KeyEvent.VK_W){
-                    simulationManager.getCurrentSimulation().getBest().setSelected(true);
                 }
                 if(e.getKeyCode() == KeyEvent.VK_X){
                     int oldSelectedIndex = simulationManager.getCurrentSimulation().getAllEspeces().indexOf(simulationManager.getCurrentSimulation().getSelectedEspece());
@@ -132,8 +131,8 @@ public class FrameManager extends JFrame implements SimulationListener, BatchLis
         simulationMenu.add(checkBoxRealtime);
 
         //Follow best checkbox
-        checkBoxFollowBest = new JCheckBoxMenuItem(new FollowBestAction("Follow best"));
-        simulationMenu.add(checkBoxFollowBest);
+        //checkBoxFollowBest = new JCheckBoxMenuItem(new FollowBestAction("Follow best"));
+        //simulationMenu.add(checkBoxFollowBest);
 
         //Pause button
         JMenuItem pause = new JMenuItem(new PauseAction("Pause", simulationManager.getCurrentSimulation()));
@@ -185,7 +184,7 @@ public class FrameManager extends JFrame implements SimulationListener, BatchLis
     private void setMenuButtonStates(){
         //TODO : CAN BE OPTIMISED WITH GETTING OPTION TYPE DIRRECTLY, i think
         checkBoxRealtime.setState(UserPrefs.getBoolean(UserPrefs.KEY_REAL_TIME));
-        checkBoxFollowBest.setState(UserPrefs.getBoolean(UserPrefs.KEY_FOLLOW_BEST));
+//        checkBoxFollowBest.setState(UserPrefs.getBoolean(UserPrefs.KEY_FOLLOW_BEST));
         checkBoxGraphique.setState(UserPrefs.getBoolean(UserPrefs.KEY_WINDOW_GRAPHIQUE));
         checkBoxEspeceInfo.setState(UserPrefs.getBoolean(UserPrefs.KEY_WINDOW_ESPECE_INFO));
     }

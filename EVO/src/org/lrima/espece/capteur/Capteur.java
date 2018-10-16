@@ -54,7 +54,7 @@ public class Capteur implements NeuralNetworkTransmitter {
 		g.fillOval((int)getPoint1().x + (int)(getLongeurX()*value) - SENSOR_DOT_SIZE.width / 2,(int)getPoint1().y + (int)(getLongeurY()*value) - (SENSOR_DOT_SIZE.height / 2), SENSOR_DOT_SIZE.width, SENSOR_DOT_SIZE.height);
 
 		g.setColor(this.SENSOR_LINE_COLOR);
-		g.drawLine((int)getPoint1().x, (int)getPoint1().y, (int)getPoint2().x, (int)getPoint2().y);
+		//g.drawLine((int)getPoint1().x, (int)getPoint1().y, (int)getPoint2().x, (int)getPoint2().y);
 	}
 
 	public Point.Double getPoint1(){

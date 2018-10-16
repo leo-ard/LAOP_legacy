@@ -1,5 +1,6 @@
 package org.lrima.simulation;
 
+import org.lrima.core.UserPrefs;
 import org.lrima.network.interfaces.NeuralNetworkModel;
 
 import java.util.ArrayList;
@@ -14,13 +15,15 @@ public class SimulationBatch implements SimulationListener, BatchListener {
 
     private ArrayList<BatchListener> batchListeners = new ArrayList<>();
 
-    private final int maxGeneration = 10;
+    private final int maxGeneration;
     private ArrayList<SimulationListener> simulationListeners = new ArrayList<>();
 
     public SimulationBatch(NeuralNetworkModel algorithmModel, int numberInBatch){
         this.simulations = new Simulation[numberInBatch];
         this.numberInBatch = numberInBatch;
         this.algorithmModel = algorithmModel;
+
+        this.maxGeneration = (int)UserPrefs.getOption(UserPrefs.KEY_NUMBER_GENERATION_PER_SIMULATION).getValue();
 
         for(int i = 0 ; i < simulations.length ; i++){
             simulations[i] = new Simulation(algorithmModel, maxGeneration);

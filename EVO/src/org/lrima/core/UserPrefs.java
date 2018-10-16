@@ -44,6 +44,9 @@ public class UserPrefs {
     final public static String KEY_NUMBER_OF_CAR = "NUMBER_OF_CAR";
     final public static String KEY_CAR_SPEED = "CAR_SPEED";
     final public static String KEY_TURN_RATE = "TURN_RATE";
+
+    final public static String KEY_NUMBER_SIMULATION = "NUMBER_SIMULATION";
+    final public static String KEY_NUMBER_GENERATION_PER_SIMULATION = "NUMBER_GENERATION";
           
     final public static String KEY_TIME_LIMIT = "TIME_LIMIT_IN_SECONDS";
     final public static String KEY_USE_LAST_SAVED = "USE_LAST_SAVED";
@@ -72,6 +75,8 @@ public class UserPrefs {
         defaultValues.put(KEY_WINDOW_NEURAL_NET, new OptionBoolean(false));
         defaultValues.put(KEY_WINDOW_ESPECE_INFO, new OptionBoolean(false));
         defaultValues.put(KEY_MAP_TO_USE, new OptionFile(new File("./default.map")));
+        defaultValues.put(KEY_NUMBER_SIMULATION, new OptionInt(1, 1, 10, 1));
+        defaultValues.put(KEY_NUMBER_GENERATION_PER_SIMULATION, new OptionInt(10, 1, 1000, 1));
     }
 
     public static int getInt(String key){

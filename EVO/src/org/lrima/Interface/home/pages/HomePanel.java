@@ -3,6 +3,7 @@ package org.lrima.Interface.home.pages;
 import org.lrima.Interface.FrameManager;
 import org.lrima.Interface.home.HomeFrameManager;
 import org.lrima.Interface.utils.ImagePanel;
+import org.lrima.core.UserPrefs;
 import org.lrima.map.Studio.Studio;
 import org.lrima.network.interfaces.NeuralNetworkModel;
 import org.lrima.simulation.SimulationManager;
@@ -121,7 +122,8 @@ public class HomePanel extends org.lrima.Interface.home.PagePanel {
 
                     SimulationManager simulationManager = new SimulationManager();
                     for(NeuralNetworkModel model : savedModels){
-                        simulationManager.addBatch(model, 2);
+                        int numberOfSimulationPerBatches = (int) UserPrefs.getOption(UserPrefs.KEY_NUMBER_SIMULATION).getValue();
+                        simulationManager.addBatch(model, numberOfSimulationPerBatches);
                     }
 
                     simulationManager.start();

@@ -172,7 +172,7 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 	 * @param graphics the graphics to modify
 	 */
 	protected void doTransforms(Graphics2D graphics){
-		if(UserPrefs.getBoolean(UserPrefs.KEY_FOLLOW_BEST)){
+		/*if(UserPrefs.getBoolean(UserPrefs.KEY_FOLLOW_BEST)){
 			Espece bestEspece = simulationManager.getCurrentSimulation().getBest();
 			translateX = (int) -bestEspece.getX() + getWidth() / 2;
 			translateY = (int) -bestEspece.getY() + getHeight() / 2;
@@ -182,10 +182,10 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 
 			bestEspece.setSelected(true);
 		}
-		else{
+		else{*/
 			translateX = (viewX+offX)*(1.0/(double)zoom);
 			translateY = (viewY+offY)*(1.0/(double)zoom);
-		}
+		//}
 
 		//Zoom based on mouse wheel
 		graphics.scale(zoom, zoom);

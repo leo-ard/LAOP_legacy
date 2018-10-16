@@ -1,8 +1,6 @@
 package org.lrima.simulation;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
+import java.util.*;
 
 import org.lrima.core.UserPrefs;
 import org.lrima.espece.Espece;
@@ -201,7 +199,7 @@ public class Simulation extends Thread{
         //Reset the time of the simulation
         Simulation.simulationTime = 0;
 
-		if(this.maxGenerations != 0 && this.generation >= this.maxGenerations){
+		if(this.maxGenerations != 0 && this.generation > this.maxGenerations){
 			this.simulationEnd();
 		}
     }
@@ -245,15 +243,14 @@ public class Simulation extends Thread{
 	 * @return the fitness of the best car
 	 */
 	public double getBestFitness(){
-		return getBest().getFitness();
-	}
+		double highestFitness = 0;
+		for(Espece e : this.especesOpen){
+			if(e.getFitness() > highestFitness){
+				highestFitness = e.getFitness();
+			}
+		}
 
-	/**
-	 * Finds the car with the highest fitness in all cars (dead or alive)
-	 * @return the car with the highest fitness
-	 */
-	public Espece getBest(){
-		return currentBest;
+		return highestFitness;
 	}
 
 	/**

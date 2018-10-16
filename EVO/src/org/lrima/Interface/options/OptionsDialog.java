@@ -57,7 +57,8 @@ public class OptionsDialog extends JDialog implements ActionListener {
         ArrayList<String> simulationTab = new ArrayList<>();
         //TODO : ADD ALL THE SETTINGS
         simulationTab.add(UserPrefs.KEY_TIME_LIMIT);
-        simulationTab.add(UserPrefs.KEY_USE_LAST_SAVED);
+        simulationTab.add(UserPrefs.KEY_NUMBER_SIMULATION);
+        simulationTab.add(UserPrefs.KEY_NUMBER_GENERATION_PER_SIMULATION);
         simulationTab.add(UserPrefs.KEY_MAP_TO_USE);
 
         allTabs.put("Simulation", simulationTab);
