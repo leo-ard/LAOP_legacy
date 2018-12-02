@@ -17,7 +17,7 @@ public class SimulationManager implements Runnable{
     private boolean currentSimulationRunning = true;
     private boolean pausing = false;
     //TODO : put in settings
-    private double msBetweenFrames = 300;
+    private double msBetweenUpdates = 300;
 
     private ArrayList<SimulationListener> simulationListeners;
     private Simulation currentSimulation;
@@ -71,8 +71,8 @@ public class SimulationManager implements Runnable{
                 if(true){
                     try{
                         timePassed = System.currentTimeMillis() - currentTime;
-                        System.out.println("pass time : " + ((msBetweenFrames - timePassed) > 0 ?msBetweenFrames - timePassed: 0));
-                        Thread.sleep((long) ((msBetweenFrames - timePassed) > 0 ?msBetweenFrames - timePassed: 0));
+                        System.out.println("pass time : " + ((msBetweenUpdates - timePassed) > 0 ? msBetweenUpdates - timePassed: 0));
+                        Thread.sleep((long) ((msBetweenUpdates - timePassed) > 0 ? msBetweenUpdates - timePassed: 0));
                     } catch(InterruptedException e){
                         e.printStackTrace();
                     }
@@ -100,7 +100,7 @@ public class SimulationManager implements Runnable{
      */
     //TODO : get the data from the current simulation
     private boolean iterateSimulation() {
-        //TODO : maybe not the best way to do it
+        //TODO : maybe not the best to detect that it's the first run
         if(simulationCount != -1)
             simulationListeners.forEach(SimulationListener::simulationFinished);
 
