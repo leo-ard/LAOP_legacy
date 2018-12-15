@@ -10,8 +10,10 @@ import java.util.prefs.Preferences;
 
 public class OptionString implements Option<String> {
     JTextField textField;
+    String defaultValue;
 
     public OptionString(String defaultValue){
+        this.defaultValue = defaultValue;
         textField = new JTextField(defaultValue);
     }
 
@@ -58,5 +60,10 @@ public class OptionString implements Option<String> {
     @Override
     public Class<String> getClassValue() {
         return String.class;
+    }
+
+    @Override
+    public Option<String> clone() {
+        return new OptionString(defaultValue);
     }
 }

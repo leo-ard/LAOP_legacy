@@ -24,9 +24,17 @@ public abstract class NeuralNetworkModel<T extends NeuralNetwork> implements Ser
     /**
      * Characteristics of the algorithm. See {@link #getDefaultOptions} to know witch variable is available.
      */
+    private String name = null;
     protected LinkedHashMap<String, Option> options;
     protected NeuralNetworkSuperviser superviser = new NaturalSelectionSupervisor();
     private OptionsDialog optionsDialog;
+
+    public NeuralNetworkModel(){
+        this(null);
+    }
+    public NeuralNetworkModel(String name){
+        this.name = name;
+    }
 
     /**
      * Set the default values of the hashmap.
@@ -38,7 +46,10 @@ public abstract class NeuralNetworkModel<T extends NeuralNetwork> implements Ser
     public void displayOptions(){
         if(optionsDialog == null)
             optionsDialog = new OptionsDialog(this.getClass().getAnnotation(AlgorithmInformation.class).name(), this.getOptions());
-        optionsDialog.setVisible(true);
+    }
+
+    public OptionsDialog getOptionsDialog(){
+        return this.optionsDialog;
     }
 
     public LinkedHashMap<String, Option> getOptions() {
@@ -79,4 +90,12 @@ public abstract class NeuralNetworkModel<T extends NeuralNetwork> implements Ser
      * @return the main class of the algorithm
      */
     public abstract Class<T> getNeuralNetworkClass();
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 }

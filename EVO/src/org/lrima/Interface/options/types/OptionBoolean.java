@@ -10,9 +10,11 @@ import java.util.prefs.Preferences;
 
 public class OptionBoolean implements Option<Boolean> {
     private JCheckBox checkbox;
+    private Boolean defaultValue;
 
     public OptionBoolean(Boolean defaultValue){
         checkbox = new JCheckBox("", defaultValue.booleanValue());
+        this.defaultValue = defaultValue;
     }
 
 
@@ -34,6 +36,11 @@ public class OptionBoolean implements Option<Boolean> {
     @Override
     public Class<Boolean> getClassValue() {
         return Boolean.class;
+    }
+
+    @Override
+    public Option<Boolean> clone() {
+        return new OptionBoolean(defaultValue);
     }
 
 

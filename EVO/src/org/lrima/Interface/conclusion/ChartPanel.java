@@ -65,16 +65,16 @@ public class ChartPanel extends JPanel {
 
         for(SimulationBatch batch : this.algorithmBatches){
             ArrayList<String> names = new ArrayList<>(allAlgorithmChart.getSeriesMap().keySet());
-            String serieName = batch.getAlgorithmModel().getAlgorithmInformationAnnotation().name();
+            String serieName = batch.getAlgorithmModel().getName();// == null ? batch.getAlgorithmModel().getAlgorithmInformationAnnotation().name() : batch.getAlgorithmModel().getName();
 
-            if(names.size() > 0) {
+            /*if(names.size() > 0) {
                 serieName = names.get(0);
                 int i = 1;
                 do {
-                    serieName = batch.getAlgorithmModel().getAlgorithmInformationAnnotation().name() + i;
+                    serieName = serieName + i;
                     i++;
                 } while (names.contains(serieName));
-            }
+            }*/
 
             allAlgorithmChart.addSeries(serieName, this.getGenerationsAsList(batch), batch.getAverageFitnessPerGeneration());
 

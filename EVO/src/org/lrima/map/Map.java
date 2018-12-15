@@ -1,6 +1,7 @@
 package org.lrima.map;
 
-import java.awt.Point;
+import java.awt.*;
+import java.awt.geom.Path2D;
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
@@ -41,6 +42,7 @@ public class Map implements Serializable {
         try {
             String filePath = UserPrefs.getFile(UserPrefs.KEY_MAP_TO_USE).getPath();
 
+
             //Open the file
             FileInputStream fis = new FileInputStream(filePath);
             ObjectInputStream ois = new ObjectInputStream(fis);
@@ -72,6 +74,29 @@ public class Map implements Serializable {
         }
 
         return null;
+    }
+
+    public Path2D.Double getShape(){
+        Path2D.Double mapPath = new Path2D.Double();
+
+
+        for(Obstacle obstacle : this.obstacles){
+            boolean firstTime = true;
+            for(Line line : obstacle.getLines()){
+                Point start = line.getEnd();
+                Point end = line.getStart();
+
+                if(firstTime){
+                    mapPath.moveTo(start.x, start.y);
+                    firstTime = false;
+                }
+
+                mapPath.lineTo(end.x, end.y);
+            }
+        }
+        //mapPath.closePath();
+
+        return mapPath;
     }
 
     //*******===========================================================================

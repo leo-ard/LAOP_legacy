@@ -222,8 +222,6 @@ public class ImprovedNeatGenome extends NeuralNetwork {
             nodeGene2 = tmp;
         }
 
-        System.out.println(nodeGene1.getType() + " " + nodeGene2.getType());
-
         //Check if the connection already exist
         ConnectionGene connectionAlreadyExist = null;
         for(ConnectionGene connection : connections){
@@ -416,11 +414,7 @@ public class ImprovedNeatGenome extends NeuralNetwork {
                 try {
                     g.drawLine(lineStart.x, lineStart.y, lineEnd.x, lineEnd.y);
                 }catch (Exception e){
-                    System.out.println("Input: " + inputNodes.size());
-                    System.out.println("Hidden: " + hiddenNodes.size());
-                    System.out.println("Output: " + outputNodes.size());
-                    System.out.println("Start: " + lineStart);
-                    System.out.println("End: " + lineEnd);
+
                 }
             }
         }

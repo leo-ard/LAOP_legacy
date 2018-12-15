@@ -84,7 +84,7 @@ public class Simulation extends Thread{
 
 					//Iterate through all the cars to get the value of the sensors
 					Iterator<Espece> iterator = especesOpen.iterator();
-					while (((Iterator) iterator).hasNext()){
+					while (iterator.hasNext()){
 						Espece espece = iterator.next();
 
 						espece.update(msBetweenFrames);
@@ -186,6 +186,7 @@ public class Simulation extends Thread{
         Collections.sort(this.especesClosed);
         this.currentBest = this.especesClosed.get(0);
 
+
         //Reset the arrays
 		especesOpen = new ArrayList<Espece>(this.algorithmModel.getSuperviser().alterEspeceListAtGenerationFinish(especesClosed, this));
         especesClosed = new ArrayList<Espece>();
@@ -244,13 +245,16 @@ public class Simulation extends Thread{
 	 */
 	public double getBestFitness(){
 		double highestFitness = 0;
-		for(Espece e : this.especesOpen){
-			if(e.getFitness() > highestFitness){
-				highestFitness = e.getFitness();
-			}
-		}
 
-		return highestFitness;
+		if(especesOpen.size() > 0) {
+			ArrayList<Espece> especes = new ArrayList<>(this.especesOpen);
+			Collections.sort(especes);
+
+			return especes.get(0).getFitness();
+		}
+		else{
+			return 0.0;
+		}
 	}
 
 	/**

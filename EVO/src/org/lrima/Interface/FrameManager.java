@@ -43,6 +43,7 @@ public class FrameManager extends JFrame implements SimulationListener, BatchLis
         this.setupWindow();
 
         this.especeInfoPanel = new EspeceInfoPanel();
+        this.graphicPanel = new GraphicPanel(simulationManager.getCurrentSimulation());
 
         createMenu();
 
@@ -50,7 +51,6 @@ public class FrameManager extends JFrame implements SimulationListener, BatchLis
         displaySavedPanel();
 
         this.mapPanel.start();
-        this.graphicPanel = new GraphicPanel(simulationManager.getCurrentSimulation());
     }
 
     /**
@@ -251,10 +251,10 @@ public class FrameManager extends JFrame implements SimulationListener, BatchLis
     public void nextSimulationInBatch() {
         //this.graphicPanel.nextSimulation(this.simulationManager.getCurrentSimulation());
         //this.remove(graphicPanel);
-        //this.graphicPanel = new GraphicPanel(this);
+        //this.graphicPanel = new GraphicPanel(simulationManager.getCurrentSimulation());
         //this.add(graphicPanel, "South");
         //this.add(graphicPanel, "South");
         //this.repaint();
-        System.out.println("END2");
+        //System.out.println("END2");
     }
 }

@@ -226,14 +226,9 @@ public class MapPanel extends JPanel implements MouseMotionListener, MouseListen
 	 * @param graphics the graphics to put the obstacles into
 	 */
 	protected void drawObstacles(Graphics2D graphics){
+
 		graphics.setColor(this.COLOR_OBSTACLE);
-		graphics.setStroke(new BasicStroke(3));
-		for(Obstacle o : map.getObstacles()){
-			ArrayList<Line> lines = o.getLines();
-			for(Line line : lines){
-				line.draw(graphics);
-			}
-		}
+		graphics.draw(map.getShape());
 	}
 
 	/**

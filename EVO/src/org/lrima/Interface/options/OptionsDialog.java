@@ -13,6 +13,8 @@ import java.util.LinkedHashMap;
 public class OptionsDialog extends JDialog implements ActionListener {
     private LinkedHashMap<String, OptionsDisplayPanel> optionPanel;
     private ArrayList<OptionDialogListener> listeners = new ArrayList<>();
+    JTabbedPane tabbedPane = new JTabbedPane();
+
 
 
     private JButton okButton;
@@ -21,6 +23,7 @@ public class OptionsDialog extends JDialog implements ActionListener {
 
     public OptionsDialog(){
         setTitle("Options");
+        tabbedPane.setTabPlacement(JTabbedPane.LEFT);
         this.setupSize();
         this.setupButtons();
         this.setupDefault();
@@ -29,13 +32,20 @@ public class OptionsDialog extends JDialog implements ActionListener {
     }
 
     public OptionsDialog(String name, LinkedHashMap<String, Option> options) {
-        setTitle("Options");
+        setTitle(name);
+        this.optionPanel = new LinkedHashMap<>();
         this.setupSize();
         this.setupButtons();
-        this.optionPanel = new LinkedHashMap<>();
-        this.optionPanel.put(name, new OptionsDisplayPanel(options));
+        this.addTab(name, options);
         this.setupTabs();
 
+    }
+
+    public void addTab(String name, LinkedHashMap<String, Option> options){
+        if(!optionPanel.containsKey(name)) {
+            this.optionPanel.put(name, new OptionsDisplayPanel(options));
+            this.setupTabs();
+        }
     }
 
     private void setUpOptionPanel() {
@@ -108,8 +118,6 @@ public class OptionsDialog extends JDialog implements ActionListener {
      */
     private void setupTabs(){
         if(this.optionPanel.size() > 1){
-            JTabbedPane tabbedPane = new JTabbedPane();
-            tabbedPane.setTabPlacement(JTabbedPane.LEFT);
 
             optionPanel.forEach((name, optionPanel)->{
                 tabbedPane.addTab(name, optionPanel);
@@ -133,6 +141,7 @@ public class OptionsDialog extends JDialog implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if(e.getSource() == okButton){
             setVisible(false);
+
             this.listeners.forEach(OptionDialogListener::onOkPress);
         }
     }

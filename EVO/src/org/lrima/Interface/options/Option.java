@@ -11,4 +11,5 @@ public interface Option<T> extends Serializable {
 
     void save(String key, Preferences preferences);
     Class<T> getClassValue();
+    Option<T> clone();
 }

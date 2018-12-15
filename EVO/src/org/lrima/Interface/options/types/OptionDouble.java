@@ -9,8 +9,10 @@ import java.util.prefs.Preferences;
 
 public class OptionDouble implements Option<Double> {
     private JSpinner spinner;
+    private SpinnerNumberModel model;
 
     public OptionDouble(SpinnerNumberModel spinnerNumberModel){
+        this.model = spinnerNumberModel;
         this.spinner = new JSpinner(spinnerNumberModel);
         JComponent comp = spinner.getEditor();
         JFormattedTextField field = ((JSpinner.DefaultEditor) comp).getTextField();
@@ -65,5 +67,10 @@ public class OptionDouble implements Option<Double> {
     @Override
     public Class<Double> getClassValue() {
         return Double.class;
+    }
+
+    @Override
+    public Option<Double> clone() {
+        return new OptionDouble(this.model);
     }
 }

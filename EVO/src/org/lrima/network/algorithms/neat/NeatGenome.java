@@ -442,13 +442,11 @@ public class NeatGenome extends NeuralNetwork {
                     nodeGeneIterator.remove();
                 }
             }
-
+            /*
             System.out.println(this.connections.size());
             System.out.println(openSet.size());
             for(NodeGene gene1 : openSet){
                 ArrayList<NodeGene> nodesConnectingToIt = this.getInputsIntoNode(gene1);
-                System.out.println(gene1.getType());
-                System.out.println("\t" + nodesConnectingToIt.size());
                 for(NodeGene gene3 :nodesConnectingToIt){
                     System.out.println("\t" + gene3.getType() + " " + gene3.hasBeenCalculated);
                     ArrayList<NodeGene> nodesConnectingToIt2 = this.getInputsIntoNode(gene3);
@@ -456,7 +454,7 @@ public class NeatGenome extends NeuralNetwork {
                         System.out.println("\t\t" + gene4.getType() + " " + gene4.hasBeenCalculated);
                     }
                 }
-            }
+            }*/
 
         }while(openSet.size() > 0);
 

@@ -20,7 +20,7 @@ public class SimulationManager implements BatchListener {
 
         simulationBatches.forEach(simulationBatch -> {
             //TODO : ressemble beaucoup à addBash() (optimisation)
-            SimulationBatch newBatch = new SimulationBatch(simulationBatch.getAlgorithmModel(), simulationBatch.getBatchSize());
+            SimulationBatch newBatch = new SimulationBatch(simulationBatch.getSimulationSettings(), simulationBatch.getAlgorithmModel(), simulationBatch.getBatchSize());
             newArray.add(newBatch);
             newBatch.addBatchListener(this);
         });
@@ -74,8 +74,8 @@ public class SimulationManager implements BatchListener {
      *
      * @param algorithm the algorithm to use
      */
-    public void addBatch(NeuralNetworkModel algorithm, int numberInBatch) {
-        SimulationBatch simulationBatch = new SimulationBatch(algorithm, numberInBatch);
+    public void addBatch(SimulationSettings simulationSettings, NeuralNetworkModel algorithm, int numberInBatch) {
+        SimulationBatch simulationBatch = new SimulationBatch(simulationSettings, algorithm, numberInBatch);
         this.simulationBatches.add(simulationBatch);
         simulationBatch.addBatchListener(this);
     }

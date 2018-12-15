@@ -189,4 +189,11 @@ public class Line implements Serializable {
 
         return false;
     }
+
+    public Point getStart(){
+        return this.start;
+    }
+    public Point getEnd(){
+        return this.end;
+    }
 }

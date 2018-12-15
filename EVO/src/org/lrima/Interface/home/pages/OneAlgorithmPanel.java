@@ -7,6 +7,7 @@ import org.lrima.core.UserPrefs;
 import org.lrima.network.algorithms.AlgorithmManager;
 import org.lrima.network.interfaces.NeuralNetworkModel;
 import org.lrima.simulation.SimulationManager;
+import org.lrima.simulation.SimulationSettings;
 
 import javax.swing.*;
 import javax.swing.LayoutStyle.ComponentPlacement;
@@ -108,9 +109,11 @@ public class OneAlgorithmPanel extends PagePanel {
 
                 homeFrameManager.addModelsToSaved(models);
 
+                SimulationSettings settings = new SimulationSettings();
+
                 SimulationManager simulationManager = new SimulationManager();
                 int numberOfSimulationPerBatches = (int) UserPrefs.getOption(UserPrefs.KEY_NUMBER_SIMULATION).getValue();
-                simulationManager.addBatch(currentModel, numberOfSimulationPerBatches);
+                simulationManager.addBatch(settings, currentModel, numberOfSimulationPerBatches);
                 simulationManager.start();
 
                 FrameManager frameManager = new FrameManager(simulationManager);

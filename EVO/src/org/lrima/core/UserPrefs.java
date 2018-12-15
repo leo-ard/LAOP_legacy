@@ -44,6 +44,7 @@ public class UserPrefs {
     final public static String KEY_NUMBER_OF_CAR = "NUMBER_OF_CAR";
     final public static String KEY_CAR_SPEED = "CAR_SPEED";
     final public static String KEY_TURN_RATE = "TURN_RATE";
+    final public static String KEY_NUMBER_SENSOR = "NUMBER_SENSOR";
 
     final public static String KEY_NUMBER_SIMULATION = "NUMBER_SIMULATION";
     final public static String KEY_NUMBER_GENERATION_PER_SIMULATION = "NUMBER_GENERATION";
@@ -77,6 +78,7 @@ public class UserPrefs {
         defaultValues.put(KEY_MAP_TO_USE, new OptionFile(new File("./default.map")));
         defaultValues.put(KEY_NUMBER_SIMULATION, new OptionInt(1, 1, 10, 1));
         defaultValues.put(KEY_NUMBER_GENERATION_PER_SIMULATION, new OptionInt(10, 1, 1000, 1));
+        defaultValues.put(KEY_NUMBER_SENSOR, new OptionInt(5, 1, 180, 1));
     }
 
     public static int getInt(String key){
@@ -99,6 +101,7 @@ public class UserPrefs {
         return UserPrefs.<File>get(key).getValue();
     }
 
+
     private static <T> Option<T> get(String key){
         Option<T> currentOption = allOptions.get(key);
 
@@ -114,11 +117,20 @@ public class UserPrefs {
             else if(defaultValues.get(key).getClassValue() == File.class) {
                 currentOption = (Option<T>) new OptionFile(new File(preferences.get(key, ((File) defaultValues.get(key).getValue()).getPath())));
             }
-            currentOption.addOptionValueChangeListener(option -> option.save(key, preferences));
+            //currentOption.addOptionValueChangeListener(option -> option.save(key, preferences));
             allOptions.put(key, currentOption);
         }
 
         return currentOption;
+    }
+
+    public static HashMap<String, Option> getVariableSettings (){
+        HashMap<String, Option> settings = new HashMap<>();
+        settings.put(KEY_NUMBER_OF_CAR, get(KEY_NUMBER_OF_CAR).clone());
+        settings.put(KEY_CAR_SPEED, get(KEY_CAR_SPEED).clone());
+        settings.put(KEY_NUMBER_SENSOR, get(KEY_NUMBER_SENSOR).clone());
+
+        return settings;
     }
 
     public static void set(String key, Option value){

@@ -19,7 +19,8 @@ import java.util.function.Consumer;
 
 public class NaturalSelectionSupervisor implements NeuralNetworkSuperviser {
     private Espece best = null;
-    private ArrayList<Espece> halfBestEspece = new ArrayList<>();
+    private ArrayList<Espece> bests = new ArrayList<>();
+    private ArrayList<Espece> halfBestEspece;
 
     /**
      * Used to display a chart of the survived cars comparing to the array before elimination
@@ -123,19 +124,21 @@ public class NaturalSelectionSupervisor implements NeuralNetworkSuperviser {
     }
 
     private static double calculateWeight(int index, ArrayList<Espece> array){
+        double max = 99.0;
+        double min = 0.1;
 
-        double b = Math.pow(1.0/99.0, 1.0/(double)(array.size()));
-        double c = -(Math.log(99)/Math.log(b));
+        double b = Math.pow((max/min), 1.0/(array.size()-1));
 
-        return Math.pow(b, -(double)index - c + (array.size() - 1));
+
+        return min * Math.pow(b, index);
     }
 
     @Override
     public ArrayList<Espece> alterEspeceListAtGenerationFinish(ArrayList<Espece> especes, Simulation simulation) {
         Collections.sort(especes);
         best = especes.get(0);
-        this.kill50(especes);
-        this.repopulate(especes, simulation);
+        especes = this.kill50(especes);
+        especes = this.repopulate(especes, simulation);
 
         return especes;
     }
@@ -143,7 +146,7 @@ public class NaturalSelectionSupervisor implements NeuralNetworkSuperviser {
     /**
      * Kill half of the cars to keep the best half
      */
-    private void kill50(ArrayList<Espece> especes) {
+    private ArrayList<Espece> kill50(ArrayList<Espece> especes) {
         int numberOfCar = UserPrefs.getInt(UserPrefs.KEY_NUMBER_OF_CAR);
 
         //assign weight depending on position
@@ -160,7 +163,7 @@ public class NaturalSelectionSupervisor implements NeuralNetworkSuperviser {
                 allWeights += weight;
             }
 
-            double randomWeight = Random.getRandomDoubleValue(1.0, allWeights);
+            double randomWeight = Random.getRandomDoubleValue(0, allWeights);
             Espece selected = null;
 
             for (Espece e : weightedEspece.keySet()) {
@@ -172,27 +175,36 @@ public class NaturalSelectionSupervisor implements NeuralNetworkSuperviser {
             }
         }while(weightedEspece.size() > numberOfCar / 2);
 
-        especes = new ArrayList<>(weightedEspece.keySet());
-        Collections.sort(especes);
+
+        ArrayList<Espece> returnEspece = new ArrayList<>(weightedEspece.keySet());
+        Collections.sort(returnEspece);
+        return returnEspece;
     }
 
     /**
      * Create the cars that was destroyed in kill50 to always keep the same number of cars
      */
-    private void repopulate(ArrayList<Espece> especes, Simulation simulation ) {
+    private ArrayList<Espece> repopulate(ArrayList<Espece> especes, Simulation simulation ) {
         int numberOfCar = UserPrefs.getInt(UserPrefs.KEY_NUMBER_OF_CAR);
         this.halfBestEspece = new ArrayList<>(especes);
+        this.bests = new ArrayList<>();
+
+        //Create an array containing the 20% best cars
+        for(int i = 0 ; i < Math.ceil((especes.size())/20.0) ; i++){
+            this.bests.add(especes.get(i));
+        }
+
         ArrayList<Espece> newCars = new ArrayList<>();
 
         while(especes.size() + newCars.size() < numberOfCar) {
-            int randomParent1 = Random.getRandomIntegerValue(halfBestEspece.size() - 1);
+            int randomParent1 = Random.getRandomIntegerValue(bests.size());
             int randomParent2;
 
             //Select two parrents
-            NeuralNetwork neuralNetworkParent1 = halfBestEspece.get(randomParent1).getNeuralNetwork();
+            NeuralNetwork neuralNetworkParent1 = bests.get(randomParent1).getNeuralNetwork();
             NeuralNetwork neuralNetworkParent2;
             do {
-                randomParent2 = Random.getRandomIntegerValue(halfBestEspece.size() - 1);
+                randomParent2 = Random.getRandomIntegerValue(halfBestEspece.size());
                 neuralNetworkParent2 = halfBestEspece.get(randomParent2).getNeuralNetwork();
             }while(randomParent1 == randomParent2);
 
@@ -200,14 +212,15 @@ public class NaturalSelectionSupervisor implements NeuralNetworkSuperviser {
             NeuralNetwork childNeuralNetwork = neuralNetworkParent1.crossOver(neuralNetworkParent1, neuralNetworkParent2);
             e.setNeuralNetwork(childNeuralNetwork);
 
-            e.getNeuralNetwork().generationFinish();
             newCars.add(e);
         }
         especes.addAll(newCars);
 
         for(Espece e : especes){
             e.setFitness(0.0);
-            //e.getNeuralNetwork().generationFinish();
+            e.getNeuralNetwork().generationFinish();
         }
+
+        return especes;
     }
 }

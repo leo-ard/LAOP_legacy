@@ -4,9 +4,14 @@ import org.lrima.Interface.FrameManager;
 import org.lrima.Interface.home.ModelListDialog;
 import org.lrima.Interface.home.HomeFrameManager;
 import org.lrima.Interface.home.PagePanel;
+import org.lrima.Interface.options.OptionsDialog;
+import org.lrima.Interface.options.types.OptionInt;
 import org.lrima.core.UserPrefs;
 import org.lrima.network.interfaces.NeuralNetworkModel;
+import org.lrima.simulation.SimulationBatch;
 import org.lrima.simulation.SimulationManager;
+import org.lrima.simulation.SimulationSettings;
+import org.lrima.utils.Random;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -14,6 +19,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.table.DefaultTableModel;
@@ -28,6 +34,7 @@ public class CompareAlgorithmsPanel extends PagePanel {
     private JButton backButton = new JButton("Back");
 
     private ArrayList<NeuralNetworkModel> models = new ArrayList<>();
+    private ArrayList<SimulationSettings> simulationSettings = new ArrayList<>();
 
     public CompareAlgorithmsPanel(HomeFrameManager homeFrameManager){
         super(homeFrameManager);
@@ -104,10 +111,15 @@ public class CompareAlgorithmsPanel extends PagePanel {
 
 
                 SimulationManager simulationManager = new SimulationManager();
-                for(NeuralNetworkModel model : models){
-                    int numberOfSimulationPerBatches = (int) UserPrefs.getOption(UserPrefs.KEY_NUMBER_SIMULATION).getValue();
-                    simulationManager.addBatch(model, numberOfSimulationPerBatches);
+
+                int numberOfSimulationPerBatches = (int) UserPrefs.getOption(UserPrefs.KEY_NUMBER_SIMULATION).getValue();
+                for(int i = 0 ; i < models.size() ; i++) {
+                    NeuralNetworkModel model = models.get(i);
+                    model.setName((String)(algorithmList.getModel().getValueAt(i, 0)));
+                    SimulationSettings simulationSetting = simulationSettings.get(i);
+                    simulationManager.addBatch(simulationSetting, model, numberOfSimulationPerBatches);
                 }
+
                 simulationManager.start();
 
                 homeFrameManager.addModelsToSaved(models);
@@ -126,7 +138,7 @@ public class CompareAlgorithmsPanel extends PagePanel {
         for(int row = 0 ; row < tableRows.length ; row++){
             tableRows[row] = new Object[]{models.get(row).getAlgorithmInformationAnnotation().name(), "Options"};
         }
-        
+
         algorithmList.setModel(new DefaultTableModel(tableRows, columnName));
         algorithmList.setShowGrid(false);
         algorithmList.setTableHeader(null);
@@ -141,7 +153,11 @@ public class CompareAlgorithmsPanel extends PagePanel {
                     int col = algorithmList.columnAtPoint(e.getPoint());
 
                     if (col == 1) {
-                       models.get(row).displayOptions();
+                        models.get(row).displayOptions();
+
+                        OptionsDialog options = models.get(row).getOptionsDialog();
+                        options.addTab("Simulation", new LinkedHashMap<>(simulationSettings.get(row).getSettings()));
+                        options.setVisible(true);
                     }
                 }catch (IndexOutOfBoundsException error){ }
             }
@@ -154,7 +170,13 @@ public class CompareAlgorithmsPanel extends PagePanel {
      * @param models the models to add
      */
     public void addModels(ArrayList<NeuralNetworkModel> models){
-        this.models.addAll(models);
+        for(NeuralNetworkModel model : models){
+            this.models.add(model);
+            SimulationSettings a = new SimulationSettings();
+            this.simulationSettings.add(a);
+            //System.out.println(((OptionInt)a.getSettings().get(UserPrefs.KEY_NUMBER_OF_CAR)));
+            //System.out.println(((OptionInt)a.getSettings().get(UserPrefs.KEY_NUMBER_OF_CAR)).getSpinner());
+        }
         this.setupAlgorithmTable();
     }
 

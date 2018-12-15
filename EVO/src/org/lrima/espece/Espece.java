@@ -1,6 +1,9 @@
 package org.lrima.espece;
 
 import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Area;
+import java.awt.geom.Path2D;
 import java.util.*;
 
 import org.lrima.Interface.FrameManager;
@@ -19,7 +22,7 @@ import org.lrima.map.Map;
 public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 
 	@DisplayInfo
-	private final int NB_CAPTEUR = 5; //Maxiumum of 180
+	private int NB_CAPTEUR;
 	//Width has to be bigger than the height
 	private static final int ESPECES_WIDTH = 74, ESPECES_HEIGHT = 50;
 
@@ -92,6 +95,8 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 
 	private double diedAtTime;
 
+	private AffineTransform transform = new AffineTransform();
+
 	/**
 	 * Initialize the car with the map to put him into
 	 * The starting position and orientation is determined by the map
@@ -117,8 +122,10 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 		//Setup a base neural network for the car to have
 		//If you want to choose which neural network to use, call Espece(Map, NeuralNetwork)
 		//neuralNetwork = new NeuralNetwork(NB_CAPTEUR, 2, true);
-		this.neuralNetwork = this.algorithmModel.getInstance();
-		this.neuralNetwork.init(this.capteurs, this);
+		if(this.algorithmModel != null) {
+			this.neuralNetwork = this.algorithmModel.getInstance();
+			this.neuralNetwork.init(this.capteurs, this);
+		}
     }
 
     //TODO: do a real copy
@@ -175,6 +182,7 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 	private void setupSensors(){
 		//Setup the sensors base on the number of sensors
 		//Note that the maximum number of sensors is limited to 180 because of this
+		this.NB_CAPTEUR = UserPrefs.getInt(UserPrefs.KEY_NUMBER_SENSOR);
 
 		double sensorEveryDeg = 180 / (NB_CAPTEUR - 1);
 
@@ -278,9 +286,7 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 		g.setColor(voitureColor);
 
 		//Get all the points of the car and draws it
-		int[] pointX = {getTopLeft().x, getTopRight().x, getBottomRight().x, getBottomLeft().x, getTopLeft().x};
-		int[] pointY = {getTopLeft().y, getTopRight().y, getBottomRight().y, getBottomLeft().y, getTopLeft().y};
-		g.fillPolygon(pointX, pointY, 5);
+		g.fill(this.getShape());
 
 		//Draw the contour of the car.
 		//If the car is selected. Set the color of the contour to blue
@@ -289,7 +295,7 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 		if(selected){
 			g.setColor(SELECTED_CAR_BORDER_COLOR);
 		}
-		g.drawPolyline(pointX, pointY, 5);
+		g.draw(this.getShape());
 
 		g.setStroke(new BasicStroke(3));
 
@@ -383,6 +389,8 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 
 	}
 
+	Path2D.Double mapShape;
+
 	/**
 	 * If the car is alive, it checks if it is coliding with an obstale.
 	 * If it is, it adds it to the closed set and kills it
@@ -392,25 +400,42 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 	public boolean shouldDie(Map map){
 		//Regarde si l'espèce meurt
 		if(this.alive) {
-			for (Obstacle o : map.getObstacles()) {
-				//Si l'espece touche un mur
-				for(Line line : o.getLines()) {
-					if (line.collisionWithRect(this)) {
-						try {
-							this.simulation.addEspeceToClosed(this);
-							this.kill();
+			if(mapShape == null)
+				mapShape = map.getShape();
+			Path2D especeShape = this.getShape();
 
-							return true;
-						} catch (Exception e1) {
-							e1.printStackTrace();
-							simulation.setRunning(false);
-						}
-					}
+			Area intersection = new Area(mapShape);
+			intersection.intersect(new Area(especeShape));
+
+			Area substract = new Area(especeShape);
+			substract.subtract(new Area(mapShape));
+
+			if(!substract.isEmpty() && !(intersection.getBounds().equals(especeShape.getBounds()))) {
+				try {
+					this.simulation.addEspeceToClosed(this);
+					this.kill();
+
+					return true;
+				} catch (Exception e1) {
+					e1.printStackTrace();
+					simulation.setRunning(false);
 				}
 			}
-			return false;
+			else
+				return false;
 		}
 		return true; // If the car is dead
+	}
+
+	public Path2D.Double getShape(){
+		Path2D.Double path = new Path2D.Double();
+		path.moveTo(getTopLeft().x, getTopLeft().y);
+		path.lineTo(getTopRight().x, getTopRight().y);
+		path.lineTo(getBottomRight().x, getBottomRight().y);
+		path.lineTo(getBottomLeft().x, getBottomLeft().y);
+		path.closePath();
+
+		return path;
 	}
 
 	//*******===========================================================================

@@ -33,6 +33,18 @@ public class Genotype {
         this.weightSize = weightSize;
     }
 
+    public void mutate(){
+        double mutationChance = Random.getRandomDoubleValue(1);
+        if(mutationChance < 10) {
+            for (int i = 0; i < genomes.length; i++) {
+                int weightChangeChance = Random.getRandomIntegerValue(100);
+                if (weightChangeChance < 0.005) {
+                    genomes[i] += Random.getRandomDoubleValue(-0.01, 0.01);
+                }
+            }
+        }
+    }
+
     public Genotype getChildren(Genotype parent2Object){
         double[] parent1 = this.genomes;
         double[] parent2 = parent2Object.genomes;

@@ -9,8 +9,10 @@ import java.util.prefs.Preferences;
 
 public class OptionInt implements Option<Integer> {
     private JSpinner spinner;
+    private SpinnerNumberModel model;
 
     private OptionInt(SpinnerNumberModel spinnerNumberModel) {
+        this.model = spinnerNumberModel;
         createSpinner(spinnerNumberModel);
     }
 
@@ -34,8 +36,8 @@ public class OptionInt implements Option<Integer> {
         if(maxComparator != null && minComparator != null && (maxComparator.compareTo(defaultValue) < 0 || minComparator.compareTo(defaultValue) > 0))
             defaultValue = option.getValue();
 
-        createSpinner(new SpinnerNumberModel(defaultValue, model.getMinimum(), model.getMaximum(), model.getStepSize()));
-
+        this.model = new SpinnerNumberModel(defaultValue, model.getMinimum(), model.getMaximum(), model.getStepSize());
+        createSpinner(model);
     }
 
     private void createSpinner(SpinnerNumberModel spinnerNumberModel){
@@ -62,9 +64,8 @@ public class OptionInt implements Option<Integer> {
 
     @Override
     public void addOptionValueChangeListener(OptionValueChangeListener listener) {
-        final OptionInt thisObject = this;
         this.spinner.addChangeListener(e -> {
-            listener.optionChange(thisObject);
+            listener.optionChange(OptionInt.this);
         });
     }
 
@@ -78,5 +79,14 @@ public class OptionInt implements Option<Integer> {
         return Integer.class;
     }
 
+    @Override
+    public Option<Integer> clone() {
+        OptionInt a = new OptionInt(this.model);
 
+        return a;
+    }
+
+    public JSpinner getSpinner() {
+        return spinner;
+    }
 }

@@ -65,6 +65,11 @@ public class OptionFile implements Option<File> {
         return File.class;
     }
 
+    @Override
+    public Option<File> clone() {
+        return new OptionFile(this.file);
+    }
+
 
     public void addOptionValueChangeListener(OptionValueChangeListener listener) {
         fileChooser.addActionListener(new ActionListener() {

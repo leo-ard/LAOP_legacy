@@ -23,17 +23,15 @@ public class OptionsDisplayPanel extends JPanel {
         modificationPanel.setLayout(gbl_modificationPanel);
 
         int i = 0;
-        Iterator<String> iterator = options.keySet().iterator();
-        while(iterator.hasNext()){
-        	String name = iterator.next();
-        	Option option = options.get(name);
+        for(String key : options.keySet()){
+        	Option option = options.get(key);
 
             GridBagConstraints gbc_Name = new GridBagConstraints();
             gbc_Name.insets = new Insets(0, 0, 5, 5);
             gbc_Name.anchor = GridBagConstraints.EAST;
             gbc_Name.gridx = 1;
             gbc_Name.gridy = i;
-            modificationPanel.add(new JLabel(OptionsDialog.fromKeyToNormalText(name) + " :"), gbc_Name);
+            modificationPanel.add(new JLabel(OptionsDialog.fromKeyToNormalText(key) + " :"), gbc_Name);
 
             GridBagConstraints gbc_option = new GridBagConstraints();
             gbc_option.fill = GridBagConstraints.HORIZONTAL;
