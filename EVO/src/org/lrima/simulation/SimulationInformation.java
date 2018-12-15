@@ -25,6 +25,7 @@ public class SimulationInformation {
         return max;
     }
 
+    //TODO : verrifier la validité de ce code
     public double getMinFitness(){
         double min = 0.0;
 

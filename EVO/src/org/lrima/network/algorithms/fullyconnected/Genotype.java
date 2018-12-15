@@ -64,8 +64,6 @@ public class Genotype {
             }
         }
 
-
-
         return new Genotype(newGenotype, topology, weightSize);
     }
 
@@ -77,7 +75,7 @@ public class Genotype {
      */
     public double[] getSubsetForLayer(int layer){
         if(layer <= 0 || layer > this.topology.length-1) {
-            System.err.println("Cannot retreive subset");
+            System.err.println("Cannot retrieve subset");
             return null;
         }
 

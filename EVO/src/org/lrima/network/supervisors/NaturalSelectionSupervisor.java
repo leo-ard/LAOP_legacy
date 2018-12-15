@@ -3,7 +3,9 @@ package org.lrima.network.supervisors;
 import org.knowm.xchart.*;
 import org.lrima.core.UserPrefs;
 import org.lrima.espece.Espece;
+import org.lrima.network.algorithms.manual_algorithm.ManualAlgorithmModel;
 import org.lrima.network.interfaces.NeuralNetwork;
+import org.lrima.network.interfaces.NeuralNetworkModel;
 import org.lrima.network.interfaces.NeuralNetworkSuperviser;
 import org.lrima.simulation.Simulation;
 import org.lrima.utils.Random;
@@ -135,10 +137,11 @@ public class NaturalSelectionSupervisor implements NeuralNetworkSuperviser {
 
     @Override
     public ArrayList<Espece> alterEspeceListAtGenerationFinish(ArrayList<Espece> especes, Simulation simulation) {
+        NeuralNetworkModel model = simulation.getAlgorithm();
         Collections.sort(especes);
         best = especes.get(0);
-        especes = this.kill50(especes);
-        especes = this.repopulate(especes, simulation);
+        especes = this.kill50(especes, model);
+        especes = this.repopulate(especes, simulation, model);
 
         return especes;
     }
@@ -146,8 +149,8 @@ public class NaturalSelectionSupervisor implements NeuralNetworkSuperviser {
     /**
      * Kill half of the cars to keep the best half
      */
-    private ArrayList<Espece> kill50(ArrayList<Espece> especes) {
-        int numberOfCar = UserPrefs.getInt(UserPrefs.KEY_NUMBER_OF_CAR);
+    private ArrayList<Espece> kill50(ArrayList<Espece> especes, NeuralNetworkModel model) {
+        int numberOfCar = (int) model.getSimulationOption(NeuralNetworkModel.KEY_NB_CARS);
 
         //assign weight depending on position
         HashMap<Espece, Double> weightedEspece = new HashMap<>();
@@ -184,8 +187,9 @@ public class NaturalSelectionSupervisor implements NeuralNetworkSuperviser {
     /**
      * Create the cars that was destroyed in kill50 to always keep the same number of cars
      */
-    private ArrayList<Espece> repopulate(ArrayList<Espece> especes, Simulation simulation ) {
-        int numberOfCar = UserPrefs.getInt(UserPrefs.KEY_NUMBER_OF_CAR);
+    private ArrayList<Espece> repopulate(ArrayList<Espece> especes, Simulation simulation , NeuralNetworkModel model) {
+        int numberOfCar = (int) model.getSimulationOption(NeuralNetworkModel.KEY_NB_CARS);
+
         this.halfBestEspece = new ArrayList<>(especes);
         this.bests = new ArrayList<>();
 

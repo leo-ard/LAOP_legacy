@@ -38,7 +38,6 @@ public class OptionsDialog extends JDialog implements ActionListener {
         this.setupButtons();
         this.addTab(name, options);
         this.setupTabs();
-
     }
 
     public void addTab(String name, LinkedHashMap<String, Option> options){
@@ -75,7 +74,7 @@ public class OptionsDialog extends JDialog implements ActionListener {
 
         //Car tab
         ArrayList<String> carTab = new ArrayList<>();
-        carTab.add(UserPrefs.KEY_NUMBER_OF_CAR);
+        //carTab.add(UserPrefs.KEY_NUMBER_OF_CAR);
         carTab.add(UserPrefs.KEY_TURN_RATE);
         allTabs.put("Car", carTab);
 

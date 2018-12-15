@@ -34,7 +34,7 @@ public class ManualAlgorithm extends NeuralNetwork {
 
 
 
-        //Les valeurs des roues sont envoyées à la voiture
+        //Les valeurs des roues sont envoyï¿½es ï¿½ la voiture
         this.receiver.setNeuralNetworkOutput(new double[]{valeurRoueDroite, valeurRoueGauche});
     }
 

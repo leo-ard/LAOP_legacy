@@ -5,13 +5,9 @@ import org.lrima.Interface.home.ModelListDialog;
 import org.lrima.Interface.home.HomeFrameManager;
 import org.lrima.Interface.home.PagePanel;
 import org.lrima.Interface.options.OptionsDialog;
-import org.lrima.Interface.options.types.OptionInt;
 import org.lrima.core.UserPrefs;
 import org.lrima.network.interfaces.NeuralNetworkModel;
-import org.lrima.simulation.SimulationBatch;
 import org.lrima.simulation.SimulationManager;
-import org.lrima.simulation.SimulationSettings;
-import org.lrima.utils.Random;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -34,7 +30,6 @@ public class CompareAlgorithmsPanel extends PagePanel {
     private JButton backButton = new JButton("Back");
 
     private ArrayList<NeuralNetworkModel> models = new ArrayList<>();
-    private ArrayList<SimulationSettings> simulationSettings = new ArrayList<>();
 
     public CompareAlgorithmsPanel(HomeFrameManager homeFrameManager){
         super(homeFrameManager);
@@ -116,13 +111,12 @@ public class CompareAlgorithmsPanel extends PagePanel {
                 for(int i = 0 ; i < models.size() ; i++) {
                     NeuralNetworkModel model = models.get(i);
                     model.setName((String)(algorithmList.getModel().getValueAt(i, 0)));
-                    SimulationSettings simulationSetting = simulationSettings.get(i);
-                    simulationManager.addBatch(simulationSetting, model, numberOfSimulationPerBatches);
+                    simulationManager.addBatch( model, numberOfSimulationPerBatches);
                 }
 
                 simulationManager.start();
 
-                homeFrameManager.addModelsToSaved(models);
+                //homeFrameManager.addModelsToSaved(models);
 
                 FrameManager frameManager = new FrameManager(simulationManager);
                 frameManager.setVisible(true);
@@ -155,9 +149,7 @@ public class CompareAlgorithmsPanel extends PagePanel {
                     if (col == 1) {
                         models.get(row).displayOptions();
 
-                        OptionsDialog options = models.get(row).getOptionsDialog();
-                        options.addTab("Simulation", new LinkedHashMap<>(simulationSettings.get(row).getSettings()));
-                        options.setVisible(true);
+                        models.get(row).displayOptions();
                     }
                 }catch (IndexOutOfBoundsException error){ }
             }
@@ -172,8 +164,6 @@ public class CompareAlgorithmsPanel extends PagePanel {
     public void addModels(ArrayList<NeuralNetworkModel> models){
         for(NeuralNetworkModel model : models){
             this.models.add(model);
-            SimulationSettings a = new SimulationSettings();
-            this.simulationSettings.add(a);
             //System.out.println(((OptionInt)a.getSettings().get(UserPrefs.KEY_NUMBER_OF_CAR)));
             //System.out.println(((OptionInt)a.getSettings().get(UserPrefs.KEY_NUMBER_OF_CAR)).getSpinner());
         }

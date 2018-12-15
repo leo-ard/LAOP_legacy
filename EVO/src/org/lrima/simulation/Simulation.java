@@ -5,6 +5,7 @@ import java.util.*;
 import org.lrima.core.UserPrefs;
 import org.lrima.espece.Espece;
 import org.lrima.espece.capteur.Capteur;
+import org.lrima.network.interfaces.NeuralNetwork;
 import org.lrima.network.interfaces.NeuralNetworkModel;
 import org.lrima.network.interfaces.NeuralNetworkSuperviser;
 import org.lrima.map.Map;
@@ -77,6 +78,7 @@ public class Simulation extends Thread{
 		int timeLimit = UserPrefs.getInt(UserPrefs.KEY_TIME_LIMIT);
 		while(running) {
 			if(!pausing) {
+
 				if(especesOpen.size() != 0 && Simulation.simulationTime < timeLimit) {
 					//Add the current time to the Simulation.simulationTime
 					currentTime = System.currentTimeMillis();
@@ -85,7 +87,8 @@ public class Simulation extends Thread{
 					//Iterate through all the cars to get the value of the sensors
 					Iterator<Espece> iterator = especesOpen.iterator();
 					while (iterator.hasNext()){
-						Espece espece = iterator.next();
+
+                        Espece espece = iterator.next();
 
 						espece.update(msBetweenFrames);
 						this.loopSetCapteur(espece);
@@ -100,6 +103,7 @@ public class Simulation extends Thread{
 					this.loopEnd();
 				}
 				else {
+
 					//Goes to the next generation
 					nextGeneration();
 				}
@@ -165,7 +169,7 @@ public class Simulation extends Thread{
 	 * Kills all the cars before mutating them
 	 */
 	public void nextGeneration(){
-		//Add the generation to the array of generationInformation
+        //Add the generation to the array of generationInformation
 		this.generations.add(new Generation(this.generation, this.getClonedEspeceSet()));
 
 		for(SimulationListener simulationListener : simulationListeners){
@@ -211,10 +215,7 @@ public class Simulation extends Thread{
 		this.generation = 1;
 		this.generations = new ArrayList<>();
 		Simulation.simulationTime = 0;
-
-		for(SimulationListener listener : this.simulationListeners){
-			listener.simulationRestarted();
-		}
+		//TODO : restarted has been deleted
 
 		this.initializeCars();
 	}
@@ -229,7 +230,8 @@ public class Simulation extends Thread{
 		especesClosed = new ArrayList<>();
 
 		//Retreive the number of cars the user want
-		int numberOfCar = UserPrefs.getInt(UserPrefs.KEY_NUMBER_OF_CAR);
+		int numberOfCar = (int) algorithmModel.getSimulationOption(NeuralNetworkModel.KEY_NB_CARS);
+		System.out.println(numberOfCar);
 
 		//Add a new car until you reach the max number of car
 		while(especesOpen.size() < numberOfCar) {

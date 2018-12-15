@@ -1,6 +1,7 @@
 package org.lrima.network.supervisors;
 
 import org.lrima.espece.Espece;
+import org.lrima.network.interfaces.NeuralNetworkModel;
 import org.lrima.network.interfaces.NeuralNetworkSuperviser;
 import org.lrima.simulation.Simulation;
 

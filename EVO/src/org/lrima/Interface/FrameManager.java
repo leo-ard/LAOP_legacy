@@ -218,11 +218,6 @@ public class FrameManager extends JFrame implements SimulationListener, BatchLis
     }
 
     @Override
-    public void simulationRestarted() {
-
-    }
-
-    @Override
     public void simulationEnded() {
         System.out.println("END1");
     }

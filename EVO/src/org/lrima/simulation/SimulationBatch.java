@@ -11,7 +11,6 @@ public class SimulationBatch implements SimulationListener, BatchListener {
     private int currentSimulation = 0;
     private int numberInBatch;
     private NeuralNetworkModel algorithmModel;
-    private SimulationSettings simulationSettings;
     private ArrayList<SimulationInformation> simulationInformations = new ArrayList<>();
 
     private ArrayList<BatchListener> batchListeners = new ArrayList<>();
@@ -19,11 +18,10 @@ public class SimulationBatch implements SimulationListener, BatchListener {
     private final int maxGeneration;
     private ArrayList<SimulationListener> simulationListeners = new ArrayList<>();
 
-    public SimulationBatch(SimulationSettings simulationSettings, NeuralNetworkModel algorithmModel, int numberInBatch){
+    public SimulationBatch(NeuralNetworkModel algorithmModel, int numberInBatch){
         this.simulations = new Simulation[numberInBatch];
         this.numberInBatch = numberInBatch;
         this.algorithmModel = algorithmModel;
-        this.simulationSettings = simulationSettings;
 
         this.maxGeneration = (int)UserPrefs.getOption(UserPrefs.KEY_NUMBER_GENERATION_PER_SIMULATION).getValue();
 
@@ -34,7 +32,6 @@ public class SimulationBatch implements SimulationListener, BatchListener {
     }
 
     public void startBatch(){
-        this.simulationSettings.applySettings();
         simulations[0].start();
     }
 
@@ -96,10 +93,6 @@ public class SimulationBatch implements SimulationListener, BatchListener {
         this.simulationListeners.forEach(SimulationListener::onNextGeneration);
     }
 
-    @Override
-    public void simulationRestarted() {
-
-    }
 
     public void addBatchListener(BatchListener listener){
         this.batchListeners.add(listener);
@@ -129,9 +122,5 @@ public class SimulationBatch implements SimulationListener, BatchListener {
     @Override
     public void nextSimulationInBatch() {
 
-    }
-
-    public SimulationSettings getSimulationSettings(){
-        return this.simulationSettings;
     }
 }

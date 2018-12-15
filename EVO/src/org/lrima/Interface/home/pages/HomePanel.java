@@ -7,14 +7,12 @@ import org.lrima.core.UserPrefs;
 import org.lrima.map.Studio.Studio;
 import org.lrima.network.interfaces.NeuralNetworkModel;
 import org.lrima.simulation.SimulationManager;
-import org.lrima.simulation.SimulationSettings;
 
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
@@ -121,12 +119,10 @@ public class HomePanel extends org.lrima.Interface.home.PagePanel {
                 if(savedModels != null){
                     homeFrameManager.close();
 
-                    SimulationSettings settings = new SimulationSettings();
-
                     SimulationManager simulationManager = new SimulationManager();
                     for(NeuralNetworkModel model : savedModels){
                         int numberOfSimulationPerBatches = (int) UserPrefs.getOption(UserPrefs.KEY_NUMBER_SIMULATION).getValue();
-                        simulationManager.addBatch(settings, model, numberOfSimulationPerBatches);
+                        simulationManager.addBatch(model, numberOfSimulationPerBatches);
                     }
 
                     simulationManager.start();

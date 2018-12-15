@@ -5,13 +5,16 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedHashMap;
 
 import org.lrima.Interface.options.OptionsDialog;
+import org.lrima.Interface.options.types.OptionInt;
 import org.lrima.network.annotations.AlgorithmInformation;
 import org.lrima.Interface.options.Option;
 import org.lrima.network.supervisors.NaturalSelectionSupervisor;
 
 public abstract class NeuralNetworkModel<T extends NeuralNetwork> implements Serializable {
-	
-	public static NeuralNetworkModel getInstanceOf(Class<? extends NeuralNetworkModel> modelClass) {
+    public static String KEY_NB_CARS = "NB_CARS";
+
+
+    public static NeuralNetworkModel getInstanceOf(Class<? extends NeuralNetworkModel> modelClass) {
         try {
             return modelClass.getConstructor().newInstance();
         } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
@@ -27,6 +30,8 @@ public abstract class NeuralNetworkModel<T extends NeuralNetwork> implements Ser
     private String name = null;
     protected LinkedHashMap<String, Option> options;
     protected NeuralNetworkSuperviser superviser = new NaturalSelectionSupervisor();
+    private LinkedHashMap<String, Option> simulationSettings;
+
     private OptionsDialog optionsDialog;
 
     public NeuralNetworkModel(){
@@ -44,12 +49,11 @@ public abstract class NeuralNetworkModel<T extends NeuralNetwork> implements Ser
     protected abstract LinkedHashMap<String, Option> getDefaultOptions();
 
     public void displayOptions(){
-        if(optionsDialog == null)
+        if(optionsDialog == null) {
             optionsDialog = new OptionsDialog(this.getClass().getAnnotation(AlgorithmInformation.class).name(), this.getOptions());
-    }
-
-    public OptionsDialog getOptionsDialog(){
-        return this.optionsDialog;
+            optionsDialog.addTab("Simulations", this.getSimulationOption());
+        }
+        optionsDialog.setVisible(true);
     }
 
     public LinkedHashMap<String, Option> getOptions() {
@@ -58,6 +62,24 @@ public abstract class NeuralNetworkModel<T extends NeuralNetwork> implements Ser
             options = getDefaultOptions();
         }
         return options;
+    }
+
+    private LinkedHashMap<String, Option> getDefaultSimulationSettings() {
+        simulationSettings.put(NeuralNetworkModel.KEY_NB_CARS, new OptionInt(50, 0, 10000, 1));
+
+
+        //met les autres settings de simulation ici. Accede dans simulation avec algorithmeModel.getSimualtionOption(key)
+
+        return simulationSettings;
+    }
+
+    public LinkedHashMap<String, Option> getSimulationOption(){
+        if(simulationSettings == null){
+            simulationSettings = new LinkedHashMap<>();
+            simulationSettings = getDefaultSimulationSettings();
+        }
+
+        return simulationSettings;
     }
 
     public NeuralNetworkSuperviser getSuperviser() {
@@ -97,5 +119,9 @@ public abstract class NeuralNetworkModel<T extends NeuralNetwork> implements Ser
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Object getSimulationOption(String key) {
+        return this.getSimulationOption().get(key).getValue();
     }
 }

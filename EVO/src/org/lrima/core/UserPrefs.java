@@ -41,7 +41,7 @@ public class UserPrefs {
     private static boolean USE_BEST = false;
 
     //Preferences keys
-    final public static String KEY_NUMBER_OF_CAR = "NUMBER_OF_CAR";
+    //final public static String KEY_NUMBER_OF_CAR = "NUMBER_OF_CAR";
     final public static String KEY_CAR_SPEED = "CAR_SPEED";
     final public static String KEY_TURN_RATE = "TURN_RATE";
     final public static String KEY_NUMBER_SENSOR = "NUMBER_SENSOR";
@@ -65,7 +65,7 @@ public class UserPrefs {
     final private static HashMap<String, Option> defaultValues = new HashMap<>();
 
     static{
-        defaultValues.put(KEY_NUMBER_OF_CAR, new OptionInt(200, 1, 10_000, 10));
+        //defaultValues.put(KEY_NUMBER_OF_CAR, new OptionInt(200, 1, 10_000, 10));
         defaultValues.put(KEY_CAR_SPEED,  new OptionInt(50));
         defaultValues.put(KEY_TURN_RATE, new OptionDouble(0.5, 0, 1, 0.1));
         defaultValues.put(KEY_TIME_LIMIT, new OptionInt(60_000, 0, 1_000_000, 10_000));
@@ -117,20 +117,11 @@ public class UserPrefs {
             else if(defaultValues.get(key).getClassValue() == File.class) {
                 currentOption = (Option<T>) new OptionFile(new File(preferences.get(key, ((File) defaultValues.get(key).getValue()).getPath())));
             }
-            //currentOption.addOptionValueChangeListener(option -> option.save(key, preferences));
+            currentOption.addOptionValueChangeListener(option -> option.save(key, preferences));
             allOptions.put(key, currentOption);
         }
 
         return currentOption;
-    }
-
-    public static HashMap<String, Option> getVariableSettings (){
-        HashMap<String, Option> settings = new HashMap<>();
-        settings.put(KEY_NUMBER_OF_CAR, get(KEY_NUMBER_OF_CAR).clone());
-        settings.put(KEY_CAR_SPEED, get(KEY_CAR_SPEED).clone());
-        settings.put(KEY_NUMBER_SENSOR, get(KEY_NUMBER_SENSOR).clone());
-
-        return settings;
     }
 
     public static void set(String key, Option value){
