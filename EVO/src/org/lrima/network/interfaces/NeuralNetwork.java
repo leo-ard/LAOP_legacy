@@ -13,6 +13,9 @@ public abstract class NeuralNetwork {
     protected double fitness;
     protected LinkedHashMap<String, Option> options;
 
+    protected double mutationChance = 0.0;
+    protected double weightModificationChance = 0.0;
+
     public NeuralNetwork(LinkedHashMap<String, Option> options){
         this.options = options;
     }
@@ -50,5 +53,11 @@ public abstract class NeuralNetwork {
         this.fitness = fitness;
     }
 
+    public void setMutationChance(double mutationChance) {
+        this.mutationChance = mutationChance;
+    }
 
+    public void setWeightModificationChance(double weightModificationChance) {
+        this.weightModificationChance = weightModificationChance;
+    }
 }

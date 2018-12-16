@@ -65,7 +65,7 @@ public class ChartPanel extends JPanel {
 
         for(SimulationBatch batch : this.algorithmBatches){
             ArrayList<String> names = new ArrayList<>(allAlgorithmChart.getSeriesMap().keySet());
-            String serieName = batch.getAlgorithmModel().getName();// == null ? batch.getAlgorithmModel().getAlgorithmInformationAnnotation().name() : batch.getAlgorithmModel().getName();
+            String serieName = batch.getAlgorithmModel().getName() == null ? batch.getAlgorithmModel().getAlgorithmInformationAnnotation().name() : batch.getAlgorithmModel().getName();
 
             /*if(names.size() > 0) {
                 serieName = names.get(0);

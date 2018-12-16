@@ -231,11 +231,20 @@ public class Simulation extends Thread{
 
 		//Retreive the number of cars the user want
 		int numberOfCar = (int) algorithmModel.getSimulationOption(NeuralNetworkModel.KEY_NB_CARS);
-		System.out.println(numberOfCar);
+		int numberOfSensors = (int) algorithmModel.getSimulationOption(NeuralNetworkModel.KEY_NB_SENSORS);
+		double mutationChance = (double) algorithmModel.getGeneticOption(NeuralNetworkModel.KEY_MUTATION_CHANCE);
+		double weightModifChance = (double) algorithmModel.getGeneticOption(NeuralNetworkModel.KEY_WEIGHT_MODIFICATION_CHANCE);
 
 		//Add a new car until you reach the max number of car
 		while(especesOpen.size() < numberOfCar) {
-			especesOpen.add(new Espece(this));
+			Espece espece = new Espece(this);
+			espece.setNumberSensor(numberOfSensors);
+
+			NeuralNetwork network = espece.getNeuralNetwork();
+			network.setMutationChance(mutationChance);
+			network.setWeightModificationChance(weightModifChance);
+
+			especesOpen.add(espece);
 		}
 
 		currentBest = especesOpen.get(0);

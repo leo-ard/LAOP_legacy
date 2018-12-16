@@ -140,6 +140,7 @@ public class NaturalSelectionSupervisor implements NeuralNetworkSuperviser {
         NeuralNetworkModel model = simulation.getAlgorithm();
         Collections.sort(especes);
         best = especes.get(0);
+
         especes = this.kill50(especes, model);
         especes = this.repopulate(especes, simulation, model);
 
@@ -189,6 +190,10 @@ public class NaturalSelectionSupervisor implements NeuralNetworkSuperviser {
      */
     private ArrayList<Espece> repopulate(ArrayList<Espece> especes, Simulation simulation , NeuralNetworkModel model) {
         int numberOfCar = (int) model.getSimulationOption(NeuralNetworkModel.KEY_NB_CARS);
+        int numberOfSensors = (int) model.getSimulationOption(NeuralNetworkModel.KEY_NB_SENSORS);
+
+        double mutationChance = (double) model.getGeneticOption(NeuralNetworkModel.KEY_MUTATION_CHANCE);
+        double weightModifChance = (double) model.getGeneticOption(NeuralNetworkModel.KEY_WEIGHT_MODIFICATION_CHANCE);
 
         this.halfBestEspece = new ArrayList<>(especes);
         this.bests = new ArrayList<>();
@@ -213,7 +218,12 @@ public class NaturalSelectionSupervisor implements NeuralNetworkSuperviser {
             }while(randomParent1 == randomParent2);
 
             Espece e = new Espece(simulation);
+            e.setNumberSensor(numberOfSensors);
+
             NeuralNetwork childNeuralNetwork = neuralNetworkParent1.crossOver(neuralNetworkParent1, neuralNetworkParent2);
+            childNeuralNetwork.setMutationChance(mutationChance);
+            childNeuralNetwork.setWeightModificationChance(weightModifChance);
+
             e.setNeuralNetwork(childNeuralNetwork);
 
             newCars.add(e);

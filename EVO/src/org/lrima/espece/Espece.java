@@ -109,7 +109,6 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 		this.simulation = simulation;
 		this.bornOnGeneration = simulation.getGeneration();
 		this.alive = true;
-		setupSensors();
 
 		//Get the starting parameters from the map
 		this.x = simulation.getMap().getDepart().x;
@@ -122,11 +121,18 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 		//Setup a base neural network for the car to have
 		//If you want to choose which neural network to use, call Espece(Map, NeuralNetwork)
 		//neuralNetwork = new NeuralNetwork(NB_CAPTEUR, 2, true);
+
+    }
+
+    public void setNumberSensor(int numberSensor){
+		this.NB_CAPTEUR = numberSensor;
+		setupSensors();
+
 		if(this.algorithmModel != null) {
 			this.neuralNetwork = this.algorithmModel.getInstance();
 			this.neuralNetwork.init(this.capteurs, this);
-		}
-    }
+		} // 5 simulations, 20 generations,
+	}
 
     //TODO: do a real copy
 	/**
@@ -182,7 +188,6 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 	private void setupSensors(){
 		//Setup the sensors base on the number of sensors
 		//Note that the maximum number of sensors is limited to 180 because of this
-		this.NB_CAPTEUR = UserPrefs.getInt(UserPrefs.KEY_NUMBER_SENSOR);
 
 		double sensorEveryDeg = 180 / (NB_CAPTEUR - 1);
 
@@ -566,5 +571,9 @@ public class Espece implements Comparable<Espece>, NeuralNetworkReceiver {
 
 	public void setFitness(double fitness) {
 		this.fitness = fitness;
+	}
+
+	public NeuralNetworkModel getAlgorithmModel() {
+		return algorithmModel;
 	}
 }

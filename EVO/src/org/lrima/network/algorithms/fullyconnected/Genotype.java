@@ -33,12 +33,12 @@ public class Genotype {
         this.weightSize = weightSize;
     }
 
-    public void mutate(){
-        double mutationChance = Random.getRandomDoubleValue(1);
-        if(mutationChance < 10) {
+    public void mutate(double mutationChance, double weightChangeChance){
+        double mutationChanceRandom = Random.getRandomDoubleValue(1);
+        if(mutationChanceRandom < mutationChance) {
             for (int i = 0; i < genomes.length; i++) {
-                int weightChangeChance = Random.getRandomIntegerValue(100);
-                if (weightChangeChance < 0.005) {
+                double weightChangeChanceRandom = Random.getRandomDoubleValue(1.0);
+                if (weightChangeChanceRandom < weightChangeChance) {
                     genomes[i] += Random.getRandomDoubleValue(-0.01, 0.01);
                 }
             }

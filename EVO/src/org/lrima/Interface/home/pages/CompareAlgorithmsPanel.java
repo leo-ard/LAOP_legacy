@@ -148,8 +148,6 @@ public class CompareAlgorithmsPanel extends PagePanel {
 
                     if (col == 1) {
                         models.get(row).displayOptions();
-
-                        models.get(row).displayOptions();
                     }
                 }catch (IndexOutOfBoundsException error){ }
             }
@@ -164,8 +162,6 @@ public class CompareAlgorithmsPanel extends PagePanel {
     public void addModels(ArrayList<NeuralNetworkModel> models){
         for(NeuralNetworkModel model : models){
             this.models.add(model);
-            //System.out.println(((OptionInt)a.getSettings().get(UserPrefs.KEY_NUMBER_OF_CAR)));
-            //System.out.println(((OptionInt)a.getSettings().get(UserPrefs.KEY_NUMBER_OF_CAR)).getSpinner());
         }
         this.setupAlgorithmTable();
     }
