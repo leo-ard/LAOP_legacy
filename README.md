@@ -9,7 +9,7 @@ La classe modèle doit hériter de la classe générique `NeuralNetworkModel` et
 public class FullyConnectedNeuralModel extends NeuralNetworkModel<FullyConnectedNeuralNetwork> { ...
 ```
 L'héritage demande de redéfinir deux méthodes :
-- `getDefaultOptions()` et `getNeuralNetworkClass()`  `getDefaultOptions()` modifie le LinkedHashMap `option` et assigne les valeurs utilisées par défaut par le système de neurone. Ces valeurs peuvent ensuite être modifiées dans l'application avant de partir l'animation.
+- `getDefaultOptions()` modifie le LinkedHashMap `option` et assigne les valeurs utilisées par défaut par le système de neurone. Ces valeurs peuvent ensuite être modifiées dans l'application avant de partir l'animation.
 - `getNeuralNetworkClass()` retourne l'objet classe de `NeuralNetwork` 
 ### La classe NeuralNetwork
 La classe NeuralNetwork doit hériter de la classe `NeuralNetwork` et implémenter par l'interface serialisable, par exemple :  
