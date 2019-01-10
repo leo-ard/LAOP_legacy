@@ -20,6 +20,13 @@ La classe NeuralNetwork doit hériter de la classe `NeuralNetwork` et implément
 public class FullyConnectedNeuralNetwork extends NeuralNetwork implements Serializable { 
 ```
 Plusieurs fonctions ont besoin d'être redéfinies : 
+- `feedForward()` : Méthode qui active les différentes couches du système de neurone. Pour accéder aux valeurs des capteurs et définir la valeur des roues, il faut faire comme suit : 
+```
+double[] entrees = this.transmitters.stream().mapToDouble(NeuralNetworkTransmitter::getNeuralNetworkInput).toArray();
+...
+receiver.setNeuralNetworkOutput(sorties);
+```
+Le tableau `entrees` contiendra toutes les valeurs des capteurs `[valeurCapteur 1, valeurCapteur2, ...]`. Et pour attribuer la valeur des roues, la fonction `receiver.setNeuralNetworkOutput([valeurRoue1, ValeurRoue2]);` est utilisée. 
 - `init(ArrayList<NeuralNetworkTransmitter>, NeuralNetworkReceiver)` : initialise le neuralNetwork. Il faut appeler la fonction `super.init()` avec les bons paramètres pour être sûr que l'algorithme fonctionne bien 
 - `crossOver(NeuralNetowk, NeuralNetwork)` : fonction qui permet au système de neurone d'apprendre. Elle retourne un nouveau système de neurone en fonction de deux autres en faisant un mélange des deux pour en obtenir un nouveau.
 - `generationFinish()` : elle est appelée à la fin de chaque génération. Souvent utilisé pour muter ses connexions.
