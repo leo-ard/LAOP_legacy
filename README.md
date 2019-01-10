@@ -1,4 +1,7 @@
 # LAOP
+## Logiciels recommandés
+Le projet utilise maven et Java 10
+
 ## Ajouter un algorithme
 Dans le package `org.lrima.network.algorithms`, ajouter un package du nom de votre algorithme
 Dans le package, il faut créer deux nouvelles classes, une classe Model et une classe Network.
