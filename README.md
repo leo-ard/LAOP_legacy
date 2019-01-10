@@ -1,5 +1,5 @@
 # LAOP
-## Logiciels recommandés
+## Recommandation pour l'importation
 Le projet utilise maven et Java 10
 
 ## Ajouter un algorithme
