@@ -11,6 +11,7 @@ La classe modèle doit hériter de la classe générique `NeuralNetworkModel` et
 @AlgorithmInformation(name="Fully Connected", description = "Fully connected network with one hidden layer containing 2 neurons. All neurons are connected to each neurons in the next layer.")
 public class FullyConnectedNeuralModel extends NeuralNetworkModel<FullyConnectedNeuralNetwork> { ...
 ```
+Notez ici que la classe générique NeuralNetworkModel demande comme paramètre générique votre classe de qui hérite de NeuralNetork. 
 L'héritage demande de redéfinir deux méthodes :
 - `getDefaultOptions()` modifie le LinkedHashMap `option` et assigne les valeurs utilisées par défaut par le système de neurone. Ces valeurs peuvent ensuite être modifiées dans l'application avant de partir l'animation.
 - `getNeuralNetworkClass()` retourne l'objet classe de `NeuralNetwork` 
