@@ -60,4 +60,8 @@ public abstract class NeuralNetwork {
     public void setWeightModificationChance(double weightModificationChance) {
         this.weightModificationChance = weightModificationChance;
     }
+
+    public void mutate(){
+
+    }
 }

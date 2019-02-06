@@ -408,6 +408,20 @@ public class NeatGenome extends NeuralNetwork {
         openSet.addAll(this.nodes);
 
 
+        for(NodeGene node : openSet){
+            if(node.getType() == NodeGene.Type.INPUT) break;
+
+            ArrayList<NodeGene> nodeConnect = this.getInputsIntoNode(node);
+            ArrayList<Double> weightsConnect = this.getWeightsIntoNode(node);
+
+
+
+            node.calculateWeightedSum(nodeConnect, weightsConnect);
+        }
+
+
+
+        /*
         do {
             Iterator<NodeGene> nodeGeneIterator = openSet.iterator();
 
@@ -454,9 +468,11 @@ public class NeatGenome extends NeuralNetwork {
                         System.out.println("\t\t" + gene4.getType() + " " + gene4.hasBeenCalculated);
                     }
                 }
-            }*/
+            }
 
         }while(openSet.size() > 0);
+        */
+
 
         ArrayList<NodeGene> outputNodes = this.getOutputNodes();
 
@@ -470,6 +486,8 @@ public class NeatGenome extends NeuralNetwork {
 
             outputNodesValues[i] = mappedValue;
         }
+
+
 
 
         this.receiver.setNeuralNetworkOutput(outputNodesValues);

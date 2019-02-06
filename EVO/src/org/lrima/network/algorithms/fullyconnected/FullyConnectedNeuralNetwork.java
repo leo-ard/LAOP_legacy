@@ -74,8 +74,12 @@ public class FullyConnectedNeuralNetwork extends NeuralNetwork implements Serial
 
 	@Override
 	public void generationFinish() {
-        this.genotype.mutate(this.mutationChance, this.weightModificationChance);
+
 	}
+
+	public void mutate(){
+        this.genotype.mutate(this.mutationChance, this.weightModificationChance);
+    }
 
 	@Override
 	public void draw(Graphics2D g, Dimension panelDimensions) {

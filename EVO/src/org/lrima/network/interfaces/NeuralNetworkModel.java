@@ -139,6 +139,9 @@ public abstract class NeuralNetworkModel<T extends NeuralNetwork> implements Ser
     public abstract Class<T> getNeuralNetworkClass();
 
     public String getName() {
+        if(name == null){
+            return this.getAlgorithmInformationAnnotation().name();
+        }
         return name;
     }
 

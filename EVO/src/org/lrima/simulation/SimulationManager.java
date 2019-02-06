@@ -3,6 +3,7 @@ package org.lrima.simulation;
 import org.lrima.Interface.FrameManager;
 import org.lrima.Interface.conclusion.ConclusionFrame;
 import org.lrima.network.interfaces.NeuralNetworkModel;
+import org.lrima.utils.CSVUtils;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -53,6 +54,9 @@ public class SimulationManager implements BatchListener {
             public void run() {
                 ConclusionFrame conclusionFrame = new ConclusionFrame(simulationBatches);
                 conclusionFrame.setVisible(true);
+
+                CSVUtils.toCSV(simulationBatches);
+
             }
         });
     }
