@@ -29,7 +29,7 @@ public class NaturalSelectionSupervisor implements NeuralNetworkSuperviser {
      * @param args
      */
     public static void main(String[] args) {
-        ArrayList<Espece> especes = new ArrayList<>();
+       /* ArrayList<Espece> especes = new ArrayList<>();
         Simulation simulation = new Simulation(null);
 
         int nbEspece = 100;
@@ -122,8 +122,10 @@ public class NaturalSelectionSupervisor implements NeuralNetworkSuperviser {
         }
 
         // Show it
-        new SwingWrapper(chart).displayChart();
+        new SwingWrapper(chart).displayChart();*/
     }
+
+
 
     private static double calculateWeight(int index, ArrayList<Espece> array){
         double max = 99.0;

@@ -30,5 +30,4 @@ public class Random {
 		int random = Random.getRandomIntegerValue(0, 10);
 		return random < 5;
 	}
-
 }

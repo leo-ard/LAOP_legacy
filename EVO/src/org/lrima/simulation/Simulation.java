@@ -199,6 +199,7 @@ public class Simulation extends Thread{
 		for(Espece e : especesOpen){
 			e.resetEspece();
 			e.tpLikeNew();
+			e.setFitness(0);
 		}
 
         //Reset the time of the simulation

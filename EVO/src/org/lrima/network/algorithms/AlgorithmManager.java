@@ -1,10 +1,9 @@
 package org.lrima.network.algorithms;
 
+import org.lrima.network.algorithms.fullyConnectedWithChangingTopology.FCWCTModel;
 import org.lrima.network.algorithms.fullyconnected.FullyConnectedNeuralModel;
-import org.lrima.network.algorithms.improved_neat.ImprovedNeatGenome;
 import org.lrima.network.algorithms.improved_neat.ImprovedNeatModel;
 import org.lrima.network.algorithms.manual_algorithm.ManualAlgorithmModel;
-import org.lrima.network.algorithms.neat.NeatModel;
 import org.lrima.network.annotations.AlgorithmInformation;
 import org.lrima.network.interfaces.NeuralNetworkModel;
 
@@ -33,7 +32,7 @@ public class AlgorithmManager {
                 //// ADD YOUR ALGORITHMS MODELS BELOW ////
                 //////////////////////////////////////////
                 FullyConnectedNeuralModel.class,
-                NeatModel.class,
+                FCWCTModel.class,
                 ImprovedNeatModel.class,
                 ManualAlgorithmModel.class
         ));

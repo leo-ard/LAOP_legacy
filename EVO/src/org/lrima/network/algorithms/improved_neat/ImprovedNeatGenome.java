@@ -1,13 +1,17 @@
 package org.lrima.network.algorithms.improved_neat;
 
+import org.lrima.network.algorithms.fullyconnected.Layer;
 import org.lrima.network.annotations.AlgorithmInformation;
 import org.lrima.network.interfaces.NeuralNetwork;
 import org.lrima.network.interfaces.NeuralNetworkReceiver;
+import org.lrima.network.interfaces.NeuralNetworkSuperviser;
 import org.lrima.network.interfaces.NeuralNetworkTransmitter;
 import org.lrima.Interface.options.Option;
+import org.lrima.network.supervisors.OtherSupervisor;
 import org.lrima.utils.Random;
 import org.omg.CORBA.IMP_LIMIT;
 
+import javax.xml.soap.Node;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,27 +38,35 @@ public class ImprovedNeatGenome extends NeuralNetwork {
     public void init(ArrayList<? extends NeuralNetworkTransmitter> transmitters, NeuralNetworkReceiver receiver){
         this.transmitters = transmitters;
         this.receiver = receiver;
-
+        if(this.connections.size() == 0) {
         //Create the default nodes
         //Inputs
-        for(NeuralNetworkTransmitter transmitter : transmitters){
-            nodes.add(new NodeGene(NodeGene.Type.INPUT));
-        }
-        //Output
-        for(int i = 0 ; i < nbOutput ; i++){
-            nodes.add(new NodeGene(NodeGene.Type.OUTPUT));
-        }
-        //A connection between a random input and output
-        ArrayList<NodeGene> inputNodes = this.getInputNodes();
-        ArrayList<NodeGene> outputNodes = this.getOutputNodes();
-        NodeGene randomNodeInput1 = inputNodes.get(Random.getRandomIntegerValue(inputNodes.size()));
+            for(NeuralNetworkTransmitter transmitter : transmitters){
+                nodes.add(new NodeGene(NodeGene.Type.INPUT));
+            }
+            //Output
+            for(int i = 0 ; i < nbOutput ; i++){
+                nodes.add(new NodeGene(NodeGene.Type.OUTPUT));
+            }
+            //A connection between a random input and output
+            ArrayList<NodeGene> inputNodes = this.getInputNodes();
+            ArrayList<NodeGene> outputNodes = this.getOutputNodes();
+        /*NodeGene randomNodeInput1 = inputNodes.get(Random.getRandomIntegerValue(inputNodes.size()));
         NodeGene randomNodeInput2;
         do {
             randomNodeInput2 = inputNodes.get(Random.getRandomIntegerValue(inputNodes.size()));
         }while(randomNodeInput2 == randomNodeInput1);
 
         this.connections.add(new ConnectionGene(randomNodeInput1,  this.getOutputNodes().get(0)));
-        this.connections.add(new ConnectionGene(randomNodeInput2,  this.getOutputNodes().get(1)));
+        this.connections.add(new ConnectionGene(randomNodeInput2,  this.getOutputNodes().get(1)));*/
+
+
+            //A connection between a random input and output
+            NodeGene randomNodeInput1 = inputNodes.get(Random.getRandomIntegerValue(inputNodes.size()));
+            NodeGene randomNodeOutput = outputNodes.get(Random.getRandomIntegerValue(outputNodes.size()));
+
+            this.connections.add(new ConnectionGene(randomNodeInput1, randomNodeOutput));
+        }
 
     }
 
@@ -155,18 +167,18 @@ public class ImprovedNeatGenome extends NeuralNetwork {
      * 10% chance of adding a node between a connection
      */
     public void mutate() {
-        int chanceWeightMutation = Random.getRandomIntegerValue(100);
-        int chanceAddConnection = Random.getRandomIntegerValue(100);
-        int chanceAddNode = Random.getRandomIntegerValue(100);
+        int chanceWeightMutation = Random.getRandomIntegerValue(80);
+        int chanceAddConnection = Random.getRandomIntegerValue(10);
+        int chanceAddNode = Random.getRandomIntegerValue(10);
 
-        if(chanceWeightMutation < 80){
-            this.changeWeightMutation(0.2);
+        if(chanceWeightMutation < 100){
+           this.changeWeightMutation(0.2);
         }
-        if(chanceAddConnection < 10){
+        if(chanceAddConnection < 100){
             this.addConnectionMutation();
         }
-        if(chanceAddNode < 10){
-            this.addNodeMutation();
+        if(chanceAddNode < 100){
+           this.addNodeMutation();
         }
     }
 
@@ -203,38 +215,26 @@ public class ImprovedNeatGenome extends NeuralNetwork {
 
         do{
             nodeGene2 = nodes.get(Random.getRandomIntegerValue(nodes.size()));
-        }while(nodeGene1 == nodeGene2 || (nodeGene2.getType() == NodeGene.Type.INPUT && nodeGene1.getType() == NodeGene.Type.INPUT));
+        }while(nodeGene2.getType().getInt() == nodeGene1.getType().getInt() && nodeGene1.getType() != NodeGene.Type.HIDDEN);
 
         //Put nodeGene1 and nodeGene2 in the correct order
-        if(nodeGene1.getType() == NodeGene.Type.HIDDEN && nodeGene2.getType() == NodeGene.Type.INPUT){
-            NodeGene tmp = nodeGene1;
-            nodeGene1 = nodeGene2;
-            nodeGene2 = tmp;
-        }
-        else if(nodeGene1.getType() == NodeGene.Type.OUTPUT && nodeGene2.getType() == NodeGene.Type.HIDDEN){
-            NodeGene tmp = nodeGene1;
-            nodeGene1 = nodeGene2;
-            nodeGene2 = tmp;
-        }
-        else if(nodeGene1.getType() == NodeGene.Type.OUTPUT && nodeGene2.getType() == NodeGene.Type.INPUT){
+
+        if(nodeGene1.getType().getInt() > nodeGene2.getType().getInt()){
             NodeGene tmp = nodeGene1;
             nodeGene1 = nodeGene2;
             nodeGene2 = tmp;
         }
 
-        //Check if the connection already exist
-        ConnectionGene connectionAlreadyExist = null;
+        //Check if the connection already exist, else redo the process of adding node
         for(ConnectionGene connection : connections){
-            if(connection.getInput().equals(nodeGene1) && connection.getOutput().equals(nodeGene2)){
-                connectionAlreadyExist = connection;
-                break;
+            if(connection.getInput() == nodeGene1 && connection.getOutput() == nodeGene2){
+                addConnectionMutation();
+                return;
             }
         }
 
         //If the connection doesn't already exist, create it
-        if(connectionAlreadyExist == null){
-            this.connections.add(new ConnectionGene(nodeGene1, nodeGene2));
-        }
+        this.connections.add(new ConnectionGene(nodeGene1, nodeGene2));
     }
 
     /**
@@ -373,49 +373,92 @@ public class ImprovedNeatGenome extends NeuralNetwork {
         ArrayList<NodeGene> hiddenNodes = this.getHiddenNodes();
         HashMap<NodeGene, Point> nodePositions = new HashMap<>();
 
-        for(int i = 0 ; i < inputNodes.size(); i++){
-            NodeGene node = inputNodes.get(i);
+        ArrayList<ArrayList<NodeGene>> topology = new ArrayList<>();
+        topology.add(inputNodes);
+        topology.add(hiddenNodes);
+        topology.add(outputNodes);
 
-            Point position = new Point(INPUT_NODE_POSITION_X, i * NODE_MARGIN);
-            nodePositions.put(node, position);
+        final int gapX = 10;
+        final int gapY = 10;
+        final int neuronneGandeur = 30;
 
-            g.drawOval(position.x, position.y, NODE_SIZE, NODE_SIZE);
-            g.drawString(String.format("%.2f", node.getValue()), position.x, position.y + 25);
+        int plusGrandNbNeuronne = 0;
+        plusGrandNbNeuronne = Math.max(Math.max(inputNodes.size(), outputNodes.size()), hiddenNodes.size());
+
+        final int minGapY = (int) ((panelDimensions.height - (gapY * 2 + neuronneGandeur)) / (double)(plusGrandNbNeuronne-1));
+        final int maxGandeur = (panelDimensions.height - (gapY * 2 + neuronneGandeur));
+        g.setColor(Color.BLACK);
+
+        ArrayList<ArrayList<Point>> allNeurons = new ArrayList<>();
+
+        //Get the neurons in an array
+        for(int i = 0; i < topology.size(); i++){
+            int neuronCount = topology.get(i).size();
+            ArrayList<Point> neurons = new ArrayList<>();
+            for(int j = 0; j < neuronCount; j++){
+                int thisMaxGrandeur = minGapY * (neuronCount-1) ;
+
+                int x = (int) (gapX + neuronneGandeur/2 + ((double)(panelDimensions.width - (gapX*2 + neuronneGandeur))/(double)(topology.size()-1))*(double)i);
+                int y = (maxGandeur-thisMaxGrandeur)/2+ gapY + neuronneGandeur/2 + (minGapY) * j;
+
+                neurons.add(new Point(x-neuronneGandeur/2, y-neuronneGandeur/2));
+
+            }
+            allNeurons.add(neurons);
         }
+        HashMap<NodeGene, Point[]> allConnections = new HashMap<>();
 
-        for(int i = 0 ; i < hiddenNodes.size(); i++){
-            NodeGene node = hiddenNodes.get(i);
+        for(ConnectionGene connectionGene : connections){
+            if(!connectionGene.isExpresed()){
+                continue;
+            }
 
-            Point position = new Point(HIDDEN_NODE_POSITION_X, i * NODE_MARGIN);
-            nodePositions.put(node, position);
+            NodeGene input = connectionGene.getInput();
+            NodeGene output = connectionGene.getOutput();
 
-            g.drawOval(position.x, position.y, NODE_SIZE, NODE_SIZE);
-            g.drawString(String.format("%.2f", node.getValue()), position.x, position.y + 25);
-        }
+            for(int i = 0; i < topology.size(); i++){
+                for(int j = 0; j < topology.get(i).size(); j++){
+                    if(input == topology.get(i).get(j)){
+                        if(!allConnections.containsKey(output))
+                            allConnections.put(input, new Point[]{allNeurons.get(i).get(j), null});
+                        else
+                            allConnections.get(output)[0] = allNeurons.get(i).get(j);
+                    }
 
-        for(int i = 0 ; i < outputNodes.size(); i++){
-            NodeGene node = outputNodes.get(i);
-
-            Point position = new Point(OUTPUT_NODE_POSITION_X, i * NODE_MARGIN);
-            nodePositions.put(node, position);
-
-            g.drawOval(position.x, position.y, NODE_SIZE, NODE_SIZE);
-            g.drawString(String.format("%.2f", node.getValue()), position.x, position.y + 25);
-        }
-
-        for(ConnectionGene connection : this.connections){
-            if(connection.isExpresed()) {
-                NodeGene input = connection.getInput();
-                NodeGene output = connection.getOutput();
-
-                Point lineStart = nodePositions.get(input);
-                Point lineEnd = nodePositions.get(output);
-
-                try {
-                    g.drawLine(lineStart.x, lineStart.y, lineEnd.x, lineEnd.y);
-                }catch (Exception e){
-
+                    else if(output == topology.get(i).get(j)){
+                        if(!allConnections.containsKey(input))
+                            allConnections.put(output, new Point[]{null, allNeurons.get(i).get(j)});
+                        else
+                            allConnections.get(input)[1] = allNeurons.get(i).get(j);
+                    }
                 }
+            }
+
+
+        }
+
+        allConnections.forEach((n, p) -> {
+            if(p[0] != null && p[1] != null)
+            g.drawLine(p[0].x + neuronneGandeur/2, p[0].y + neuronneGandeur/2, p[1].x + neuronneGandeur/2, p[1].y+neuronneGandeur/2);
+        });
+
+
+        //draw the neurons
+        for(int i = 0; i < topology.size(); i++){
+            ArrayList<NodeGene> layer = topology.get(i);
+            for(int j = 0; j < layer.size(); j++){
+                Point p = allNeurons.get(i).get(j);
+                g.setColor(Color.white);
+                g.fillOval(p.x, p.y, neuronneGandeur, neuronneGandeur);
+                int red = 0, green = 0;
+                if(layer.get(j).getValue() > .5) green = (int) ((layer.get(j).getValue() - .5) * 255 * 2);
+                else red = 255-(int) (layer.get(j).getValue() *255*2);
+                g.setColor(new Color(red,green,0));
+                g.drawOval(p.x, p.y, neuronneGandeur, neuronneGandeur);
+                g.drawString(String.format("%.2f", layer.get(j).getValue()), p.x + neuronneGandeur/2-10, p.y+neuronneGandeur/2+5);
+
+                g.setColor(Color.BLACK);
+
             }
         }
 

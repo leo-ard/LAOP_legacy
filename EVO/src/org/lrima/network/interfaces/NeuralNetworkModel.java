@@ -72,7 +72,7 @@ public abstract class NeuralNetworkModel<T extends NeuralNetwork> implements Ser
 
     private LinkedHashMap<String, Option> getDefaultSimulationSettings() {
         simulationSettings.put(NeuralNetworkModel.KEY_NB_CARS, new OptionInt(50, 0, 10000, 5));
-        simulationSettings.put(NeuralNetworkModel.KEY_NB_SENSORS, new OptionInt(5, 1, 180, 1));
+        simulationSettings.put(NeuralNetworkModel.KEY_NB_SENSORS, new OptionInt(7, 1, 180, 1));
 
 
         //met les autres settings de simulation ici. Accede dans simulation avec algorithmeModel.getSimualtionOption(key)
@@ -81,8 +81,8 @@ public abstract class NeuralNetworkModel<T extends NeuralNetwork> implements Ser
     }
 
     private LinkedHashMap<String, Option> getDefaultGeneticSettings(){
-        geneticSettings.put(NeuralNetworkModel.KEY_MUTATION_CHANCE, new OptionDouble(0.1, 0.0, 1.0, 0.05));
-        geneticSettings.put(NeuralNetworkModel.KEY_WEIGHT_MODIFICATION_CHANCE, new OptionDouble(0.01, 0.0, 1.0, 0.001));
+        geneticSettings.put(NeuralNetworkModel.KEY_MUTATION_CHANCE, new OptionDouble(0.2, 0.0, 1.0, 0.05));
+        geneticSettings.put(NeuralNetworkModel.KEY_WEIGHT_MODIFICATION_CHANCE, new OptionDouble(0.09, 0.0, 1.0, 0.001));
 
         return geneticSettings;
     }
@@ -136,7 +136,7 @@ public abstract class NeuralNetworkModel<T extends NeuralNetwork> implements Ser
      *
      * @return the main class of the algorithm
      */
-    public abstract Class<T> getNeuralNetworkClass();
+    public abstract Class getNeuralNetworkClass();
 
     public String getName() {
         if(name == null){

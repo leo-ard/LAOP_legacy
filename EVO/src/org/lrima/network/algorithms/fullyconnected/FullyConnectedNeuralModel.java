@@ -12,12 +12,12 @@ import java.util.LinkedHashMap;
 
 @AlgorithmInformation(name="Fully Connected", supervisor = OtherSupervisor.class, description = "Fully connected network with one hidden layer containing 2 neurons. All neurons are connected to each neurons in the next layer.")
 public class FullyConnectedNeuralModel extends NeuralNetworkModel<FullyConnectedNeuralNetwork> {
-    OtherSupervisor otherSupervisor = new OtherSupervisor();
+    //OtherSupervisor otherSupervisor = new OtherSupervisor();
 
-    @Override
+    /*@Override
     public NeuralNetworkSuperviser getSuperviser() {
         return otherSupervisor;
-    }
+    }*/
 
     @Override
     public LinkedHashMap<String, Option> getDefaultOptions() {
@@ -28,7 +28,7 @@ public class FullyConnectedNeuralModel extends NeuralNetworkModel<FullyConnected
     }
 
     @Override
-    public Class<FullyConnectedNeuralNetwork> getNeuralNetworkClass() {
+    public Class getNeuralNetworkClass() {
         return FullyConnectedNeuralNetwork.class;
     }
 }

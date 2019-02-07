@@ -3,27 +3,22 @@ package org.lrima.network.algorithms.fullyconnected;
 import java.awt.*;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 
-import org.apache.commons.math3.linear.MatrixUtils;
 import org.lrima.network.interfaces.NeuralNetwork;
 import org.lrima.network.interfaces.NeuralNetworkReceiver;
 import org.lrima.network.interfaces.NeuralNetworkTransmitter;
-import org.apache.commons.math3.linear.RealMatrix;
-import org.lrima.Interface.options.OptionsDisplayPanel;
 import org.lrima.Interface.options.Option;
-import org.lrima.utils.Random;
 
 public class FullyConnectedNeuralNetwork extends NeuralNetwork implements Serializable {
-	private Genotype genotype;
-	private int[] topology;
+	protected Genotype genotype;
+	protected int[] topology;
 
 	public FullyConnectedNeuralNetwork(LinkedHashMap<String, Option> options) {
 		super(options);
 	}
 
-	private FullyConnectedNeuralNetwork(LinkedHashMap<String, Option> options, Genotype genotype){
+	protected FullyConnectedNeuralNetwork(LinkedHashMap<String, Option> options, Genotype genotype){
 		super(options);
 		this.genotype = genotype;
 	}
@@ -62,7 +57,7 @@ public class FullyConnectedNeuralNetwork extends NeuralNetwork implements Serial
 		double[] values = this.transmitters.stream().mapToDouble(NeuralNetworkTransmitter::getNeuralNetworkInput).toArray();
 
 		Layer previousLayer = new Layer(values, genotype.getSubsetForLayer(1));
-		for(int i = 1; i < topology.length-1; i++){
+		for(int i = 1; i < topology.length; i++){
 			Layer currentLayer = new Layer(topology[i], genotype.getSubsetForLayer(i));
 
 			currentLayer.calculateSum(previousLayer);
@@ -74,11 +69,11 @@ public class FullyConnectedNeuralNetwork extends NeuralNetwork implements Serial
 
 	@Override
 	public void generationFinish() {
-
+        this.genotype.mutate(this.mutationChance, this.weightModificationChance);
 	}
 
 	public void mutate(){
-        this.genotype.mutate(this.mutationChance, this.weightModificationChance);
+
     }
 
 	@Override

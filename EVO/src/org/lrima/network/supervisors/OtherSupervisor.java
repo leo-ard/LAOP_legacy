@@ -1,5 +1,6 @@
 package org.lrima.network.supervisors;
 
+import org.apache.commons.math3.ml.neuralnet.twod.util.SmoothedDataHistogram;
 import org.lrima.espece.Espece;
 import org.lrima.network.interfaces.NeuralNetwork;
 import org.lrima.network.interfaces.NeuralNetworkModel;
@@ -14,16 +15,18 @@ import java.util.stream.Collector;
 
 public class OtherSupervisor implements NeuralNetworkSuperviser {
     ArrayList<Espece> bestPerformingOnes = new ArrayList<>();
-    final double pbestTaken = 10;
+    final int pbestTakenCap = 10;
     final double pmiddle = 0.2;
+
+    public OtherSupervisor (){
+        System.out.println(bestPerformingOnes);
+    }
 
 
     @Override
     public ArrayList<Espece> alterEspeceListAtGenerationFinish(ArrayList<Espece> especes, Simulation simulation) {
         NeuralNetworkModel model = simulation.getAlgorithm();
         Collections.sort(especes);
-
-        System.out.println(especes.get(0).getFitness());
 
         this.kill(especes, model);
         this.repopulate(especes, model, simulation);
@@ -33,7 +36,7 @@ public class OtherSupervisor implements NeuralNetworkSuperviser {
     }
 
     private void repopulate(ArrayList<Espece> especes, NeuralNetworkModel model, Simulation simulation) {
-        int numberOfCar = (int) model.getSimulationOption(NeuralNetworkModel.KEY_NB_CARS);
+        int numberOfCars = (int) model.getSimulationOption(NeuralNetworkModel.KEY_NB_CARS);
         int numberOfSensors = (int) model.getSimulationOption(NeuralNetworkModel.KEY_NB_SENSORS);
 
         double mutationChance = (double) model.getGeneticOption(NeuralNetworkModel.KEY_MUTATION_CHANCE);
@@ -41,16 +44,18 @@ public class OtherSupervisor implements NeuralNetworkSuperviser {
 
 
 
-        while(especes.size() < numberOfCar){
+        while(especes.size() < numberOfCars){
             Collections.sort(bestPerformingOnes);
+
+            int pbestTaken = simulation.getGeneration() > pbestTakenCap ? pbestTakenCap : simulation.getGeneration();
 
             int randomPick = (int) (Math.random() * pbestTaken);
             int randomPick2 = (int) (Math.random() * pbestTaken);
 
             //check that there are not the same
-            while(randomPick == randomPick2){
+            /*while(randomPick == randomPick2){
                 randomPick2 = (int) (Math.random() * pbestTaken);
-            }
+            }*/
 
             Espece e = new Espece(simulation);
             e.setNumberSensor(numberOfSensors);
@@ -72,22 +77,12 @@ public class OtherSupervisor implements NeuralNetworkSuperviser {
 
     private void kill(ArrayList<Espece> especes, NeuralNetworkModel model) {
         int numberOfCar = (int) model.getSimulationOption(NeuralNetworkModel.KEY_NB_CARS);
-        for(int i = 0; i < pbestTaken; i++){
+        for(int i = 0; i < pbestTakenCap; i++){
             if(!bestPerformingOnes.contains(especes.get(i)))
             bestPerformingOnes.add(especes.get(i));
         }
-        System.out.println(especes.size());
         double capFitness = especes.get((int)(pmiddle * numberOfCar)).getFitness();
-        System.out.println(capFitness);
         especes.removeIf(espece -> espece.getFitness() < capFitness);
-        System.out.println(especes.size());
-
-
-
-
-
-
-
 
     }
 }

@@ -5,10 +5,17 @@ import java.util.ArrayList;
 public class NodeGene {
 
     enum Type{
-        INPUT,
-        HIDDEN,
-        OUTPUT,
+        INPUT(0),
+        HIDDEN(1),
+        OUTPUT(2),
         ;
+        int type = 0;
+        public int getInt(){
+            return type;
+        }
+        Type(int i){
+            type = i;
+        }
     }
 
     private static int currentInnovation = 0;

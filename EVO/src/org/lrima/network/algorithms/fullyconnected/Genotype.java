@@ -82,6 +82,10 @@ public class Genotype {
         return getSubset(weightSize[layer-1], weightSize[layer]);
     }
 
+    public void setGenomes(double[] genomes) {
+        this.genomes = genomes;
+    }
+
     private double[] getSubset(int min, int max){
         double[] sub = new double[max-min];
         for(int i = min; i < max; i++)
@@ -92,5 +96,13 @@ public class Genotype {
 
     public double[] toArray() {
         return this.genomes;
+    }
+
+    public int getGenomeSize() {
+        return this.genomes.length;
+    }
+
+    public int[] getWeight() {
+        return weightSize;
     }
 }
