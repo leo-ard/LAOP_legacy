@@ -1,7 +1,6 @@
 package org.lrima.laop.simulation;
 
 import org.lrima.laop.simulation.exeptions.SimulationStillRunningExeption;
-import org.lrima.laop.simulation.map.Map;
 
 import java.util.ArrayList;
 
@@ -10,11 +9,11 @@ public class SimulationManager implements Runnable{
     private int simulationCount, batchCount;
 
     private SimulationManagerModel simulationManagerModel;
-    private Map map;
+    //private Map map;
     private Thread simulationThread;
 
     //For the loop
-    private boolean currentSimulationRunning = true;
+    private boolean alive = true;
     private boolean pausing = false;
     //TODO : put in settings
     private double msBetweenUpdates = 300;
@@ -39,7 +38,7 @@ public class SimulationManager implements Runnable{
         //Default settings
         simulationCount = -1;
         batchCount = 0;
-        currentSimulationRunning = true;
+        alive = true;
         currentSimulation = new Simulation(this, simulationManagerModel.getSimulationModel(0));
 
         //Start
@@ -60,7 +59,7 @@ public class SimulationManager implements Runnable{
         while(iterateSimulation()){
             long currentTime;
             long timePassed;
-            while(currentSimulationRunning) {
+            while(alive) {
                 currentTime = System.currentTimeMillis();
                 if(!pausing){
                     currentSimulation.update();
@@ -120,17 +119,13 @@ public class SimulationManager implements Runnable{
             }
         }
         currentSimulation = new Simulation(this, simulationManagerModel.getSimulationModel(batchCount));
-        currentSimulationRunning = true;
+        alive = true;
 
         return true;
     }
 
     void nextSimulation(){
-        currentSimulationRunning = false;
-    }
-
-    public Map getMap(){
-        return map;
+        alive = false;
     }
 
     int getSimulationCount() {
